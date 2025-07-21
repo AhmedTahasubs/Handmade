@@ -1,0 +1,212 @@
+import { LanguageService } from './../../services/language.service';
+import { ThemeService } from './../../services/theme.service';
+import { Component } from "@angular/core"
+import { CommonModule } from "@angular/common"
+import { RouterModule } from "@angular/router"
+import { FormButton } from "../../components/form-button/form-button";
+import { FormInputComponent } from "../../components/form-input/form-input";
+import { SocialButton } from "../../components/social-button/social-button";
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: "app-login",
+  imports: [CommonModule, RouterModule, FormButton, FormInputComponent, SocialButton,FormsModule],
+  templateUrl: './login.html',
+  styles: [
+    `
+      @keyframes fade-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slide-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slide-in-left {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slide-in-right {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .animate-fade-in-up {
+        animation: fade-in-up 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .animate-slide-in-up {
+        animation: slide-in-up 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .animate-slide-in-left {
+        animation: slide-in-left 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .animate-slide-in-right {
+        animation: slide-in-right 0.6s ease-out forwards;
+        opacity: 0;
+      }
+    `,
+  ],
+})
+export class Login {
+  email = ""
+  password = ""
+  rememberMe = false
+  isLoading = false
+
+  socialLoading = {
+    google: false,
+    facebook: false,
+    github: false,
+    apple: false,
+  }
+
+  emailError = ""
+  passwordError = ""
+
+  constructor(
+    public ThemeService: ThemeService,
+    public LanguageService: LanguageService,
+  ) {}
+
+  get labels() {
+    const isArabic = this.LanguageService.currentLanguage() === "ar"
+    return isArabic
+      ? {
+          welcome: "مرحباً بعودتك",
+          subtitle: "سجل دخولك لإدارة سوق الحرفيين",
+          continueWithGoogle: "المتابعة مع Google",
+          facebook: "Facebook",
+          github: "GitHub",
+          email: "البريد الإلكتروني",
+          emailPlaceholder: "أدخل بريدك الإلكتروني",
+          password: "كلمة المرور",
+          passwordPlaceholder: "أدخل كلمة المرور",
+          rememberMe: "تذكرني",
+          forgotPassword: "نسيت كلمة المرور؟",
+          signIn: "تسجيل الدخول",
+          or: "أو",
+          noAccount: "ليس لديك حساب؟",
+          signUp: "إنشاء حساب",
+        }
+      : {
+          welcome: "Welcome Back",
+          subtitle: "Sign in to manage your artisan marketplace",
+          continueWithGoogle: "Continue with Google",
+          facebook: "Facebook",
+          github: "GitHub",
+          email: "Email Address",
+          emailPlaceholder: "Enter your email",
+          password: "Password",
+          passwordPlaceholder: "Enter your password",
+          rememberMe: "Remember me",
+          forgotPassword: "Forgot password?",
+          signIn: "Sign In",
+          or: "OR",
+          noAccount: "Don't have an account?",
+          signUp: "Sign up",
+        }
+  }
+
+  toggleTheme(): void {
+    this.ThemeService.toggleTheme()
+  }
+
+  toggleLanguage(): void {
+    this.LanguageService.toggleLanguage()
+  }
+
+  async onSocialLogin(provider: "google" | "facebook" | "github" | "apple"): Promise<void> {
+    this.socialLoading[provider] = true
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      console.log(`${provider} login successful`)
+    } catch (error) {
+      console.error(`${provider} login failed:`, error)
+    } finally {
+      this.socialLoading[provider] = false
+    }
+  }
+
+  validateForm(): boolean {
+    let isValid = true
+
+    if (!this.email) {
+      this.emailError =
+        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
+      isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+      this.emailError =
+        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
+      isValid = false
+    } else {
+      this.emailError = ""
+    }
+
+    if (!this.password) {
+      this.passwordError =
+        this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
+      isValid = false
+    } else if (this.password.length < 6) {
+      this.passwordError =
+        this.LanguageService.currentLanguage() === "ar"
+          ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+          : "Password must be at least 6 characters"
+      isValid = false
+    } else {
+      this.passwordError = ""
+    }
+
+    return isValid
+  }
+
+  async onSubmit(): Promise<void> {
+    if (!this.validateForm()) {
+      return
+    }
+
+    this.isLoading = true
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      console.log("Login successful:", { email: this.email, rememberMe: this.rememberMe })
+    } catch (error) {
+      console.error("Login failed:", error)
+    } finally {
+      this.isLoading = false
+    }
+  }
+}

@@ -1,0 +1,152 @@
+<div [class]="'min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 sm:px-6 lg:px-8 transition-all duration-500 ' + (LanguageService.currentLanguage() === 'ar' ? 'rtl' : 'ltr')">
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="relative w-full max-w-md">
+    <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border border-gray-200 dark:border-gray-700 animate-slide-up">
+      <div class="flex justify-between items-center mb-8">
+        <button
+          (click)="toggleLanguage()"
+          class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <i class="fa-solid fa-globe w-5 h-5 mr-1"></i>
+          <span class="text-sm font-medium">{{ LanguageService.currentLanguage().toUpperCase() }}</span>
+        </button>
+
+        <button
+          (click)="toggleTheme()"
+          class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <i [class]="'w-5 h-5 fa-solid ' + (ThemeService.isDark() ? 'fa-sun' : 'fa-moon')"></i>
+        </button>
+      </div>
+
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
+          <span class="text-white font-bold text-xl">HM</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 animate-fade-in-up" style="animation-delay: 0.1s">
+          {{ labels.welcome }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 animate-fade-in-up" style="animation-delay: 0.2s">
+          {{ labels.subtitle }}
+        </p>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <div class="animate-slide-in-left" style="animation-delay: 0.3s">
+          <app-social-button
+            provider="google"
+            [text]="labels.continueWithGoogle"
+            [loading]="socialLoading.google"
+            (buttonClick)="onSocialLogin('google')"
+          ></app-social-button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div class="animate-slide-in-left" style="animation-delay: 0.4s">
+            <app-social-button
+              provider="facebook"
+              [text]="labels.facebook"
+              [loading]="socialLoading.facebook"
+              (buttonClick)="onSocialLogin('facebook')"
+            ></app-social-button>
+          </div>
+          <div class="animate-slide-in-right" style="animation-delay: 0.4s">
+            <app-social-button
+              provider="github"
+              [text]="labels.github"
+              [loading]="socialLoading.github"
+              (buttonClick)="onSocialLogin('github')"
+            ></app-social-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.5s">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">{{ labels.or }}</span>
+          </div>
+        </div>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="space-y-6">
+        <div class="animate-slide-in-up" style="animation-delay: 0.6s">
+          <app-form-input
+            [label]="labels.email"
+            [placeholder]="labels.emailPlaceholder"
+            type="email"
+            icon="fa-envelope"
+            [required]="true"
+            [error]="emailError"
+            autocomplete="email"
+            [(ngModel)]="email"
+            name="email"
+          ></app-form-input>
+        </div>
+
+        <div class="animate-slide-in-up" style="animation-delay: 0.7s">
+          <app-form-input
+            [label]="labels.password"
+            [placeholder]="labels.passwordPlaceholder"
+            type="password"
+            icon="fa-lock"
+            [required]="true"
+            [error]="passwordError"
+            autocomplete="current-password"
+            [(ngModel)]="password"
+            name="password"
+          ></app-form-input>
+        </div>
+
+        <div class="flex items-center justify-between animate-slide-in-up" style="animation-delay: 0.8s">
+          <label class="flex items-center group cursor-pointer">
+            <input
+              type="checkbox"
+              [(ngModel)]="rememberMe"
+              name="rememberMe"
+              class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2 transition-all duration-200"
+            />
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors duration-200">{{ labels.rememberMe }}</span>
+          </label>
+          <a
+            routerLink="/forgot-password"
+            class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200 hover:underline"
+          >
+            {{ labels.forgotPassword }}
+          </a>
+        </div>
+
+        <div class="animate-slide-in-up" style="animation-delay: 0.9s">
+          <app-form-button
+            [text]="labels.signIn"
+            type="submit"
+            variant="primary"
+            [fullWidth]="true"
+            [loading]="isLoading"
+            icon="fa-arrow-right"
+          ></app-form-button>
+        </div>
+      </form>
+
+      <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 1s">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ labels.noAccount }}
+          <a
+            routerLink="/register"
+            class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200 ml-1 hover:underline"
+          >
+            {{ labels.signUp }}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

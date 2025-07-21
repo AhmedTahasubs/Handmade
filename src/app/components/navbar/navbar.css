@@ -1,0 +1,53 @@
+.container {
+  max-width: 1200px;
+}
+
+/* Custom scrollbar for mobile menu */
+.mobile-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mobile-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-menu::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+/* Animation for mobile menu */
+.mobile-menu {
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RTL support */
+:host-context([dir="rtl"]) .flex {
+  flex-direction: row-reverse;
+}
+
+:host-context([dir="rtl"]) .space-x-2 > * + * {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+:host-context([dir="rtl"]) .space-x-4 > * + * {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+
+:host-context([dir="rtl"]) .space-x-8 > * + * {
+  margin-left: 0;
+  margin-right: 2rem;
+}

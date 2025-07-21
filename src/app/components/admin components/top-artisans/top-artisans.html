@@ -1,0 +1,60 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ labels.title }}</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ labels.subtitle }}</p>
+  </div>
+
+  <div class="p-6">
+    <div class="space-y-4">
+      <div
+        *ngFor="let artisan of artisans; let i = index"
+        class="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+      >
+        <div class="relative">
+          <img
+            [src]="artisan.avatar || '/placeholder.svg'"
+            [alt]="artisan.name"
+            class="w-12 h-12 rounded-full object-cover"
+          />
+          <div *ngIf="i === 0" class="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-award w-3 h-3 text-yellow-800"></i>
+          </div>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center space-x-2 mb-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ artisan.name }}</p>
+            <span
+              *ngIf="artisan.badge"
+              [class]="'inline-flex px-2 py-1 text-xs font-semibold rounded-full ' + getBadgeColor(artisan.badge)"
+            >
+              {{ getBadgeText(artisan.badge) }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ artisan.specialty }}</p>
+          <div class="flex items-center space-x-4 mt-2">
+            <div class="flex items-center space-x-1">
+              <i class="fa-solid fa-star w-3 h-3 text-yellow-400"></i>
+              <span class="text-xs text-gray-600 dark:text-gray-400">{{ artisan.rating }}</span>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              {{ artisan.products }} {{ labels.products }}
+            </span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <p class="text-sm font-bold text-gray-900 dark:text-white">{{ artisan.sales }}</p>
+          <div class="flex items-center space-x-1 text-green-600 dark:text-green-400 mt-1">
+            <i class="fa-solid fa-trending-up w-3 h-3"></i>
+            <span class="text-xs font-medium">{{ artisan.trend }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="w-full mt-4 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg transition-colors">
+      {{ LanguageService.currentLanguage() === 'en' ? 'View All Artisans' : 'عرض جميع الحرفيين' }}
+    </button>
+  </div>
+</div>

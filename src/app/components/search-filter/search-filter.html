@@ -1,0 +1,134 @@
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+  <!-- Search Bar -->
+  <div class="relative mb-6">
+    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+    <input
+      type="text"
+      [placeholder]="labels.search"
+      [value]="searchTerm"
+      (input)="onSearchChange($any($event.target).value)"
+      class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+    />
+  </div>
+
+  <!-- Filter Toggle Button (Mobile) -->
+  <div class="flex items-center justify-between mb-4 lg:hidden">
+    <button
+      (click)="toggleFilters()"
+      class="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+      </svg>
+      <span class="text-gray-700 dark:text-gray-300">{{ labels.filters }}</span>
+    </button>
+    <button
+      (click)="onClearAllFilters()"
+      class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+    >
+      {{ labels.clearAll }}
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div [class.hidden]="!showFilters" [class.lg:grid]="true" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Category Filter -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ labels.category }}</label>
+      <select
+        [value]="selectedCategory"
+        (change)="onCategoryChange($any($event.target).value)"
+        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+      >
+        <option *ngFor="let category of categoryOptions | keyvalue" [value]="category.key">
+          {{ category.value }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Price Range Filter -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ labels.priceRange }}</label>
+      <div class="space-y-2">
+        <input
+          type="range"
+          min="0"
+          max="200"
+          [value]="priceRange[1]"
+          (input)="onPriceRangeChange(+$any($event.target).value)"
+          class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+        />
+        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+          <span>$0</span>
+          <span>${{ priceRange[1] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customizable Filter -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ labels.customizable }}</label>
+      <div class="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="customizable"
+          [checked]="showCustomizable"
+          (change)="onCustomizableChange($any($event.target).checked)"
+          class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+        />
+        <label for="customizable" class="text-sm text-gray-600 dark:text-gray-400">
+          {{ labels.showCustomizableItems }}
+        </label>
+      </div>
+    </div>
+
+    <!-- Clear All Button (Desktop) -->
+    <div class="hidden lg:flex items-end">
+      <button
+        (click)="onClearAllFilters()"
+        class="w-full px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        {{ labels.clearAll }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Filters Display -->
+  <div class="flex flex-wrap gap-2 mt-4">
+    <span 
+      *ngIf="searchTerm" 
+      class="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full"
+    >
+      {{ language === 'en' ? 'Search: ' : 'البحث: ' }}{{ searchTerm }}
+      <button (click)="removeSearchFilter()" class="ml-2 hover:text-blue-600 dark:hover:text-blue-300">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </span>
+    <span 
+      *ngIf="selectedCategory !== 'all'" 
+      class="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full"
+    >
+      {{ getCategoryName(selectedCategory) }}
+      <button (click)="removeCategoryFilter()" class="ml-2 hover:text-blue-600 dark:hover:text-blue-300">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </span>
+    <span 
+      *ngIf="showCustomizable" 
+      class="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full"
+    >
+      {{ labels.customizable }}
+      <button (click)="removeCustomizableFilter()" class="ml-2 hover:text-blue-600 dark:hover:text-blue-300">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </span>
+  </div>
+</div>

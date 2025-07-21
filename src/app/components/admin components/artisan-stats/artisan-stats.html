@@ -1,0 +1,24 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        {{ LanguageService.currentLanguage() === 'en' ? 'Artisan Management' : 'إدارة الحرفيين' }}
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        {{ LanguageService.currentLanguage() === 'en' ? 'Overview of creator community' : 'نظرة عامة على مجتمع المبدعين' }}
+      </p>
+    </div>
+    <i class="fa-solid fa-users w-5 h-5 text-gray-400"></i>
+  </div>
+
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div *ngFor="let stat of stats" class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div [class]="'w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center ' + stat.color">
+        <i [class]="'w-5 h-5 text-white fa-solid ' + getIconClass(stat.icon)"></i>
+      </div>
+      <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
+      <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">{{ stat.name }}</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ stat.description }}</p>
+    </div>
+  </div>
+</div>

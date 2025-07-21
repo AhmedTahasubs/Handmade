@@ -1,0 +1,78 @@
+<div class="relative">
+  <label
+    *ngIf="label"
+    [for]="inputId"
+    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200 animate-fade-in"
+  >
+    {{ label }}
+    <span *ngIf="required" class="text-red-500 ml-1">*</span>
+  </label>
+
+  <div class="relative group">
+    <!-- Icon (left side) -->
+    <div
+      *ngIf="icon"
+      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 group-focus-within:text-blue-500"
+    >
+      <i [class]="icon + ' w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors duration-200'"></i>
+    </div>
+
+    <!-- Input Field -->
+    <input
+      [id]="inputId"
+      [type]="getInputType()"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+      [class]="getInputClasses()"
+      [attr.autocomplete]="autocomplete"
+      class="animate-slide-in-up"
+    />
+
+    <!-- Password Toggle (right side) -->
+    <button
+      *ngIf="type === 'password'"
+      type="button"
+      (click)="togglePasswordVisibility()"
+      class="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 transform hover:scale-110"
+    >
+      <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye' + ' w-5 h-5 text-gray-400 dark:text-gray-500'"></i>
+    </button>
+
+    <!-- Focus Ring Animation -->
+    <div class="absolute inset-0 rounded-lg border-2 border-transparent group-focus-within:border-blue-500 dark:group-focus-within:border-blue-400 transition-all duration-200 pointer-events-none animate-pulse-ring"></div>
+  </div>
+
+  <!-- Error Message -->
+  <div
+    *ngIf="error && (touched || dirty)"
+    class="mt-2 text-sm text-red-600 dark:text-red-400 animate-shake-in flex items-center"
+  >
+    <svg class="w-4 h-4 mr-1 animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- Helper Text -->
+  <div
+    *ngIf="helperText && !error"
+    class="mt-2 text-sm text-gray-500 dark:text-gray-400 animate-fade-in"
+  >
+    {{ helperText }}
+  </div>
+
+  <!-- Success State -->
+  <div
+    *ngIf="!error && value && touched && !dirty"
+    class="mt-2 text-sm text-green-600 dark:text-green-400 animate-fade-in flex items-center"
+  >
+    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+    </svg>
+    Looks good!
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  (click)="onClick()"
+  [class]="getButtonClasses()"
+>
+  <!-- Loading Spinner -->
+  <i *ngIf="loading" class="fas fa-spinner w-4 h-4 mr-2 animate-spin"></i>
+
+  <!-- Icon -->
+  <i *ngIf="icon && !loading" [class]="icon + ' w-4 h-4 mr-2'"></i>
+
+  <!-- Button Text -->
+  <span>{{ text }}</span>
+</button>

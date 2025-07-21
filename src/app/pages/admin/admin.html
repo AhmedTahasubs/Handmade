@@ -1,0 +1,59 @@
+<!-- Root wrapper with dynamic direction -->
+<div [attr.dir]="LanguageService.currentLanguage()" class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  
+  <!-- Sidebar -->
+  <app-admin-sidebar 
+    [isOpen]="sidebarOpen" 
+    (onClose)="sidebarOpen = false">
+  </app-admin-sidebar>
+
+  <!-- Main content with RTL/LTR adjusted padding -->
+  <div [ngClass]="{
+    'lg:pl-64': LanguageService.currentLanguage() === 'en',
+    'lg:pr-64': LanguageService.currentLanguage() === 'ar'
+  }">
+    
+    <!-- Header -->
+    <app-admin-header (onMenuClick)="sidebarOpen = true"></app-admin-header>
+
+    <!-- Main Dashboard Content -->
+    <main class="p-6">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {{ LanguageService.currentLanguage() === 'en' 
+              ? 'Handmade Marketplace Dashboard' 
+              : 'لوحة تحكم سوق الصناعات اليدوية' }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ LanguageService.currentLanguage() === 'en' 
+              ? 'Manage your artisan marketplace, track sales, and support creators'
+              : 'إدارة سوق الحرفيين، تتبع المبيعات، ودعم المبدعين' }}
+        </p>
+      </div>
+
+      <!-- Overview Section -->
+      <app-dashboard-overview></app-dashboard-overview>
+
+      <!-- Artisan Stats -->
+      <div class="mt-8">
+        <app-artisan-stats></app-artisan-stats>
+      </div>
+
+      <!-- Grid Layout: Analytics + Orders + Top Artisans -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
+        <!-- Left Column -->
+        <div class="xl:col-span-2 space-y-6">
+          <app-sales-analytics></app-sales-analytics>
+          <app-recent-orders></app-recent-orders>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-6">
+          <app-top-artisans></app-top-artisans>
+          <app-pending-approvals></app-pending-approvals>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>

@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300" [attr.dir]="language === 'ar' ? 'rtl' : 'ltr'">
+  <!-- Navbar -->
+  <app-navbar 
+    [language]="language" 
+    [theme]="theme"
+    (languageChange)="onLanguageChange($event)"
+    (themeChange)="onThemeChange($event)">
+  </app-navbar>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Hero Section -->
+    <section class="text-center py-12 mb-12 transition-opacity duration-1000 ease-in-out">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-indigo-700 to-purple-600 dark:from-gray-100 dark:via-purple-300 dark:to-white pb-5 bg-clip-text text-transparent transition-all duration-300 hover:scale-105">
+        {{ language === 'en' ? 'Discover Unique Handmade Treasures' : 'اكتشف الكنوز المصنوعة يدوياً الفريدة' }}
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        {{ language === 'en' 
+          ? 'Connect with talented artisans and find one-of-a-kind handcrafted items made with love and passion'
+          : 'تواصل مع الحرفيين الموهوبين واعثر على قطع فريدة مصنوعة يدوياً بحب وشغف' }}
+      </p>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <app-search-filter
+      [language]="language"
+      [searchTerm]="searchTerm"
+      [selectedCategory]="selectedCategory"
+      [priceRange]="priceRange"
+      [showCustomizable]="showCustomizable"
+      (searchTermChange)="onSearchTermChange($event)"
+      (selectedCategoryChange)="onSelectedCategoryChange($event)"
+      (priceRangeChange)="onPriceRangeChange($event)"
+      (showCustomizableChange)="onShowCustomizableChange($event)"
+      (clearAllFilters)="onClearAllFilters()">
+    </app-search-filter>
+
+    <!-- Products Grid -->
+    <section class="mt-12">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {{ language === 'en' ? 'Featured Products' : 'المنتجات المميزة' }}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ language === 'en' 
+            ? filteredProducts.length + ' products found'
+            : 'تم العثور على ' + filteredProducts.length + ' منتج' }}
+        </p>
+      </div>
+
+      <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <i class="fa-solid fa-box-open text-6xl text-gray-400 dark:text-gray-500 animate-bounce"></i>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-lg">
+          {{ language === 'en'
+            ? 'No products found matching your criteria'
+            : 'لم يتم العثور على منتجات تطابق معاييرك' }}
+        </p>
+      </div>
+
+      <div *ngIf="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <app-product-card 
+          *ngFor="let product of filteredProducts; trackBy: trackByProductId"
+          [product]="product" 
+          [language]="language"
+          (addToCart)="onAddToCart($event)"
+          (addToWishlist)="onAddToWishlist($event)">
+        </app-product-card>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="text-center py-16 mt-16 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white transition-transform hover:translate-y-[-3px] duration-300">
+        {{ language === 'en' ? 'Are you an artisan?' : 'هل أنت حرفي؟' }}
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        {{ language === 'en'
+          ? 'Join our community of talented creators and start selling your handmade products to customers worldwide'
+          : 'انضم إلى مجتمعنا من المبدعين الموهوبين وابدأ في بيع منتجاتك المصنوعة يدوياً للعملاء في جميع أنحاء العالم' }}
+      </p>
+      <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all active:scale-90 transform hover:scale-105 duration-300">
+        {{ language === 'en' ? 'Start Selling' : 'ابدأ البيع' }}
+      </button>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <app-footer [language]="language"></app-footer>
+</div>

@@ -1,0 +1,128 @@
+<!-- Add this in your index.html or angular.json styles -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  integrity="sha512-..."
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+
+<!-- Navbar -->
+<div class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-700">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Logo -->
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-blue-600 ms-2 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-sm">HM</span>
+        </div>
+        <span class="font-bold text-xl text-gray-900 dark:text-white">
+          {{ language === 'en' ? 'HandMade' : 'صُنع يدوياً' }}
+        </span>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a 
+          *ngFor="let item of navItems[language]" 
+          href="#" 
+          class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+        >
+          {{ item }}
+        </a>
+      </div>
+
+      <!-- Right Side -->
+      <div class="flex items-center space-x-4 dark:text-gray-300 ">
+
+        <!-- Theme Toggle -->
+        <button
+          (click)="toggleTheme()"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="Toggle theme"
+        >
+          <i 
+            [ngClass]="theme === 'dark' ? 'fa-solid fa-sun text-blue-400' : 'fa-solid fa-moon text-blue-500'" 
+            class="text-lg transition-transform duration-200 hover:rotate-45"
+          ></i>
+        </button>
+
+        <!-- Language Toggle -->
+        <button
+          (click)="toggleLanguage()"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-1"
+          aria-label="Toggle language"
+        >
+          <i class="fa-solid fa-language text-blue-500"></i>
+          <span class="text-sm font-medium">{{ language.toUpperCase() }}</span>
+        </button>
+
+        <!-- User Actions -->
+        <div class="hidden sm:flex items-center space-x-3">
+          <!-- Wishlist -->
+          <button class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <i class="fa-regular fa-heart text-red-500 text-lg"></i>
+            <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+          </button>
+
+          <!-- Cart -->
+          <button class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <i class="fa-solid fa-cart-shopping text-lg"></i>
+            <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+          </button>
+
+          <!-- User -->
+          <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <i class="fa-solid fa-user text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button
+          (click)="toggleMenu()"
+          class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <i 
+            [ngClass]="isMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'" 
+            class="text-xl"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div *ngIf="isMenuOpen" class="md:hidden mobile-menu py-4 border-t border-gray-200 dark:border-gray-700">
+      <div class="space-y-1">
+        <a 
+          *ngFor="let item of navItems[language]" 
+          href="#" 
+          class="block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+          (click)="closeMenu()"
+        >
+          {{ item }}
+        </a>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-2">
+            <!-- Wishlist -->
+            <button class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <i class="fa-regular fa-heart text-red-500 text-lg"></i>
+              <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+            </button>
+
+            <!-- Cart -->
+            <button class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <i class="fa-solid fa-cart-shopping text-lg"></i>
+              <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+            </button>
+
+            <!-- User -->
+            <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <i class="fa-solid fa-user text-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>

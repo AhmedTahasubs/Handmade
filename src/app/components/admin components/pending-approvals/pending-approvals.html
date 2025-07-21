@@ -1,0 +1,52 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ labels.title }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ labels.subtitle }}</p>
+      </div>
+      <div class="w-8 h-8 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+        <span class="text-sm font-bold text-red-600 dark:text-red-400">{{ pendingItems.length }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6">
+    <div class="space-y-4">
+      <div *ngFor="let item of pendingItems; let i = index" class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div class="flex-shrink-0 mt-1">
+          <i class="{{ getTypeIcon(item.type) }} {{ getTypeIconClass(item.type) }}"></i>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center space-x-2 mb-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ item.title }}</p>
+            <span
+              [class]="'inline-flex px-2 py-1 text-xs font-semibold rounded-full ' + getPriorityColor(item.priority)"
+            >
+              {{ item.priority }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ item.description }}</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">{{ item.time }}</p>
+        </div>
+
+        <div class="flex space-x-1">
+          <button class="p-1 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 rounded">
+            <i class="fa-solid fa-check w-4 h-4"></i>
+          </button>
+          <button class="p-1 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 rounded">
+            <i class="fa-solid fa-times w-4 h-4"></i>
+          </button>
+          <button class="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded">
+            <i class="fa-solid fa-eye w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button class="w-full mt-4 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg transition-colors">
+      {{ labels.viewAll }}
+    </button>
+  </div>
+</div>

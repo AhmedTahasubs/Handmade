@@ -1,0 +1,166 @@
+:host {
+  display: block;
+}
+
+/* Custom slider styling */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Filter toggle animation */
+.filter-section {
+  transition: all 0.3s ease;
+}
+
+.filter-section.hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.filter-section:not(.hidden) {
+  opacity: 1;
+  max-height: 500px;
+}
+
+/* Active filter badges */
+.filter-badge {
+  transition: all 0.2s ease;
+}
+
+.filter-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.filter-badge button {
+  transition: color 0.2s ease;
+}
+
+.filter-badge button:hover {
+  transform: scale(1.1);
+}
+
+/* Search input focus effects */
+input[type="text"] {
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Select dropdown styling */
+select {
+  transition: all 0.3s ease;
+}
+
+select:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+select option {
+  padding: 8px;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* RTL support */
+:host-context([dir="rtl"]) .flex {
+  flex-direction: row-reverse;
+}
+
+:host-context([dir="rtl"]) .space-x-2 > * + * {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+:host-context([dir="rtl"]) .space-x-4 > * + * {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+
+:host-context([dir="rtl"]) .text-left {
+  text-align: right;
+}
+
+:host-context([dir="rtl"]) .text-right {
+  text-align: left;
+}
+
+:host-context([dir="rtl"]) .absolute.left-3 {
+  left: auto;
+  right: 0.75rem;
+}
+
+:host-context([dir="rtl"]) input[type="text"] {
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+}
+
+/* Dark mode transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .filter-section .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .filter-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}

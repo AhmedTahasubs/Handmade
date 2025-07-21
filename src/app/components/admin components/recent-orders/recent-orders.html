@@ -1,0 +1,83 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ labels.title }}</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ labels.subtitle }}</p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.orderId }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.customer }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.artisan }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.product }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.amount }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.commission }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.status }}
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ labels.actions }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tr *ngFor="let order of orders; let i = index" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
+            {{ order.id }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.customer }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ order.artisan }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ order.product }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ order.amount }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">{{ order.commission }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="'inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ' + getStatusColor(order.status)">
+              <i *ngIf="getStatusIcon(order.status)" [class]="'w-3 h-3 mr-1 fa-solid ' + getStatusIcon(order.status)"></i>
+              {{ getStatusText(order.status) }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+            <div class="relative">
+              <button
+                (click)="toggleDropdown(i)"
+                class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                <i class="fa-solid fa-ellipsis-h w-4 h-4"></i>
+              </button>
+              <div *ngIf="activeDropdown === i" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-600">
+                <div class="py-1">
+                  <button class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left">
+                    <i class="fa-solid fa-eye w-4 h-4 mr-2"></i>
+                    {{ labels.view }}
+                  </button>
+                  <button class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left">
+                    <i class="fa-solid fa-pen-to-square w-4 h-4 mr-2"></i>
+                    {{ labels.edit }}
+                  </button>
+                  <button class="flex items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left">
+                    <i class="fa-solid fa-truck w-4 h-4 mr-2"></i>
+                    {{ labels.ship }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
