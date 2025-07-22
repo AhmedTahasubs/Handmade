@@ -1,24 +1,26 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Product, ProductCardComponent } from '../../components/product-card/product-card';
-import { FooterComponent } from "../../components/footer/footer";
 import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
-import { NavbarComponent } from "../../components/navbar/navbar";
-import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
+
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
   standalone: true,
-  imports: [FooterComponent, CommonModule, ProductCardComponent, SearchFilterComponent, NavbarComponent]
+  imports: [CommonModule, ProductCardComponent, SearchFilterComponent]
 })
-export class HomeComponent implements OnInit {
-  language: 'en' | 'ar' = 'en';
-  theme: 'light' | 'dark' = 'light';
-  private themeService = inject(ThemeService);
+export class HomeComponent {
+  
   private languageService = inject(LanguageService);
+
+  // Get language from service for template usage
+  get language(): 'en' | 'ar' {
+    return this.languageService.currentLanguage();
+  }
+
 
   // Filter states
   searchTerm = '';
@@ -166,22 +168,6 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  ngOnInit(): void {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      this.theme = savedTheme as 'light' | 'dark';
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      this.theme = 'dark';
-    }
-    this.applyTheme();
-
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      this.language = savedLanguage as 'en' | 'ar';
-    }
-    this.applyLanguage();
-  }
-
   get filteredProducts(): Product[] {
     return this.products.filter(product => {
       const matchesSearch =
@@ -194,18 +180,6 @@ export class HomeComponent implements OnInit {
 
       return matchesSearch && matchesCategory && matchesPrice && matchesCustomizable;
     });
-  }
-
-  onLanguageChange(newLanguage: 'en' | 'ar'): void {
-    this.language = newLanguage;
-    localStorage.setItem('language', newLanguage);
-    this.applyLanguage();
-  }
-
-  onThemeChange(newTheme: 'light' | 'dark'): void {
-    this.theme = newTheme;
-    localStorage.setItem('theme', newTheme);
-    this.applyTheme();
   }
 
   onSearchTermChange(searchTerm: string): void {
@@ -239,25 +213,6 @@ export class HomeComponent implements OnInit {
   onAddToWishlist(product: Product): void {
     console.log('Added to wishlist:', product);
     // Implement wishlist functionality
-  }
-
-  private applyTheme(): void {
-    console.log('Theme applied:', this.theme);
-    if (this.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }
-
-  private applyLanguage(): void {
-    if (this.language === 'ar') {
-      document.documentElement.setAttribute('dir', 'rtl');
-      document.documentElement.setAttribute('lang', 'ar');
-    } else {
-      document.documentElement.setAttribute('dir', 'ltr');
-      document.documentElement.setAttribute('lang', 'en');
-    }
   }
 
   trackByProductId(index: number, product: Product): number {

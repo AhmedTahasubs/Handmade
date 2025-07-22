@@ -1,12 +1,4 @@
-<div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300" [attr.dir]="language === 'ar' ? 'rtl' : 'ltr'">
-  <!-- Navbar -->
-  <app-navbar 
-    [language]="language" 
-    [theme]="theme"
-    (languageChange)="onLanguageChange($event)"
-    (themeChange)="onThemeChange($event)">
-  </app-navbar>
-
+<div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
   <main class="container mx-auto px-4 py-8">
     <!-- Hero Section -->
     <section class="text-center py-12 mb-12 transition-opacity duration-1000 ease-in-out">
@@ -86,5 +78,5 @@
   </main>
 
   <!-- Footer -->
-  <app-footer [language]="language"></app-footer>
+
 </div>
