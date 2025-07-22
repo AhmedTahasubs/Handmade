@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
-  imports:[CommonModule]
+  imports: [CommonModule, RouterModule]
 })
 export class NavbarComponent {
   @Input() language: 'en' | 'ar' = 'en';
@@ -16,8 +17,20 @@ export class NavbarComponent {
   isMenuOpen = false;
 
   navItems = {
-    en: ['Home', 'Categories', 'Custom Orders', 'About', 'Contact'],
-    ar: ['الرئيسية', 'الفئات', 'الطلبات المخصصة', 'حولنا', 'اتصل بنا']
+    en: [
+      { label: 'Home', route: '/' },
+      { label: 'Categories', route: '/categories' },
+      { label: 'Custom Orders', route: '/custom-orders' },
+      { label: 'About', route: '/about' },
+      { label: 'Contact', route: '/contact' }
+    ],
+    ar: [
+      { label: 'الرئيسية', route: '/' },
+      { label: 'الفئات', route: '/categories' },
+      { label: 'الطلبات المخصصة', route: '/custom-orders' },
+      { label: 'حولنا', route: '/about' },
+      { label: 'اتصل بنا', route: '/contact' }
+    ]
   };
 
   toggleTheme(): void {
