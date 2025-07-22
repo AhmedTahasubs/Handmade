@@ -1,10 +1,9 @@
-<!-- <app-home></app-home> -->
-<!-- <app-admin></app-admin> -->
-<!-- <app-login></app-login> -->
-<!-- <app-register></app-register> -->
- <!-- <app-forgot-password></app-forgot-password> -->
-<!-- <app-navbar></app-navbar> -->
-<!-- routing -->
-<!-- <router-outlet></router-outlet> -->
-<!-- routing -->
-<!-- <app-footer></app-footer> -->
+
+<app-navbar 
+[language]="language" 
+[theme]="theme"
+(languageChange)="onLanguageChange($event)"
+(themeChange)="onThemeChange($event)">
+</app-navbar>
+<router-outlet></router-outlet>
+<app-footer [language]="language"></app-footer>
