@@ -1,4 +1,4 @@
-<div [class]="'min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 sm:px-6 lg:px-8 py-12 transition-all duration-500 ' + (LanguageService.currentLanguage() === 'ar' ? 'rtl' : 'ltr')">
+<div [class]="'min-h-screen flex relative items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 sm:px-6 lg:px-8 py-12 transition-all duration-500 ' + (LanguageService.currentLanguage() === 'ar' ? 'rtl' : 'ltr')">
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute -top-40 -left-40 w-80 h-80 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-70 animate-blob"></div>
     <div class="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -7,22 +7,6 @@
 
   <div class="relative w-full max-w-lg">
     <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border border-gray-200 dark:border-gray-700 animate-slide-up">
-      <div class="flex justify-between items-center mb-8">
-        <button
-          (click)="toggleLanguage()"
-          class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-        >
-          <i class="fa-solid fa-globe w-5 h-5 mr-1"></i>
-          <span class="text-sm font-medium">{{ LanguageService.currentLanguage().toUpperCase() }}</span>
-        </button>
-
-        <button
-          (click)="toggleTheme()"
-          class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-        >
-          <i [class]="'w-5 h-5 fa-solid ' + (ThemeService.isDark() ? 'fa-sun' : 'fa-moon')"></i>
-        </button>
-      </div>
 
       <div class="text-center mb-8">
         <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
@@ -84,7 +68,7 @@
               [label]="labels.firstName"
               [placeholder]="labels.firstNamePlaceholder"
               type="text"
-              icon="fa-user"
+              icon="fa-solid fa-user"
               [required]="true"
               [error]="firstNameError"
               autocomplete="given-name"
@@ -98,7 +82,7 @@
               [label]="labels.lastName"
               [placeholder]="labels.lastNamePlaceholder"
               type="text"
-              icon="fa-user"
+              icon="fa-solid fa-user"
               [required]="true"
               [error]="lastNameError"
               autocomplete="family-name"
@@ -113,7 +97,7 @@
             [label]="labels.email"
             [placeholder]="labels.emailPlaceholder"
             type="email"
-            icon="fa-envelope"
+            icon="fa-solid fa-envelope"
             [required]="true"
             [error]="emailError"
             autocomplete="email"
@@ -127,7 +111,7 @@
             [label]="labels.phone"
             [placeholder]="labels.phonePlaceholder"
             type="tel"
-            icon="fa-phone"
+            icon="fa-solid fa-phone"
             [required]="true"
             [error]="phoneError"
             autocomplete="tel"
@@ -141,7 +125,7 @@
             [label]="labels.company"
             [placeholder]="labels.companyPlaceholder"
             type="text"
-            icon="fa-building"
+            icon="fa-solid fa-building"
             [required]="false"
             [error]="companyError"
             autocomplete="organization"
@@ -156,7 +140,7 @@
               [label]="labels.password"
               [placeholder]="labels.passwordPlaceholder"
               type="password"
-              icon="fa-lock"
+              icon="fa-solid fa-lock"
               [required]="true"
               [error]="passwordError"
               autocomplete="new-password"
@@ -170,7 +154,7 @@
               [label]="labels.confirmPassword"
               [placeholder]="labels.confirmPasswordPlaceholder"
               type="password"
-              icon="fa-lock"
+              icon="fa-solid fa-lock"
               [required]="true"
               [error]="confirmPasswordError"
               autocomplete="new-password"
@@ -218,7 +202,7 @@
             variant="primary"
             [fullWidth]="true"
             [loading]="isLoading"
-            icon="fa-check"
+            icon="fa-solid fa-check"
           ></app-form-button>
         </div>
       </form>

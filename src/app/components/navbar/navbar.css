@@ -81,3 +81,10 @@ nav a:hover {
   margin-left: 0;
   margin-right: 2rem;
 }
+
+li {
+  transition: all 0.2s ease-in-out;
+}
+li:hover {
+  transform: translateX(4px);
+}
