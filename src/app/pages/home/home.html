@@ -13,7 +13,7 @@
     </section>
 
     <!-- Search and Filter Section -->
-    <app-search-filter
+    <!-- <app-search-filter
       [language]="language"
       [searchTerm]="searchTerm"
       [selectedCategory]="selectedCategory"
@@ -24,10 +24,10 @@
       (priceRangeChange)="onPriceRangeChange($event)"
       (showCustomizableChange)="onShowCustomizableChange($event)"
       (clearAllFilters)="onClearAllFilters()">
-    </app-search-filter>
+    </app-search-filter> -->
 
     <!-- Products Grid -->
-    <section class="mt-12">
+    <!-- <section class="mt-12">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
           {{ language === 'en' ? 'Featured Products' : 'المنتجات المميزة' }}
@@ -59,7 +59,61 @@
           (addToWishlist)="onAddToWishlist($event)">
         </app-product-card>
       </div>
-    </section>
+    </section> -->
+
+
+    <!-- Categories Grid -->
+      <div class="mb-16">
+      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
+        {{ language === 'en' ? 'Featured Categories' : 'الفئات المميزة' }}
+      </h2>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div *ngFor="let category of featuredCategories" 
+             class="relative overflow-hidden transition-all duration-300 transform bg-white shadow-lg group rounded-xl dark:bg-gray-800 hover:shadow-xl hover:scale-105">
+          <div class="relative overflow-hidden aspect-w-16 aspect-h-9">
+            <img [src]="category.image" 
+                 [alt]="category.name[language]"
+                 class="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-110">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div class="absolute text-white bottom-4 left-4">
+              <h3 class="mb-1 text-xl font-bold">{{ category.name[language] }}</h3>
+              <p class="text-sm opacity-90">
+                {{ category.productCount }} {{ language === 'en' ? 'products' : 'منتج' }}
+              </p>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="mb-4 text-gray-600 dark:text-gray-400">
+              {{ category.description[language] }}
+            </p>
+            <button class="w-full px-4 py-2 align-bottom text-white transition-colors duration-200 bg-indigo-600 rounded-lg hover:bg-indigo-700">
+              {{ language === 'en' ? 'Explore Category' : 'استكشف الفئة' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!-- All Categories Grid -->
+    <div>
+      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
+        {{ language === 'en' ? 'All Categories' : 'جميع الفئات' }}
+      </h2>
+      <div class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        <div *ngFor="let category of allCategories" 
+             class="p-6 text-center transition-all duration-300 transform bg-white shadow-md cursor-pointer group dark:bg-gray-800 rounded-xl hover:shadow-lg hover:scale-105">
+          <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600">
+            <i class="fas fa-{{ getCategoryIcon(category.id) }} text-white text-2xl"></i>
+          </div>
+          <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">
+            {{ category.name[language] }}
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ category.productCount }} {{ language === 'en' ? 'items' : 'عنصر' }}
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Call to Action Section -->
     <section class="py-16 mt-16 text-center rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -76,7 +130,5 @@
       </button>
     </section>
   </main>
-
-  <!-- Footer -->
 
 </div>

@@ -88,16 +88,18 @@ export class NavbarComponent implements OnInit {
     en: [
       { label: 'Home', route: '/' },
       { label: 'Categories', route: '/categories' },
-      { label: 'Custom Orders', route: '/custom-orders' },
-      { label: 'About', route: '/about' },
-      { label: 'Contact', route: '/contact' }
+      { label: 'Custom Service', route: '/custom-service' },
+      { label: 'Add Service', route: '/add-service' },
+      // { label: 'About', route: '/about' },
+      // { label: 'Contact', route: '/contact' }
     ],
     ar: [
       { label: 'الرئيسية', route: '/' },
       { label: 'الفئات', route: '/categories' },
-      { label: 'الطلبات المخصصة', route: '/custom-orders' },
-      { label: 'حولنا', route: '/about' },
-      { label: 'اتصل بنا', route: '/contact' }
+      { label: 'الخدمات المخصصة', route: '/custom-service' },
+      { label: 'أضف خدمه', route: '/add-service' },
+      // { label: 'حولنا', route: '/about' },
+      // { label: 'اتصل بنا', route: '/contact' }
     ]
   };
 
