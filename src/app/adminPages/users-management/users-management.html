@@ -1,0 +1,117 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Users Management</h1>
+      <p class="text-gray-600 dark:text-gray-400">Manage system users and their permissions</p>
+    </div>
+    <button
+      (click)="openCreateModal()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+    >
+      <i class="fas fa-plus w-4 h-4"></i>
+      Add User
+    </button>
+  </div>
+
+  <!-- Data Table -->
+  <app-data-table
+    title="Users"
+    subtitle="Manage all system users"
+    [data]="users"
+    [columns]="columns"
+    [actions]="actions"
+    searchPlaceholder="Search users..."
+    (actionClicked)="onAction($event)"
+    (exportClicked)="onExport()"
+  ></app-data-table>
+
+  <!-- Create/Edit Modal -->
+  <app-modal
+    [isOpen]="showModal"
+    [title]="modalTitle"
+    (closed)="closeModal()"
+    (confirmed)="saveUser()"
+  >
+    <form class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-form-input
+          label="Full Name"
+          placeholder="Enter full name"
+          icon="user"
+          [(ngModel)]="currentUser.name"
+          name="name"
+          required
+        ></app-form-input>
+
+        <app-form-input
+          label="Email"
+          placeholder="Enter email address"
+          type="email"
+          icon="envelope"
+          [(ngModel)]="currentUser.email"
+          name="email"
+          required
+        ></app-form-input>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-form-input
+          label="Phone"
+          placeholder="Enter phone number"
+          type="tel"
+          icon="phone"
+          [(ngModel)]="currentUser.phone"
+          name="phone"
+        ></app-form-input>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+          <select
+            [(ngModel)]="currentUser.role"
+            name="role"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+          >
+            <option value="admin">Admin</option>
+            <option value="artisan">Artisan</option>
+            <option value="customer">Customer</option>
+            <option value="moderator">Moderator</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+        <select
+          [(ngModel)]="currentUser.status"
+          name="status"
+          class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Delete Confirmation Modal -->
+  <app-modal
+    [isOpen]="showDeleteModal"
+    title="Delete User"
+    confirmText="Delete"
+    confirmButtonType="danger"
+    (closed)="closeDeleteModal()"
+    (confirmed)="confirmDelete()"
+  >
+    <div class="text-center">
+      <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+      <p class="text-gray-500 dark:text-gray-400">
+        This action cannot be undone. This will permanently delete the user account and remove all associated data.
+      </p>
+    </div>
+  </app-modal>
+</div>

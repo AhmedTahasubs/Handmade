@@ -15,55 +15,40 @@ export class AdminSidebar {
   constructor(public LanguageService: LanguageService) {}
 
   getIconClass(icon: string): string {
-    switch(icon) {
-      case 'faHome': return 'fa-home';
-      case 'faUsers': return 'fa-users';
-      case 'faBox': return 'fa-box';
-      case 'faShoppingBag': return 'fa-shopping-bag';
-      case 'faDollarSign': return 'fa-dollar-sign';
-      case 'faChartBar': return 'fa-chart-bar';
-      case 'faCog': return 'fa-cog';
-      case 'faUserCheck': return 'fa-user-check';
-      case 'faPalette': return 'fa-palette';
-      case 'faCommentDots': return 'fa-comment-dots';
-      case 'faShield': return 'fa-shield';
-      case 'faAward': return 'fa-award';
-      default: return '';
-    }
+  switch (icon) {
+    case 'faHome': return 'fa-home';
+    case 'faUsers': return 'fa-users';
+    case 'faBox': return 'fa-box';
+    case 'faShoppingBag': return 'fa-shopping-bag';
+    case 'faCog': return 'fa-cog';
+    case 'faPalette': return 'fa-palette';
+    case 'faHandsHelping': return 'fa-hands-helping'; // new for services
+    default: return '';
   }
+}
 
   get navigation() {
-    const isArabic = this.LanguageService.currentLanguage() === "ar"
-    return isArabic
-      ? [
-          { name: "لوحة التحكم", icon: "faHome", href: "#", current: true },
-          { name: "الحرفيون", icon: "faUsers", href: "#", current: false, badge: "12" },
-          { name: "المنتجات", icon: "faBox", href: "#", current: false },
-          { name: "الطلبات", icon: "faShoppingBag", href: "#", current: false, badge: "5" },
-          { name: "الفئات", icon: "faPalette", href: "#", current: false },
-          { name: "العمولات", icon: "faDollarSign", href: "#", current: false },
-          { name: "التحليلات", icon: "faChartBar", href: "#", current: false },
-          { name: "الموافقات", icon: "faUserCheck", href: "#", current: false, badge: "3" },
-          { name: "المراجعات", icon: "faCommentDots", href: "#", current: false },
-          { name: "المميز", icon: "faAward", href: "#", current: false },
-          { name: "الإشراف", icon: "faShield", href: "#", current: false },
-          { name: "الإعدادات", icon: "faCog", href: "#", current: false },
-        ]
-      : [
-          { name: "Dashboard", icon: "faHome", href: "#", current: true },
-          { name: "Artisans", icon: "faUsers", href: "#", current: false, badge: "12" },
-          { name: "Products", icon: "faBox", href: "#", current: false },
-          { name: "Orders", icon: "faShoppingBag", href: "#", current: false, badge: "5" },
-          { name: "Categories", icon: "faPalette", href: "#", current: false },
-          { name: "Commissions", icon: "faDollarSign", href: "#", current: false },
-          { name: "Analytics", icon: "faChartBar", href: "#", current: false },
-          { name: "Approvals", icon: "faUserCheck", href: "#", current: false, badge: "3" },
-          { name: "Reviews", icon: "faCommentDots", href: "#", current: false },
-          { name: "Featured", icon: "faAward", href: "#", current: false },
-          { name: "Moderation", icon: "faShield", href: "#", current: false },
-          { name: "Settings", icon: "faCog", href: "#", current: false },
-        ]
-  }
+  const isArabic = this.LanguageService.currentLanguage() === "ar";
+  return isArabic
+    ? [
+      { name: "الحرفيون", icon: "faUsers", href: "/admin/users-management", current: true },
+      { name: "الخدمات", icon: "faHandsHelping", href: "/admin/services-management", current: false },
+      { name: "الطلبات", icon: "faShoppingBag", href: "/admin/orders-management", current: false },
+      { name: "المنتجات", icon: "faBox", href: "/admin/products-management", current: false },
+      { name: "الفئات", icon: "faPalette", href: "/categories", current: false },
+      { name: "الرئيسية", icon: "faHome", href: "/", current: false },
+        { name: "الإعدادات", icon: "faCog", href: "/settings", current: false },
+      ]
+    : [
+      { name: "Users", icon: "faUsers", href: "/admin/users-management", current: true },
+      { name: "Services", icon: "faHandsHelping", href: "/admin/services-management", current: false },
+      { name: "Orders", icon: "faShoppingBag", href: "/admin/orders-management", current: false },
+      { name: "Products", icon: "faBox", href: "/admin/products-management", current: false },
+      { name: "Categories", icon: "faPalette", href: "/categories", current: false },
+      { name: "Home", icon: "faHome", href: "/", current: false },
+        { name: "Settings", icon: "faCog", href: "/settings", current: false },
+      ];
+}
 
   get labels() {
     const isArabic = this.LanguageService.currentLanguage() === "ar"

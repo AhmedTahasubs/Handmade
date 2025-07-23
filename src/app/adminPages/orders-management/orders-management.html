@@ -1,0 +1,265 @@
+
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Orders Management</h1>
+      <p class="text-gray-600 dark:text-gray-400">Monitor and track all customer orders</p>
+    </div>
+    
+    <!-- Status Filter -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        *ngFor="let status of statusFilters"
+        (click)="setStatusFilter(status.value)"
+        [class]="getFilterButtonClass(status.value)"
+        class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+      >
+        <i [class]="status.icon + ' w-4 h-4'"></i>
+        {{ status.label }}
+        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+          {{ getStatusCount(status.value) }}
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ orders.length }}</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-shopping-bag w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Orders</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getPendingOrdersCount() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-clock w-6 h-6 text-yellow-600 dark:text-yellow-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalRevenue() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-green-50 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-dollar-sign w-6 h-6 text-green-600 dark:text-green-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Delivered Orders</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getDeliveredOrdersCount() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-check-circle w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <app-data-table
+    title="Orders"
+    subtitle="All customer orders and their status"
+    [data]="filteredOrders"
+    [columns]="columns"
+    [actions]="actions"
+    searchPlaceholder="Search orders..."
+    (actionClicked)="onAction($event)"
+    (exportClicked)="onExport()"
+  ></app-data-table>
+
+  <!-- Order Details Modal -->
+  <app-modal
+    [isOpen]="showDetailsModal"
+    title="Order Details"
+    [showConfirmButton]="false"
+    cancelText="Close"
+    (closed)="closeDetailsModal()"
+  >
+    <div *ngIf="selectedOrder" class="space-y-6">
+      <!-- Order Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Order {{ selectedOrder.id }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ selectedOrder.orderDate | date:'medium' }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span [class]="getOrderStatusBadgeClass(selectedOrder.status)" class="px-3 py-1 text-sm font-medium rounded-full">
+            {{ selectedOrder.status | titlecase }}
+          </span>
+          <span [class]="getPaymentStatusBadgeClass(selectedOrder.paymentStatus)" class="px-3 py-1 text-sm font-medium rounded-full">
+            {{ selectedOrder.paymentStatus | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Customer Information -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Customer Information</h4>
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <img
+              [src]="selectedOrder.customer.avatar"
+              [alt]="selectedOrder.customer.name"
+              class="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedOrder.customer.name }}</p>
+              <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-envelope w-3 h-3"></i>
+                  {{ selectedOrder.customer.email }}
+                </div>
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-phone w-3 h-3"></i>
+                  {{ selectedOrder.customer.phone }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Order Items</h4>
+        <div class="space-y-3">
+          <div
+            *ngFor="let item of selectedOrder.items"
+            class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+          >
+            <img
+              [src]="item.productImage"
+              [alt]="item.productName"
+              class="w-16 h-16 rounded-lg object-cover"
+            />
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.productName }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Quantity: {{ item.quantity }}</p>
+              <p *ngIf="item.customizations" class="text-xs text-blue-600 dark:text-blue-400">{{ item.customizations }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.price | currency }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">each</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Address -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Shipping Address</h4>
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div class="flex items-start gap-2">
+            <i class="fas fa-map-marker-alt w-4 h-4 text-gray-400 mt-1"></i>
+            <div class="text-sm text-gray-900 dark:text-white">
+              <p>{{ selectedOrder.shippingAddress.street }}</p>
+              <p>{{ selectedOrder.shippingAddress.city }}, {{ selectedOrder.shippingAddress.state }} {{ selectedOrder.shippingAddress.zipCode }}</p>
+              <p>{{ selectedOrder.shippingAddress.country }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Order Summary</h4>
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
+            <span class="text-gray-900 dark:text-white">{{ selectedOrder.totalAmount | currency }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Shipping</span>
+            <span class="text-gray-900 dark:text-white">{{ selectedOrder.shippingCost | currency }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Tax</span>
+            <span class="text-gray-900 dark:text-white">{{ selectedOrder.tax | currency }}</span>
+          </div>
+          <div class="border-t border-gray-200 dark:border-gray-600 pt-2">
+            <div class="flex justify-between text-base font-medium">
+              <span class="text-gray-900 dark:text-white">Total</span>
+              <span class="text-gray-900 dark:text-white">{{ selectedOrder.finalAmount | currency }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment & Shipping Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Payment Information</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Method</span>
+              <span class="text-gray-900 dark:text-white">{{ selectedOrder.paymentMethod }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Status</span>
+              <span [class]="getPaymentStatusTextClass(selectedOrder.paymentStatus)">{{ selectedOrder.paymentStatus | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Shipping Information</h4>
+          <div class="space-y-2 text-sm">
+            <div *ngIf="selectedOrder.trackingNumber" class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Tracking</span>
+              <span class="text-blue-600 dark:text-blue-400 font-mono">{{ selectedOrder.trackingNumber }}</span>
+            </div>
+            <div *ngIf="selectedOrder.shippedDate" class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Shipped</span>
+              <span class="text-gray-900 dark:text-white">{{ selectedOrder.shippedDate | date:'short' }}</span>
+            </div>
+            <div *ngIf="selectedOrder.deliveredDate" class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Delivered</span>
+              <span class="text-gray-900 dark:text-white">{{ selectedOrder.deliveredDate | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artisans -->
+      <div *ngIf="selectedOrder.artisans.length > 0">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Involved Artisans</h4>
+        <div class="flex flex-wrap gap-2">
+          <span
+            *ngFor="let artisan of selectedOrder.artisans"
+            class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-sm rounded-full"
+          >
+            {{ artisan }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div *ngIf="selectedOrder.notes">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Order Notes</h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+          {{ selectedOrder.notes }}
+        </p>
+      </div>
+    </div>
+  </app-modal>
+</div>

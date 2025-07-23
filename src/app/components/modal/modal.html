@@ -1,0 +1,51 @@
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 overflow-y-auto"
+  (click)="onBackdropClick($event)"
+>
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"></div>
+
+  <!-- Modal -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div
+      class="relative w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-2xl transform transition-all duration-300 scale-100"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+        <button
+          (click)="close()"
+          class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <i class="fas fa-times w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6">
+        <ng-content></ng-content>
+      </div>
+
+      <!-- Footer -->
+      <div *ngIf="showFooter" class="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+        <button
+          *ngIf="showCancelButton"
+          (click)="close()"
+          class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+        >
+          {{ cancelText }}
+        </button>
+        <button
+          *ngIf="showConfirmButton"
+          (click)="confirm()"
+          [class]="getConfirmButtonClass()"
+          class="px-4 py-2 rounded-lg transition-colors duration-200"
+        >
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

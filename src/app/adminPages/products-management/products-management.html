@@ -1,0 +1,227 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Products Management</h1>
+      <p class="text-gray-600 dark:text-gray-400">View and monitor all handmade products</p>
+    </div>
+    
+    <!-- Category Filter -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        *ngFor="let category of categoryFilters"
+        (click)="setCategoryFilter(category.value)"
+        [class]="getFilterButtonClass(category.value)"
+        class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+      >
+        <i [class]="category.icon" class="w-4 h-4"></i>
+        {{ category.label }}
+        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+          {{ getCategoryCount(category.value) }}
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Products</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ products.length }}</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-box w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Products</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getActiveProductsCount() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-green-50 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-shopping-cart w-6 h-6 text-green-600 dark:text-green-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Sales</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalSales() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-dollar-sign w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Rating</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getAverageRating() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-star w-6 h-6 text-yellow-600 dark:text-yellow-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <app-data-table
+    title="Products"
+    subtitle="All handmade products in the marketplace"
+    [data]="filteredProducts"
+    [columns]="columns"
+    [actions]="actions"
+    searchPlaceholder="Search products..."
+    (actionClicked)="onAction($event)"
+    (exportClicked)="onExport()"
+  ></app-data-table>
+
+  <!-- Product Details Modal -->
+  <app-modal
+    [isOpen]="showDetailsModal"
+    title="Product Details"
+    [showConfirmButton]="false"
+    cancelText="Close"
+    (closed)="closeDetailsModal()"
+  >
+    <div *ngIf="selectedProduct" class="space-y-6">
+      <!-- Product Images -->
+      <div *ngIf="selectedProduct.images.length > 0">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Product Images</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <img
+            *ngFor="let image of selectedProduct.images"
+            [src]="image"
+            [alt]="selectedProduct.name"
+            class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+          />
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Product Information</h4>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Name</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.name }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.description }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Category</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.category }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400">Price</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.price | currency }}</p>
+              </div>
+              <div *ngIf="selectedProduct.originalPrice">
+                <label class="text-xs text-gray-500 dark:text-gray-400">Original Price</label>
+                <p class="text-sm text-gray-500 dark:text-gray-400 line-through">{{ selectedProduct.originalPrice | currency }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400">Stock</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.stock }} units</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400">Processing Time</label>
+                <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.processingTime }}</p>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Customizable</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.isCustomizable ? 'Yes' : 'No' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Artisan & Stats</h4>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <img
+                [src]="selectedProduct.artisan.avatar"
+                [alt]="selectedProduct.artisan.name"
+                class="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedProduct.artisan.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ selectedProduct.artisan.email }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400">Rating</label>
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-star w-4 h-4 text-yellow-400"></i>
+                  <span class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.rating }}</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">({{ selectedProduct.reviewCount }} reviews)</span>
+                </div>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400">Favorites</label>
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-heart w-4 h-4 text-red-400"></i>
+                  <span class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.favoriteCount }}</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Total Sold</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.soldCount }} units</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Created Date</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.createdDate | date }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Last Updated</label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedProduct.lastUpdated | date }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specifications -->
+      <div *ngIf="selectedProduct.specifications && Object.keys(selectedProduct.specifications).length > 0">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Specifications</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div *ngFor="let spec of getSpecifications(selectedProduct.specifications)" class="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{ spec.key }}</span>
+            <span class="text-sm text-gray-900 dark:text-white">{{ spec.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div *ngIf="selectedProduct.tags.length > 0">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Tags</h4>
+        <div class="flex flex-wrap gap-2">
+          <span
+            *ngFor="let tag of selectedProduct.tags"
+            class="px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs rounded-full"
+          >
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </app-modal>
+</div>

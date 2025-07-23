@@ -8,6 +8,12 @@ import { CategoriesComponent } from './pages/categories/categories';
 import { Admin } from './pages/admin/admin';
 import { App } from './app';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
+import { ProductsManagement } from './adminPages/products-management/products-management';
+import { OrdersManagement } from './adminPages/orders-management/orders-management';
+import { ServicesManagement } from './adminPages/services-management/services-management';
+import { UsersManagement } from './adminPages/users-management/users-management';
+import { CategoriesManagement } from './adminPages/categories-management/categories-management';
+// import { ErrorPageComponent } from './pages/error-page/error-page'; // You must create this
 
 export const routes: Routes = [
   {
@@ -22,10 +28,23 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'admin',
+    path: '',
     component: DashboardLayout,
     children: [
-      { path: '', component: Admin }
+      {
+        path: 'admin',
+        component: Admin,
+        children: [
+          { path: '', component: UsersManagement },
+          { path: 'products-management', component: ProductsManagement },
+          { path: 'orders-management', component: OrdersManagement },
+          { path: 'services-management', component: ServicesManagement },
+          { path: 'users-management', component: UsersManagement },
+          { path: 'categories-management', component: CategoriesManagement },
+        ]
+      },
     ]
-  }
+  },
+  // wildcard for unknown routes
+  // { path: '**', component: ErrorPageComponent }
 ];

@@ -1,0 +1,180 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+  <!-- Table Header -->
+  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ subtitle }}</p>
+      </div>
+      
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+          <input
+            type="text"
+            [placeholder]="searchPlaceholder"
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            class="pl-10 pr-4 py-2 w-full sm:w-64 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+          />
+        </div>
+
+        <!-- Filter Button -->
+        <button
+          *ngIf="showFilter"
+          (click)="toggleFilter()"
+          class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center gap-2"
+        >
+          <i class="fas fa-filter w-4 h-4"></i>
+          <span class="hidden sm:inline">Filter</span>
+        </button>
+
+        <!-- Export Button -->
+        <button
+          *ngIf="showExport"
+          (click)="onExport()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+        >
+          <i class="fas fa-download w-4 h-4"></i>
+          <span class="hidden sm:inline">Export</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th
+            *ngFor="let column of columns"
+            [style.width]="column.width"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+            (click)="onSort(column.key)"
+          >
+            <div class="flex items-center gap-2">
+              {{ column.label }}
+              <div *ngIf="column.sortable" class="flex flex-col">
+                <div [class]="getSortIconClass(column.key, 'asc')">▲</div>
+                <div [class]="getSortIconClass(column.key, 'desc')">▼</div>
+              </div>
+            </div>
+          </th>
+          <th *ngIf="actions.length > 0" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tr
+          *ngFor="let item of paginatedData; let i = index"
+          class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <td
+            *ngFor="let column of columns"
+            class="px-6 py-4 whitespace-nowrap"
+          >
+            <div [ngSwitch]="column.type">
+              <!-- Text -->
+              <span *ngSwitchCase="'text'" class="text-sm text-gray-900 dark:text-white">
+                {{ getNestedValue(item, column.key) }}
+              </span>
+              
+              <!-- Badge -->
+              <span *ngSwitchCase="'badge'" [class]="getBadgeClass(getNestedValue(item, column.key))" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                {{ getNestedValue(item, column.key) }}
+              </span>
+              
+              <!-- Image -->
+              <img *ngSwitchCase="'image'" [src]="getNestedValue(item, column.key)" [alt]="item.name || 'Image'" class="w-10 h-10 rounded-full object-cover">
+              
+              <!-- Date -->
+              <span *ngSwitchCase="'date'" class="text-sm text-gray-500 dark:text-gray-400">
+                {{ formatDate(getNestedValue(item, column.key)) }}
+              </span>
+              
+              <!-- Currency -->
+              <span *ngSwitchCase="'currency'" class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ formatCurrency(getNestedValue(item, column.key)) }}
+              </span>
+              
+              <!-- Default -->
+              <span *ngSwitchDefault class="text-sm text-gray-900 dark:text-white">
+                {{ getNestedValue(item, column.key) }}
+              </span>
+            </div>
+          </td>
+          
+          <!-- Actions -->
+          <td *ngIf="actions.length > 0" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="relative inline-block">
+              <button
+                (click)="toggleActionMenu(i)"
+                class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                <i class="fas fa-ellipsis-v w-4 h-4"></i>
+              </button>
+              
+              <div
+                *ngIf="activeActionMenu === i"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-600"
+              >
+                <div class="py-1">
+                  <button
+                    *ngFor="let action of actions"
+                    (click)="onAction(action.action, item)"
+                    [class]="getActionButtonClass(action.color)"
+                    class="flex items-center px-4 py-2 text-sm w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+                  >
+                    <i [class]="'fas fa-' + action.icon" class="w-4 h-4 mr-2"></i>
+                    {{ action.label }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredData.length) }} of {{ filteredData.length }} results
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        >
+          Previous
+        </button>
+        
+        <div class="flex gap-1">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            (click)="goToPage(page)"
+            [class]="page === currentPage ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'"
+            class="px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+          >
+            {{ page }}
+          </button>
+        </div>
+        
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

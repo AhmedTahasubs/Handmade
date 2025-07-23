@@ -10,6 +10,7 @@ import { SalesAnalytics } from "../../components/admin components/sales-analytic
 import { RecentOrders } from "../../components/admin components/recent-orders/recent-orders";
 import { TopArtisans } from "../../components/admin components/top-artisans/top-artisans";
 import { PendingApprovalsComponent } from "../../components/admin components/pending-approvals/pending-approvals";
+import { RouterOutlet } from '@angular/router';
 @Component({
   selector: "app-admin",
   standalone: true,
@@ -22,7 +23,8 @@ import { PendingApprovalsComponent } from "../../components/admin components/pen
     SalesAnalytics,
     RecentOrders,
     TopArtisans,
-    PendingApprovalsComponent
+    PendingApprovalsComponent,
+    RouterOutlet
 ],
   templateUrl: './admin.html',
 })

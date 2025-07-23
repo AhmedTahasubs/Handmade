@@ -15,9 +15,14 @@
     
     <!-- Header -->
     <app-admin-header (onMenuClick)="sidebarOpen = true"></app-admin-header>
-
+    
+    <!-- routing outlet -->
+     <main class="p-4 md:p-6 lg:p-8">
+       <router-outlet></router-outlet>
+     </main>
     <!-- Main Dashboard Content -->
-    <main class="p-6">
+     
+    <!-- <main class="p-6">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           {{ LanguageService.currentLanguage() === 'en' 
@@ -31,29 +36,30 @@
         </p>
       </div>
 
-      <!-- Overview Section -->
+      Overview Section
       <app-dashboard-overview></app-dashboard-overview>
 
-      <!-- Artisan Stats -->
+      Artisan Stats
       <div class="mt-8">
         <app-artisan-stats></app-artisan-stats>
       </div>
 
-      <!-- Grid Layout: Analytics + Orders + Top Artisans -->
+      Grid Layout: Analytics + Orders + Top Artisans
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
-        <!-- Left Column -->
+        Left Column
         <div class="xl:col-span-2 space-y-6">
           <app-sales-analytics></app-sales-analytics>
           <app-recent-orders></app-recent-orders>
         </div>
 
-        <!-- Right Column -->
+        Right Column
         <div class="space-y-6">
           <app-top-artisans></app-top-artisans>
           <app-pending-approvals></app-pending-approvals>
         </div>
       </div>
-    </main>
-
+    </main> -->
+  
+  
   </div>
 </div>
