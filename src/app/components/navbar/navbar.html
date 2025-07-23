@@ -102,8 +102,8 @@
           </ng-container>
           <ng-template #guest>
             <!-- Not logged in -->
-            <a [routerLink]="'/login'" class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Login</a>
-            <a [routerLink]="'/register'" class="px-3 py-1 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-800">Register</a>
+            <a [routerLink]="'/login'" class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">@if (this.language=='ar') {سجل الدخول}@else{Login}</a>
+            <a [routerLink]="'/register'" class="px-3 py-1 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-800">@if (this.language=='ar') {سجل لأول مره}@else{Register}</a>
           </ng-template>
         </div>
 
@@ -166,8 +166,8 @@
             </div>
           </ng-container>
           <ng-template #mobileGuest>
-            <a [routerLink]="'/login'" class="block w-full px-3 py-2 text-center text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Login</a>
-            <a [routerLink]="'/register'" class="block w-full px-3 py-2 text-center text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-800">Register</a>
+            <a [routerLink]="'/login'" class="block w-full px-3 py-2 text-center text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">@if (this.language=='ar') {سجل الدخول}@else{Login}</a>
+            <a [routerLink]="'/register'" class="block w-full px-3 py-2 text-center text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-800">@if (this.language=='ar') {سجل لأول مره}@else{Register}</a>
           </ng-template>
         </div>
       </div>
