@@ -1,0 +1,12 @@
+<div class="min-h-screen flex flex-col">
+  <app-navbar 
+    [language]="language" 
+    [theme]="theme"
+    (languageChange)="onLanguageChange($event)"
+    (themeChange)="onThemeChange($event)">
+  </app-navbar>
+
+  <router-outlet></router-outlet>
+
+  <app-footer [language]="language"></app-footer>
+</div>
