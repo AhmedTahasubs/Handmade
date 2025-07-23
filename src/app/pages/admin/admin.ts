@@ -18,12 +18,6 @@ import { RouterOutlet } from '@angular/router';
     CommonModule,
     AdminSidebar,
     AdminHeader,
-    DashboardOverview,
-    ArtisanStats,
-    SalesAnalytics,
-    RecentOrders,
-    TopArtisans,
-    PendingApprovalsComponent,
     RouterOutlet
 ],
   templateUrl: './admin.html',

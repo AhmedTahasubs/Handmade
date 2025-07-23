@@ -1,18 +1,24 @@
 <div class="space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Users Management</h1>
-      <p class="text-gray-600 dark:text-gray-400">Manage system users and their permissions</p>
-    </div>
-    <button
-      (click)="openCreateModal()"
-      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
-    >
-      <i class="fas fa-plus w-4 h-4"></i>
-      Add User
-    </button>
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      {{ languageService.currentLanguage() === 'en' ? 'Users Management' : 'إدارة المستخدمين' }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ languageService.currentLanguage() === 'en' 
+        ? 'Manage system users and their permissions' 
+        : 'إدارة مستخدمي النظام وصلاحياتهم' }}
+    </p>
   </div>
+  <button
+    (click)="openCreateModal()"
+    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+  >
+    <i class="fa-solid fa-plus w-4 h-4"></i>
+    {{ languageService.currentLanguage() === 'en' ? 'Add User' : 'إضافة مستخدم' }}
+  </button>
+</div>
 
   <!-- Data Table -->
   <app-data-table

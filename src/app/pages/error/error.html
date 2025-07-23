@@ -1,0 +1,68 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+  <div class="max-w-lg w-full text-center">
+    <!-- Error Icon -->
+    <div class="mb-8">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+        <i class="fa-solid fa-exclamation-triangle text-3xl text-red-600 dark:text-red-400"></i>
+      </div>
+      <h1 class="text-6xl font-bold text-gray-900 dark:text-white mb-2">404</h1>
+      <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
+        {{ getTranslation('title') }}
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-8">
+        {{ getTranslation('message') }}
+      </p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+      <button
+        (click)="goBack()"
+        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+      >
+        <i [class]="'fa-solid fa-arrow-' + (currentLanguage === 'ar' ? 'right' : 'left') + ' ' + (currentLanguage === 'ar' ? 'ml-2' : 'mr-2')"></i>
+        {{ getTranslation('goBack') }}
+      </button>
+      
+      <button
+        (click)="goHome()"
+        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+      >
+        <i [class]="'fa-solid fa-home ' + (currentLanguage === 'ar' ? 'ml-2' : 'mr-2')"></i>
+        {{ getTranslation('home') }}
+      </button>
+    </div>
+
+    <!-- Language and Theme Controls -->
+    <div class="flex items-center justify-center gap-4">
+      <!-- Language Toggle -->
+      <button
+        (click)="toggleLanguage()"
+        class="flex items-center gap-2 p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+        [title]="getTranslation('switchLanguage')"
+      >
+        <i class="fa-solid fa-language text-blue-600 dark:text-blue-400"></i>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {{ currentLanguage === 'en' ? 'عربي' : 'English' }}
+        </span>
+      </button>
+
+      <!-- Theme Toggle -->
+      <button
+        (click)="toggleTheme()"
+        class="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+        [title]="getTranslation('switchTheme')"
+      >
+        <i [class]="isDarkMode ? 'fa-solid fa-sun text-yellow-500' : 'fa-solid fa-moon text-gray-600 dark:text-gray-400'"></i>
+      </button>
+    </div>
+
+    <!-- Additional Help -->
+    <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+      <p class="text-sm text-blue-700 dark:text-blue-300">
+        <i class="fa-solid fa-info-circle mr-2"></i>
+        {{ getTranslation('helpText') }}
+      </p>
+    </div>
+  </div>
+</div>

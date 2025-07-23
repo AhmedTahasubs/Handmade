@@ -35,6 +35,19 @@
       </div>
       <!-- <span *ngIf="item?.badge" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ item?.badge }}</span> -->
     </a>
+        <!-- <a
+      *ngFor="let item of navigation"
+      [routerLink]="item.href"
+      routerLinkActive="bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [class]="getNavItemClasses(item)"
+    >
+      <div [class]="getNavItemContentClasses()">
+        <i [class]="'w-5 h-5 mx-3 fa-solid ' + getIconClass(item.icon)"></i>
+        {{ item.name }}
+      </div>
+      <span *ngIf="item?.badge" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ item?.badge }}</span>
+    </a> -->
   </nav>
 
   <div class="p-4 border-t border-gray-200 dark:border-gray-700">

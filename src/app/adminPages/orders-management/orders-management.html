@@ -1,31 +1,41 @@
 
 <div class="space-y-6">
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Orders Management</h1>
-      <p class="text-gray-600 dark:text-gray-400">Monitor and track all customer orders</p>
-    </div>
-    
-    <!-- Status Filter -->
-    <div class="flex flex-wrap gap-2">
-      <button
-        *ngFor="let status of statusFilters"
-        (click)="setStatusFilter(status.value)"
-        [class]="getFilterButtonClass(status.value)"
-        class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-      >
-        <i [class]="status.icon + ' w-4 h-4'"></i>
-        {{ status.label }}
-        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
-          {{ getStatusCount(status.value) }}
-        </span>
-      </button>
-    </div>
+ <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      {{ LanguageService.currentLanguage() === 'en' ? 'Orders Management' : 'إدارة الطلبات' }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ LanguageService.currentLanguage() === 'en' 
+        ? 'Monitor and track all customer orders' 
+        : 'مراقبة وتتبع جميع طلبات العملاء' }}
+    </p>
   </div>
+  
+  <!-- Status Filter -->
+  <div class="flex flex-wrap gap-2">
+    <button
+      *ngFor="let status of statusFilters"
+      (click)="setStatusFilter(status.value)"
+      [class]="getFilterButtonClass(status.value)"
+      class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+    >
+      <i [class]="status.icon + ' w-4 h-4'"></i>
+      {{ LanguageService.currentLanguage() === 'en' ? status.label : 
+         status.value === 'all' ? 'الكل' :
+         status.value === 'pending' ? 'قيد الانتظار' :
+         status.value === 'processing' ? 'قيد المعالجة' :
+         status.value === 'completed' ? 'مكتمل' : 'ملغى' }}
+      <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+        {{ getStatusCount(status.value) }}
+      </span>
+    </button>
+  </div>
+</div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-5">
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
       <div class="flex items-center justify-between">
         <div>

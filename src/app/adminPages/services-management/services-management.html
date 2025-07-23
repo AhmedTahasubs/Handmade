@@ -1,27 +1,36 @@
 <div class="space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Services Management</h1>
-      <p class="text-gray-600 dark:text-gray-400">Review and manage artisan services</p>
-    </div>
-    
-    <!-- Status Filter -->
-    <div class="flex gap-2">
-      <button
-        *ngFor="let status of statusFilters"
-        (click)="setStatusFilter(status.value)"
-        [class]="getFilterButtonClass(status.value)"
-        class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-      >
-        <i [class]="status.icon" class="w-4 h-4"></i>
-        {{ status.label }}
-        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
-          {{ getStatusCount(status.value) }}
-        </span>
-      </button>
-    </div>
+ <!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      {{ languageService.currentLanguage() === 'en' ? 'Services Management' : 'إدارة الخدمات' }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ languageService.currentLanguage() === 'en' 
+        ? 'Review and manage artisan services' 
+        : 'مراجعة وإدارة خدمات الحرفيين' }}
+    </p>
   </div>
+  
+  <!-- Status Filter -->
+  <div class="flex gap-2">
+    <button
+      *ngFor="let status of statusFilters"
+      (click)="setStatusFilter(status.value)"
+      [class]="getFilterButtonClass(status.value)"
+      class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+    >
+      <i [class]="status.icon" class="w-4 h-4"></i>
+      {{ languageService.currentLanguage() === 'en' ? status.label : 
+         status.value === 'all' ? 'الكل' :
+         status.value === 'awaiting' ? 'بانتظار المراجعة' :
+         status.value === 'approved' ? 'مقبول' : 'مرفوض' }}
+      <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+        {{ getStatusCount(status.value) }}
+      </span>
+    </button>
+  </div>
+</div>
 
   <!-- Data Table -->
   <app-data-table

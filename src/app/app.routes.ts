@@ -13,7 +13,7 @@ import { OrdersManagement } from './adminPages/orders-management/orders-manageme
 import { ServicesManagement } from './adminPages/services-management/services-management';
 import { UsersManagement } from './adminPages/users-management/users-management';
 import { CategoriesManagement } from './adminPages/categories-management/categories-management';
-// import { ErrorPageComponent } from './pages/error-page/error-page'; // You must create this
+import { ErrorPage } from './pages/error/error';
 
 export const routes: Routes = [
   {
@@ -46,5 +46,6 @@ export const routes: Routes = [
     ]
   },
   // wildcard for unknown routes
-  // { path: '**', component: ErrorPageComponent }
+  { path: '**', component: ErrorPage }
+
 ];

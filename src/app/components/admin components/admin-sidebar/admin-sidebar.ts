@@ -1,11 +1,12 @@
 import { LanguageService } from './../../../services/language.service';
 import { Component, Input, Output, EventEmitter } from "@angular/core"
 import { CommonModule } from "@angular/common"
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: "app-admin-sidebar",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterModule],
   templateUrl: './admin-sidebar.html',
 })
 export class AdminSidebar {
@@ -35,7 +36,7 @@ export class AdminSidebar {
       { name: "الخدمات", icon: "faHandsHelping", href: "/admin/services-management", current: false },
       { name: "الطلبات", icon: "faShoppingBag", href: "/admin/orders-management", current: false },
       { name: "المنتجات", icon: "faBox", href: "/admin/products-management", current: false },
-      { name: "الفئات", icon: "faPalette", href: "/categories", current: false },
+      { name: "الفئات", icon: "faPalette", href: "/admin/categories-management", current: false },
       { name: "الرئيسية", icon: "faHome", href: "/", current: false },
         { name: "الإعدادات", icon: "faCog", href: "/settings", current: false },
       ]
@@ -44,7 +45,7 @@ export class AdminSidebar {
       { name: "Services", icon: "faHandsHelping", href: "/admin/services-management", current: false },
       { name: "Orders", icon: "faShoppingBag", href: "/admin/orders-management", current: false },
       { name: "Products", icon: "faBox", href: "/admin/products-management", current: false },
-      { name: "Categories", icon: "faPalette", href: "/categories", current: false },
+      { name: "Categories", icon: "faPalette", href: "/admin/categories-management", current: false },
       { name: "Home", icon: "faHome", href: "/", current: false },
         { name: "Settings", icon: "faCog", href: "/settings", current: false },
       ];
@@ -92,6 +93,15 @@ export class AdminSidebar {
 
     return `${baseClasses} ${activeClasses} ${rtlClasses}`
   }
+//     getNavItemClasses(item: any): string {
+//   const isArabic = this.LanguageService.currentLanguage() === "ar";
+//   const baseClasses =
+//     "flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors";
+//   const rtlClasses = isArabic ? "flex-row-reverse" : "";
+
+//   // active styles are now handled via routerLinkActive
+//   return `${baseClasses} ${rtlClasses}`;
+// }
 
   getNavItemContentClasses(): string {
     const isArabic = this.LanguageService.currentLanguage() === "ar"

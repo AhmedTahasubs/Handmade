@@ -17,7 +17,7 @@ interface Category {
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
   standalone: true,
-  imports: [CommonModule, ProductCardComponent, SearchFilterComponent]
+  imports: [CommonModule]
 })
 export class HomeComponent {
   
