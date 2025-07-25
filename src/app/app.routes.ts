@@ -6,7 +6,6 @@ import { Register } from './authPages/register/register';
 import { ForgotPassword } from './authPages/forgot-password/forgot-password';
 import { CategoriesComponent } from './pages/categories/categories';
 import { Admin } from './pages/admin/admin';
-import { App } from './app';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { ProductsManagement } from './adminPages/products-management/products-management';
 import { OrdersManagement } from './adminPages/orders-management/orders-management';
@@ -14,6 +13,10 @@ import { ServicesManagement } from './adminPages/services-management/services-ma
 import { UsersManagement } from './adminPages/users-management/users-management';
 import { CategoriesManagement } from './adminPages/categories-management/categories-management';
 import { ErrorPage } from './pages/error/error';
+import { SellerServicesManagement } from './sellerPages/services-management/services-management';
+import { SellerProductsManagement } from './sellerPages/products-management/products-management';
+import { SellerOrdersManagement } from './sellerPages/orders-management/orders-management';
+import { Seller } from './pages/seller/seller';
 
 export const routes: Routes = [
   {
@@ -43,13 +46,18 @@ export const routes: Routes = [
           { path: 'categories-management', component: CategoriesManagement },
         ]
       },
-      // {
-        //user path ----------------------------
-        // path: 'user',
-      // }
+      {
+        path: 'seller',
+        component: Seller,
+        children:[
+          { path: '', component: SellerServicesManagement },
+          { path: 'services-management', component: SellerServicesManagement },
+          { path: 'products-management', component: SellerProductsManagement },
+          { path: 'orders-management', component: SellerOrdersManagement },
+        ]
+      }
     ]
   },
   // wildcard for unknown routes
   { path: '**', component: ErrorPage }
-
 ];

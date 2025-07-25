@@ -4,6 +4,7 @@ import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
 import { Component } from "@angular/core";
+import { RouterModule } from '@angular/router';
  
 interface Product {
   id: number;
@@ -36,7 +37,7 @@ interface Product {
   selector: "app-products-management",
   templateUrl: "./products-management.html",
   standalone: true,
-  imports: [DataTable, Modal,CommonModule],
+  imports: [DataTable, Modal,CommonModule,RouterModule,CommonModule],
 })
 export class ProductsManagement {
   showDetailsModal = false;

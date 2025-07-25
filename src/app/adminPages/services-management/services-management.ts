@@ -5,6 +5,7 @@ import { DataTable, TableAction, TableColumn } from './../../components/data-tab
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 interface Service {
   id: number;
   title: string;
@@ -29,7 +30,7 @@ interface Service {
 @Component({
   selector: "app-services-management",
   standalone: true,
-  imports: [CommonModule, DataTable, Modal, FormsModule],
+  imports: [CommonModule, DataTable, Modal, FormsModule,RouterModule],
   templateUrl: "./services-management.html",
 })
 export class ServicesManagement {

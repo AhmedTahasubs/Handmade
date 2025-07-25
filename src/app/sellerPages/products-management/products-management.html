@@ -1,0 +1,241 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTranslation('title') }}</h2>
+      <p class="text-gray-600 dark:text-gray-400">{{ getTranslation('subtitle') }}</p>
+    </div>
+    <button
+      (click)="openCreateModal()"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+    >
+      <i class="fas fa-plus mr-2 rtl:ml-2 rtl:mr-0"></i>
+      {{ getTranslation('addProduct') }}
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-box text-blue-600 dark:text-blue-400"></i>
+        </div>
+        <div class="ml-4 rtl:mr-4 rtl:ml-0">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ getTranslation('totalProducts') }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ products.length }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+        </div>
+        <div class="ml-4 rtl:mr-4 rtl:ml-0">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ getTranslation('activeProducts') }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getActiveProductsCount() }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
+        </div>
+        <div class="ml-4 rtl:mr-4 rtl:ml-0">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ getTranslation('outOfStock') }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getOutOfStockCount() }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
+          <i class="fas fa-chart-line text-purple-600 dark:text-purple-400"></i>
+        </div>
+        <div class="ml-4 rtl:mr-4 rtl:ml-0">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ getTranslation('totalSales') }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalSales() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ getTranslation('productsTable') }}</h3>
+        
+        <!-- Search -->
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            [placeholder]="getTranslation('searchPlaceholder')"
+            class="pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-2 w-full sm:w-64 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('product') }}
+            </th>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('category') }}
+            </th>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('price') }}
+            </th>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('stock') }}
+            </th>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('status') }}
+            </th>
+            <th class="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('sales') }}
+            </th>
+            <th class="px-6 py-3 text-right rtl:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {{ getTranslation('actions') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tr *ngFor="let product of filteredProducts" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img [src]="product.image" [alt]="product.name" class="w-10 h-10 rounded-lg object-cover">
+                <div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ product.description.substring(0, 30) }}...</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              {{ product.category }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">\
+              ${{ product.price }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              {{ product.stock }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="'inline-flex px-2 py-1 text-xs font-semibold rounded-full ' + getBadgeClass(product.status)">
+                {{ getStatusText(product.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              {{ product.sales }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right rtl:text-left text-sm font-medium">
+              <div class="flex items-center justify-end space-x-2 rtl:space-x-reverse">
+                <button
+                  (click)="editProduct(product)"
+                  class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  (click)="deleteProduct(product)"
+                  class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<app-modal
+  [isOpen]="showModal"
+  [title]="isEditing ? getTranslation('editProduct') : getTranslation('addProduct')"
+  [confirmText]="isEditing ? getTranslation('update') : getTranslation('create')"
+  (closed)="closeModal()"
+  (confirmed)="saveProduct()"
+>
+  <form class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ getTranslation('productName') }}
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="currentProduct.name"
+        name="name"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      />
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ getTranslation('description') }}
+      </label>
+      <textarea
+        [(ngModel)]="currentProduct.description"
+        name="description"
+        rows="3"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      ></textarea>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ getTranslation('price') }}
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="currentProduct.price"
+          name="price"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ getTranslation('stock') }}
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="currentProduct.stock"
+          name="stock"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        />
+      </div>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ getTranslation('category') }}
+      </label>
+      <select
+        [(ngModel)]="currentProduct.category"
+        name="category"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      >
+        <option value="Home Decor">{{ getTranslation('homeDecor') }}</option>
+        <option value="Jewelry">{{ getTranslation('jewelry') }}</option>
+        <option value="Clothing">{{ getTranslation('clothing') }}</option>
+        <option value="Accessories">{{ getTranslation('accessories') }}</option>
+        <option value="Art">{{ getTranslation('art') }}</option>
+      </select>
+    </div>
+  </form>
+</app-modal>

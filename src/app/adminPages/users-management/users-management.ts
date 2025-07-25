@@ -6,6 +6,7 @@ import { LanguageService } from './../../services/language.service';
 import { Component } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
+import { RouterModule } from '@angular/router';
 
 interface User {
   id: number
@@ -24,7 +25,7 @@ interface User {
 @Component({
   selector: "app-users-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTable, Modal],
+  imports: [CommonModule, FormsModule, DataTable, Modal,RouterModule],
   templateUrl: "./users-management.html"
 })
 export class UsersManagement {

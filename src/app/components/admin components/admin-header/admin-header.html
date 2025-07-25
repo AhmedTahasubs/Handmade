@@ -34,10 +34,10 @@
 
       <button
         (click)="toggleLanguage()"
-        class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-1"
+        class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
         [attr.aria-label]="'Toggle language'"
       >
-        <i class="fa-solid fa-language text-blue-500"></i>
+        <i class="fa-solid fa-language text-blue-500 mx-1"></i>
         <span class="text-sm font-medium">{{ LanguageService.currentLanguage().toUpperCase() }}</span>
       </button>
 

@@ -1,37 +1,29 @@
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component, HostListener, OnDestroy } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { AdminSidebar } from "../../components/admin components/admin-sidebar/admin-sidebar";
-import { AdminHeader } from "../../components/admin components/admin-header/admin-header";
+import { Component, HostListener, OnDestroy } from "@angular/core"
+import { CommonModule } from "@angular/common"
 import { RouterOutlet } from '@angular/router';
+import { SellerSidebar } from '../../components/seller components/seller-sidebar/seller-sidebar';
+import { SellerHeader } from '../../components/seller components/seller-header/seller-header';
 
 @Component({
-  selector: "app-admin",
+  selector: "app-seller",
   standalone: true,
   imports: [
     CommonModule,
-    AdminSidebar,
-    AdminHeader,
+    SellerSidebar,
+    SellerHeader,
     RouterOutlet
   ],
-  templateUrl: './admin.html',
+  templateUrl: './seller.html',
 })
-export class Admin implements OnDestroy {
+export class Seller implements OnDestroy {
   sidebarOpen = false;
 
   constructor(
     public ThemeService: ThemeService,
     public LanguageService: LanguageService,
   ) {}
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event) {
-    // Close sidebar on desktop view
-    if (window.innerWidth >= 1024) {
-      this.closeSidebar();
-    }
-  }
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
@@ -43,8 +35,14 @@ export class Admin implements OnDestroy {
     this.updateBodyOverflow();
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    if (window.innerWidth >= 1024) {
+      this.closeSidebar();
+    }
+  }
+
   private updateBodyOverflow() {
-    // Prevent scrolling when sidebar is open on mobile
     document.body.style.overflow = this.sidebarOpen ? 'hidden' : '';
   }
 

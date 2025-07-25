@@ -5,6 +5,7 @@ import { ThemeService } from './../../services/theme.service';
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { RouterModule } from '@angular/router';
 
 interface Category {
   id: number;
@@ -26,7 +27,7 @@ interface Category {
 @Component({
   selector: "app-categories-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal,RouterModule],
   templateUrl: "./categories-management.html",
 })
 export class CategoriesManagement implements OnInit {

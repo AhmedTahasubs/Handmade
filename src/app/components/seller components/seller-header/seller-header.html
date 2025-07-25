@@ -1,0 +1,62 @@
+<header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16">
+  <div class="flex items-center justify-between h-full px-6">
+    <!-- Left side -->
+    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+      <button
+        (click)="menuClicked.emit()"
+        class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+      >
+        <i class="fas fa-bars w-5 h-5"></i>
+      </button>
+
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+        {{ getTranslation('welcome') }}
+      </h1>
+    </div>
+
+    <!-- Right side -->
+    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+      <!-- Theme toggle -->
+      <button
+        (click)="toggleTheme()"
+        class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 hover:text-blue-600 transition-colors font-medium dark:hover:text-blue-400 dark:hover:bg-gray-700"
+        [title]="getTranslation('toggleTheme')"
+      >
+        <i [class]="'w-5 h-5 fa-solid text-lg transition-transform duration-200 hover:rotate-45 ' + (isDarkMode() ? 'fa-sun' : 'fa-moon')"></i>
+      </button>
+
+      <!-- Language toggle -->
+      <button
+        (click)="toggleLanguage()"
+        class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+        [title]="getTranslation('toggleLanguage')"
+      >
+        <i class="fa-solid fa-language text-blue-500 mx-1"></i>
+        <span class="text-sm font-medium">{{ currentLanguage().toUpperCase() }}</span>
+      </button>
+
+      <!-- Notifications -->
+      <button class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 relative">
+        <i class="fas fa-bell w-5 h-5"></i>
+        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+          2
+        </span>
+      </button>
+
+      <!-- Profile -->
+      <div class="flex items-center space-x-3 rtl:space-x-reverse">
+        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+          <i class="fas fa-user w-4 h-4 text-gray-600 dark:text-gray-300"></i>
+        </div>
+        <div class="hidden md:block">
+          <p class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ getTranslation('sellerName') }}
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            {{ getTranslation('seller') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
