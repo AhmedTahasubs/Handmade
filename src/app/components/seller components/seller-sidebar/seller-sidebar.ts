@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from "@angular/core";
+import { Component, Input, Output, EventEmitter, OnInit, inject, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from '@angular/router';
 import { LanguageService } from './../../../services/language.service';
@@ -14,22 +14,22 @@ export class SellerSidebar implements OnInit {
   @Output() onClose = new EventEmitter<void>();
 
   navigation: any[] = [];
+  languageService = inject(LanguageService);
 
-  constructor(
-    public LanguageService: LanguageService,
-    public router: Router
-  ) {}
+  constructor(public router: Router) {
+    // Create an effect that rebuilds navigation when language changes
+    effect(() => {
+      this.languageService.currentLanguage(); // Track the signal
+      this.buildNavigation();
+    });
+  }
 
   ngOnInit(): void {
     this.buildNavigation();
   }
 
-  get currentLanguage(): string {
-    return this.LanguageService.currentLanguage();
-  }
-
   private buildNavigation(): void {
-    const isArabic = this.currentLanguage === "ar";
+    const isArabic = this.languageService.currentLanguage() === "ar";
 
     this.navigation = [
       { 
@@ -80,7 +80,7 @@ export class SellerSidebar implements OnInit {
   }
 
   get labels() {
-    return this.currentLanguage === 'ar'
+    return this.languageService.currentLanguage() === 'ar'
       ? {
           title: 'لوحة البائع',
           sellerName: 'اسم البائع',

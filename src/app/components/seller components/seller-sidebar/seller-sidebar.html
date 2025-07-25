@@ -1,5 +1,5 @@
 <!-- Mobile backdrop -->
-<div *ngIf="isOpen" class="fixed inset-0 z-40 lg:hidden" 
+<div *ngIf="isOpen" class="fixed inset-0 lg:hidden z-40" 
      (click)="onClose.emit(); $event.stopPropagation()"
      (touchstart)="onClose.emit(); $event.stopPropagation()">
   <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
@@ -7,16 +7,18 @@
 
 <!-- Sidebar -->
 <div
-  [ngClass]="[
-    'fixed inset-y-0 z-50 w-64 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0',
-    isOpen ? 'translate-x-0' : (currentLanguage === 'ar' ? 'translate-x-full' : '-translate-x-full'),
-    currentLanguage === 'ar' ? 'right-0 border-l border-r-0' : 'left-0 border-r'
-  ]"
-  style="z-index: 60;"
+  [ngClass]="{
+    'fixed inset-y-0 w-64 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50': true,
+    'translate-x-0': isOpen,
+    'translate-x-full': !isOpen && languageService.currentLanguage() === 'ar',
+    '-translate-x-full': !isOpen && languageService.currentLanguage() !== 'ar',
+    'right-0 border-l': languageService.currentLanguage() === 'ar',
+    'left-0 border-r': languageService.currentLanguage() !== 'ar'
+  }"
 >
   <!-- Header -->
   <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
-    <div class="flex items-center space-x-3" [ngClass]="{ 'flex-row-reverse space-x-reverse': currentLanguage === 'ar' }">
+    <div class="flex items-center gap-3" [ngClass]="{ 'flex-row-reverse': languageService.currentLanguage() === 'ar' }">
       <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
         <i class="fas fa-store text-white text-sm"></i>
       </div>
@@ -40,7 +42,7 @@
       class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer border border-transparent"
       [ngClass]="{
         'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700': !router.isActive(item.href, item.exact),
-        'flex-row-reverse': currentLanguage === 'ar'
+        'flex-row-reverse': languageService.currentLanguage() === 'ar'
       }"
       (click)="onClose.emit()"
     >
@@ -48,21 +50,21 @@
         class="fas"
         [ngClass]="[
           getIconClass(item.icon),
-          currentLanguage === 'ar' ? 'ml-3' : 'mr-3',
+          languageService.currentLanguage() === 'ar' ? 'ml-3' : 'mr-3',
           'w-5 h-5 text-center'
         ]"
       ></i>
-      {{ item.name }}
+      <span class="flex-1">{{ item.name }}</span>
     </a>
   </nav>
 
   <!-- User Info -->
   <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-    <div class="flex items-center space-x-3" [ngClass]="{ 'flex-row-reverse space-x-reverse': currentLanguage === 'ar' }">
+    <div class="flex items-center gap-3" [ngClass]="{ 'flex-row-reverse': languageService.currentLanguage() === 'ar' }">
       <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
         <i class="fas fa-user text-gray-600 dark:text-gray-300"></i>
       </div>
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-0" [dir]="languageService.currentLanguage() === 'ar' ? 'rtl' : 'ltr'">
         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
           {{ labels.sellerName }}
         </p>
