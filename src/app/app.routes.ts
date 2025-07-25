@@ -43,6 +43,10 @@ export const routes: Routes = [
           { path: 'categories-management', component: CategoriesManagement },
         ]
       },
+      {
+        //user path ----------------------------
+        // path: 'user',
+      }
     ]
   },
   // wildcard for unknown routes
