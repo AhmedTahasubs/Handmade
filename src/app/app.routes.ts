@@ -31,10 +31,18 @@ export const routes: Routes = [
         path: 'services',
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
       },
-             {
-         path: 'products',
-         loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
-       }
+      {
+        path: 'products',
+        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
+      },
+      {
+        path: 'cart',
+        loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
+      }
     ]
   },
   {
