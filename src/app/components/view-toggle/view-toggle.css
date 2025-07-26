@@ -1,0 +1,54 @@
+/* View Toggle Component Styles */
+
+.view-toggle-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.view-toggle-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.view-toggle-button:hover {
+  transform: scale(1.05);
+}
+
+/* Active state animation */
+.view-toggle-button.active {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .view-toggle-container {
+  direction: rtl;
+}
+
+/* Dark mode enhancements */
+.dark .view-toggle-button:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Accessibility improvements */
+.view-toggle-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .view-toggle-button {
+    border: 1px solid currentColor;
+  }
+} 

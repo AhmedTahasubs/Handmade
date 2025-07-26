@@ -1,0 +1,68 @@
+/* Custom styles for the services page */
+
+/* Smooth transitions for view mode changes */
+.grid, 
+.space-y-6 {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Custom styling for range slider */
+input[type=range].slider {
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 5px;
+}
+
+input[type=range].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+input[type=range].slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Animation for cards */
+app-service-card {
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+app-service-card:hover {
+  transform: translateY(-5px);
+}
+
+/* RTL support */
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-4 {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  input[type=range].slider::-webkit-slider-thumb {
+    border-color: #1f2937;
+  }
+  
+  input[type=range].slider::-moz-range-thumb {
+    border-color: #1f2937;
+  }
+}
