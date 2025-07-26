@@ -15,8 +15,7 @@ interface LoginRequest {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = 'https://localhost:7047';
-  private loginUrl = `${this.baseUrl}/api/Auth/Login`;
+  private baseUrl = 'https://localhost:7047/';
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(
@@ -33,7 +32,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.loginUrl, credentials).pipe(
+    return this.http.post<LoginResponse>(this.baseUrl+"api/AuthUser/login", credentials).pipe(
       tap(response => {
         this.handleLoginSuccess(response.token);
       }),
