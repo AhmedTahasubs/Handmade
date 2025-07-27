@@ -1,0 +1,118 @@
+<div class="mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      {{ translations.title }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ translations.subtitle }}
+    </p>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="orders.length > 0; else noOrders" class="space-y-6">
+    <div *ngFor="let order of orders" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <!-- Order Header -->
+      <div class="border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ translations.orderId }}: <span class="font-medium text-gray-900 dark:text-white">{{ order.id }}</span>
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ translations.orderDate }}: <span class="font-medium text-gray-900 dark:text-white">{{ order.date | date }}</span>
+          </p>
+        </div>
+        <div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+            [class]="getStatusClass(order.status)">
+            {{ translations.statuses[order.status] }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="p-4 sm:p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          {{ translations.items }}
+        </h3>
+        <div class="space-y-4">
+          <div *ngFor="let item of order.items" class="flex gap-4">
+            <div class="flex-shrink-0">
+              <img [src]="item.image" [alt]="item.name" class="h-20 w-20 rounded-md object-cover">
+            </div>
+            <div class="flex-1">
+              <p class="text-gray-900 dark:text-white font-medium">{{ item.name }}</p>
+              <p class="text-gray-600 dark:text-gray-400 text-sm">
+                {{ item.quantity }} × {{ item.price | currency }}
+              </p>
+            </div>
+            <div class="text-gray-900 dark:text-white font-medium">
+              {{ item.quantity * item.price | currency }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6 bg-gray-50 dark:bg-gray-700/50">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              {{ translations.shippingAddress }}
+            </h4>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+              {{ order.shippingAddress }}
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div *ngIf="order.trackingNumber" class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">
+                {{ translations.trackingNumber }}:
+              </span>
+              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ order.trackingNumber }}
+              </span>
+            </div>
+            <div *ngIf="order.estimatedDelivery" class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">
+                {{ translations.estimatedDelivery }}:
+              </span>
+              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ order.estimatedDelivery | date }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">
+                {{ translations.total }}:
+              </span>
+              <span class="text-lg font-bold text-gray-900 dark:text-white">
+                {{ order.total | currency }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Actions -->
+      <div class="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-end gap-3">
+        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors">
+          {{ translations.viewDetails }}
+        </button>
+        <button class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors">
+          {{ translations.contactSupport }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #noOrders>
+    <div class="text-center py-12">
+      <i class="fas fa-box-open text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+      <p class="text-gray-600 dark:text-gray-400 text-lg">{{ translations.noOrders }}</p>
+      <button class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors">
+        {{ languageService.currentLanguage() === 'en' ? 'Start Shopping' : 'ابدأ التسوق' }}
+      </button>
+    </div>
+  </ng-template>
+</div>
