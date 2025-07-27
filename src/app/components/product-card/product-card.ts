@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 
 export interface Product {
   id: number;
@@ -31,12 +32,36 @@ export class ProductCardComponent {
   @Output() addToCart = new EventEmitter<Product>();
   @Output() addToWishlist = new EventEmitter<Product>();
 
+  constructor(private router: Router) {}
+
   onAddToCart(): void {
     this.addToCart.emit(this.product);
   }
 
   onAddToWishlist(): void {
     this.addToWishlist.emit(this.product);
+  }
+
+  onSellerClick(): void {
+    // For demo purposes, using seller name to create a simple ID
+    const sellerId = this.getSellerIdFromName(this.product.seller);
+    this.router.navigate(['/seller', sellerId]);
+  }
+
+  private getSellerIdFromName(sellerName: string): number {
+    // Mock mapping of seller names to IDs
+    const sellerMap: { [key: string]: number } = {
+      'ArtisanCrafts': 1,
+      'WoolWonders': 2, 
+      'WoodMasters': 3,
+      'LeatherCraft Co': 4,
+      'BohoVibes': 5,
+      'ArtisticSoul': 6,
+      'NaturalGlow': 7,
+      'BabyComfort': 8,
+      'CeramicArt': 9
+    };
+    return sellerMap[sellerName] || 1;
   }
 
   getStarArray(): number[] {

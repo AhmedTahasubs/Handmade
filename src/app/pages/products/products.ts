@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Product, ProductCardComponent } from '../../components/product-card/product-card';
 import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
@@ -14,6 +15,7 @@ import { LanguageService } from '../../services/language.service';
 })
 export class ProductsPage {
   private languageService = inject(LanguageService);
+  private router = inject(Router);
 
   // Get language from service for template usage
   get language(): 'en' | 'ar' {
@@ -278,6 +280,29 @@ export class ProductsPage {
   onAddToWishlist(product: Product): void {
     console.log('Added to wishlist:', product);
     // Implement wishlist functionality
+  }
+
+  onSellerClick(sellerName: string): void {
+    // For demo purposes, using seller name to create a simple ID
+    // In a real app, you'd have actual seller IDs
+    const sellerId = this.getSellerIdFromName(sellerName);
+    this.router.navigate(['/seller', sellerId]);
+  }
+
+  private getSellerIdFromName(sellerName: string): number {
+    // Mock mapping of seller names to IDs
+    const sellerMap: { [key: string]: number } = {
+      'ArtisanCrafts': 1,
+      'WoolWonders': 2, 
+      'WoodMasters': 3,
+      'LeatherCraft Co': 4,
+      'BohoVibes': 5,
+      'ArtisticSoul': 6,
+      'NaturalGlow': 7,
+      'BabyComfort': 8,
+      'CeramicArt': 9
+    };
+    return sellerMap[sellerName] || 1;
   }
 
   trackByProductId(index: number, product: Product): number {

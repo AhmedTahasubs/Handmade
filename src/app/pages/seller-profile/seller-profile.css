@@ -1,0 +1,228 @@
+/* Seller Profile Specific Styles */
+
+/* Cover image gradient overlay */
+.cover-gradient {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(147, 51, 234, 0.8) 100%);
+}
+
+/* Floating profile card animation */
+.profile-card {
+  transform: translateY(-4rem);
+  transition: all 0.3s ease-in-out;
+}
+
+.profile-card:hover {
+  transform: translateY(-4.5rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Avatar hover effects */
+.avatar-container {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.avatar-container:hover {
+  transform: scale(1.05);
+}
+
+.avatar-container::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-container:hover::after {
+  opacity: 1;
+}
+
+/* Online status pulse animation */
+.online-status {
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+}
+
+/* Verified badge animation */
+.verified-badge {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Stats cards hover effect */
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+}
+
+.dark .stat-card:hover {
+  background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+/* Skill tags animation */
+.skill-tag {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.skill-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Product cards enhanced animations */
+.product-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.product-card-wrapper {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.product-card-wrapper:nth-child(1) { animation-delay: 0.1s; }
+.product-card-wrapper:nth-child(2) { animation-delay: 0.2s; }
+.product-card-wrapper:nth-child(3) { animation-delay: 0.3s; }
+.product-card-wrapper:nth-child(4) { animation-delay: 0.4s; }
+.product-card-wrapper:nth-child(5) { animation-delay: 0.5s; }
+.product-card-wrapper:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Contact button enhanced styling */
+.contact-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.contact-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.contact-btn:hover::before {
+  left: 100%;
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* Loading spinner styling */
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-card {
+    transform: translateY(-2rem);
+    margin-top: -2rem;
+  }
+  
+  .profile-card:hover {
+    transform: translateY(-2.5rem);
+  }
+}
+
+/* Dark mode enhancements */
+.dark .stat-card {
+  background: linear-gradient(145deg, #374151, #1f2937);
+}
+
+.dark .skill-tag:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* RTL support */
+[dir="rtl"] .avatar-container {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .avatar-container img {
+  transform: scaleX(-1);
+}
+
+/* Custom scrollbar for product grid */
+.product-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.product-section::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.product-section::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.product-section::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark .product-section::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark .product-section::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark .product-section::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

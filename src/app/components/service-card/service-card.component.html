@@ -1,4 +1,4 @@
-<div class="overflow-hidden transition-transform bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1">
+<div (click)="onServiceClick()" class="overflow-hidden transition-transform bg-white border border-gray-200 rounded-lg shadow-md cursor-pointer dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1">
   <!-- Service Image -->
   <div class="relative h-48 overflow-hidden">
     <img [src]="service.imageUrl" [alt]="service.title" class="object-cover w-full h-full">
@@ -53,7 +53,7 @@
       <span class="text-xs text-gray-500 dark:text-gray-400">
         {{ language === 'en' ? 'Delivery: ' : 'التوصيل: ' }}{{ service.deliveryTime }}
       </span>
-      <button class="px-3 py-1 text-sm text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
+      <button (click)="onViewDetails($event)" class="px-3 py-1 text-sm text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
         {{ language === 'en' ? 'View Details' : 'عرض التفاصيل' }}
       </button>
     </div>
