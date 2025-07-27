@@ -42,6 +42,10 @@ export class ProductCardComponent {
     this.addToWishlist.emit(this.product);
   }
 
+  onProductClick(): void {
+    this.router.navigate(['/products', this.product.id]);
+  }
+
   onSellerClick(): void {
     // For demo purposes, using seller name to create a simple ID
     const sellerId = this.getSellerIdFromName(this.product.seller);
