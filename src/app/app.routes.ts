@@ -32,8 +32,16 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
       },
       {
+        path: 'services/:id',
+        loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
+      },
+      {
         path: 'products',
         loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
+      },
+      {
+        path: 'seller/:id',
+        loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
       },
       {
         path: 'cart',
@@ -110,3 +118,4 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/error/error').then(m => m.ErrorPage)
   }
 ];
+

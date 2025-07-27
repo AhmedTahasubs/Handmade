@@ -83,7 +83,11 @@
             <div class="flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-700 bg-gray-300 rounded-full dark:bg-gray-600 dark:text-gray-300">
               {{ product.seller.charAt(0) }}
             </div>
-            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ product.seller }}</span>
+            <button 
+              (click)="onSellerClick(product.seller)"
+              class="ml-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors">
+              {{ product.seller }}
+            </button>
             
             <div class="flex items-center ml-4">
               <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">

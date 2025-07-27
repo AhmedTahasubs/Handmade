@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 export interface Service {
   id: number;
@@ -25,7 +26,9 @@ export interface Service {
 export class ServiceCardComponent {
   @Input() service!: Service;
   @Input() language: 'en' | 'ar' = 'en';
- public Math = Math;
+  public Math = Math;
+
+  constructor(private router: Router) {}
 
   get stars(): number[] {
     return Array(5).fill(0).map((_, i) => i < Math.floor(this.service?.rating || 0) ? 1 : 0);
@@ -33,5 +36,14 @@ export class ServiceCardComponent {
 
   get halfStar(): boolean {
     return (this.service?.rating || 0) % 1 >= 0.5;
+  }
+
+  onServiceClick(): void {
+    this.router.navigate(['/service', this.service.id]);
+  }
+
+  onViewDetails(event: Event): void {
+    event.stopPropagation();
+    this.onServiceClick();
   }
 }

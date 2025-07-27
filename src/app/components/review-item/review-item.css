@@ -1,0 +1,133 @@
+/* Review Item Component Styles */
+
+.review-card {
+  transition: all 0.3s ease;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.review-card:hover {
+  background-color: rgba(59, 130, 246, 0.02);
+  transform: translateX(4px);
+}
+
+.dark .review-card:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Star rating animations */
+.star-rating {
+  gap: 2px;
+}
+
+.star {
+  transition: all 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+/* User avatar enhancements */
+.review-card img {
+  transition: all 0.3s ease;
+}
+
+.review-card:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Verified badge animation */
+.verified-badge {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-color: rgb(34, 197, 94, 0.1);
+  }
+  50% {
+    background-color: rgb(34, 197, 94, 0.2);
+  }
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .review-card {
+    padding: 0.75rem;
+  }
+  
+  .review-card .flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .review-card .flex:first-child {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .review-card:hover {
+  transform: translateX(-4px);
+}
+
+/* Focus states for accessibility */
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Loading skeleton for reviews */
+.review-skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.review-skeleton .avatar {
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+}
+
+.review-skeleton .line {
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  height: 1rem;
+}
+
+.review-skeleton .line-short {
+  width: 75%;
+}
+
+.review-skeleton .line-long {
+  width: 100%;
+}
+
+.dark .review-skeleton .avatar,
+.dark .review-skeleton .line {
+  background-color: #374151;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
