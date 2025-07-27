@@ -46,6 +46,14 @@ export const routes: Routes = [
       {
         path: 'seller/:id',
         loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
+      },
+      {
+        path: 'cart',
+        loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
       }
     ]
   },
@@ -114,3 +122,4 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/error/error').then(m => m.ErrorPage)
   }
 ];
+

@@ -1,0 +1,121 @@
+<div class="mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900">
+  <!-- Cart Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
+      {{ translations.title }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ cartItems.length }} {{ translations.items }}
+    </p>
+  </div>
+
+  <!-- Cart Content -->
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Cart Items -->
+    <div class="lg:w-2/3">
+      <div *ngIf="cartItems.length === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+        <i class="fas fa-shopping-cart text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+        <p class="text-gray-700 dark:text-gray-300 text-lg">{{ translations.emptyCart }}</p>
+      </div>
+
+      <div *ngFor="let item of cartItems" class="bg-white dark:bg-gray-800 rounded-lg shadow mb-4 p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row gap-4">
+          <!-- Product Image -->
+          <div class="w-full sm:w-32 h-32 flex-shrink-0">
+            <img [src]="item.image" [alt]="item.name" class="w-full h-full object-cover rounded-lg">
+          </div>
+
+          <!-- Product Details -->
+          <div class="flex-grow">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ item.name }}</h3>
+                <p class="text-gray-600 dark:text-gray-400">{{ translations.artisan }}: {{ item.artisan }}</p>
+              </div>
+              <button 
+                (click)="removeItem(item.id)"
+                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 flex items-center gap-1"
+              >
+                <i class="fas fa-trash"></i>
+                <span class="text-sm">{{ translations.remove }}</span>
+              </button>
+            </div>
+
+            <!-- Price and Quantity -->
+            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                  {{ item.price | currency }}
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ translations.estimated }}: {{ item.deliveryDate | date }}
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button 
+                  (click)="updateQuantity(item, item.quantity - 1)"
+                  class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  <i class="fas fa-minus text-gray-600 dark:text-gray-300"></i>
+                </button>
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.quantity"
+                  (change)="updateQuantity(item, item.quantity)"
+                  min="1"
+                  class="w-16 text-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                <button 
+                  (click)="updateQuantity(item, item.quantity + 1)"
+                  class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  <i class="fas fa-plus text-gray-600 dark:text-gray-300"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="lg:w-1/3">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sticky top-4">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+          {{ languageService.currentLanguage() === 'en' ? 'Order Summary' : 'ملخص الطلب' }}
+        </h2>
+
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">{{ translations.subtotal }}</span>
+            <span class="text-gray-900 dark:text-white">{{ subtotal | currency }}</span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">{{ translations.shipping }}</span>
+            <span class="text-gray-900 dark:text-white">{{ shipping | currency }}</span>
+          </div>
+
+          <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between">
+            <span class="font-bold text-gray-900 dark:text-white">{{ translations.total }}</span>
+            <span class="font-bold text-gray-900 dark:text-white">{{ total | currency }}</span>
+          </div>
+
+          <button
+            class="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+          >
+            {{ translations.checkout }}
+          </button>
+
+          <a
+            routerLink="/products"
+            class="block text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {{ translations.continue }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

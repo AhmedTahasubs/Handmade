@@ -1,39 +1,41 @@
+import { TableAction, TableColumn, DataTable } from './../../components/data-table/data-table';
 import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component, effect, inject } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { FormsModule } from "@angular/forms"
+import { Component, effect, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 import { RouterModule } from '@angular/router';
 
 interface Product {
-  id: number
-  name: string
-  description: string
-  price: number
-  stock: number
-  category: string
-  status: "active" | "inactive" | "out_of_stock"
-  image: string
-  createdAt: string
-  sales: number
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  status: "active" | "inactive" | "out_of_stock";
+  image: string;
+  createdAt: string;
+  sales: number;
 }
 
 @Component({
   selector: "app-seller-products-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, Modal,RouterModule],
+  imports: [CommonModule, FormsModule, DataTable, Modal, RouterModule],
   templateUrl: './products-management.html'
 })
 export class SellerProductsManagement {
-  private themeService = inject(ThemeService)
-  private languageService = inject(LanguageService)
+  private themeService = inject(ThemeService);
+  private languageService = inject(LanguageService);
 
-  currentLanguage: "en" | "ar" = "en"
-  searchTerm = ""
-  showModal = false
-  isEditing = false
-  currentProduct: Partial<Product> = {}
+  currentLanguage: "en" | "ar" = "en";
+  showModal = false;
+  showDeleteModal = false;
+  isEditing = false;
+  productToDelete: Product | null = null;
+  currentProduct: Partial<Product> = {};
 
   products: Product[] = [
     {
@@ -84,31 +86,42 @@ export class SellerProductsManagement {
       createdAt: "2024-01-18",
       sales: 18,
     },
-  ]
+  ];
+
+  columns: TableColumn[] = [
+    { key: "image", label: "Image", type: "image", width: "80px" },
+    { key: "name", label: "Product", sortable: true, type: "text" },
+    { key: "category", label: "Category", sortable: true, type: "text" },
+    { key: "price", label: "Price", sortable: true, type: "currency" },
+    { key: "stock", label: "Stock", sortable: true, type: "text" },
+    { 
+      key: "status", 
+      label: "Status", 
+      sortable: true, 
+      type: "badge"
+    },
+    { key: "sales", label: "Sales", sortable: true, type: "text" },
+    { key: "createdAt", label: "Created", sortable: true, type: "date" },
+  ];
+
+  actions: TableAction[] = [
+    { label: "Edit", icon: "edit", color: "secondary", action: "edit" },
+    { label: "Delete", icon: "trash", color: "danger", action: "delete" },
+  ];
 
   private translations = {
     en: {
       title: "Products Management",
       subtitle: "Manage your product inventory and listings",
       addProduct: "Add Product",
-      totalProducts: "Total Products",
-      activeProducts: "Active Products",
-      outOfStock: "Out of Stock",
-      totalSales: "Total Sales",
-      productsTable: "Your Products",
-      searchPlaceholder: "Search products...",
-      product: "Product",
-      category: "Category",
-      price: "Price",
-      stock: "Stock",
-      status: "Status",
-      sales: "Sales",
-      actions: "Actions",
       editProduct: "Edit Product",
+      deleteProduct: "Delete Product",
       productName: "Product Name",
       description: "Description",
       update: "Update",
       create: "Create",
+      deleteConfirm: "Are you sure?",
+      deleteMessage: "This will permanently delete the product and all its data.",
       homeDecor: "Home Decor",
       jewelry: "Jewelry",
       clothing: "Clothing",
@@ -117,29 +130,23 @@ export class SellerProductsManagement {
       active: "Active",
       inactive: "Inactive",
       out_of_stock: "Out of Stock",
+      totalProducts: "Total Products",
+      activeProducts: "Active Products",
+      outOfStock: "Out of Stock",
+      totalSales: "Total Sales",
     },
     ar: {
       title: "إدارة المنتجات",
       subtitle: "إدارة مخزون المنتجات والقوائم",
       addProduct: "إضافة منتج",
-      totalProducts: "إجمالي المنتجات",
-      activeProducts: "المنتجات النشطة",
-      outOfStock: "نفد من المخزون",
-      totalSales: "إجمالي المبيعات",
-      productsTable: "منتجاتك",
-      searchPlaceholder: "البحث في المنتجات...",
-      product: "المنتج",
-      category: "الفئة",
-      price: "السعر",
-      stock: "المخزون",
-      status: "الحالة",
-      sales: "المبيعات",
-      actions: "الإجراءات",
       editProduct: "تعديل المنتج",
+      deleteProduct: "حذف المنتج",
       productName: "اسم المنتج",
       description: "الوصف",
       update: "تحديث",
       create: "إنشاء",
+      deleteConfirm: "هل أنت متأكد؟",
+      deleteMessage: "سيتم حذف هذا المنتج وبياناته بشكل دائم.",
       homeDecor: "ديكور المنزل",
       jewelry: "المجوهرات",
       clothing: "الملابس",
@@ -148,59 +155,41 @@ export class SellerProductsManagement {
       active: "نشط",
       inactive: "غير نشط",
       out_of_stock: "نفد من المخزون",
+      totalProducts: "إجمالي المنتجات",
+      activeProducts: "المنتجات النشطة",
+      outOfStock: "نفد من المخزون",
+      totalSales: "إجمالي المبيعات",
     },
-  }
+  };
 
   constructor() {
     effect(() => {
-    this.currentLanguage = this.languageService.currentLanguage()
-  })
-  }
-
-  get filteredProducts(): Product[] {
-    if (!this.searchTerm) return this.products
-    return this.products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(this.searchTerm.toLowerCase()),
-    )
+      this.currentLanguage = this.languageService.currentLanguage();
+    });
   }
 
   getTranslation(key: string): string {
-    return this.translations[this.currentLanguage][key as keyof typeof this.translations.en] || key
+    return this.translations[this.currentLanguage][key as keyof typeof this.translations.en] || key;
+  }
+
+  get modalTitle(): string {
+    return this.isEditing ? this.getTranslation('editProduct') : this.getTranslation('addProduct');
   }
 
   getActiveProductsCount(): number {
-    return this.products.filter((p) => p.status === "active").length
+    return this.products.filter((p) => p.status === "active").length;
   }
 
   getOutOfStockCount(): number {
-    return this.products.filter((p) => p.status === "out_of_stock").length
+    return this.products.filter((p) => p.status === "out_of_stock").length;
   }
 
   getTotalSales(): number {
-    return this.products.reduce((total, product) => total + product.sales, 0)
-  }
-
-  getBadgeClass(status: string): string {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-      case "out_of_stock":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
-      case "inactive":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-    }
-  }
-
-  getStatusText(status: string): string {
-    return this.getTranslation(status)
+    return this.products.reduce((total, product) => total + product.sales, 0);
   }
 
   openCreateModal(): void {
-    this.isEditing = false
+    this.isEditing = false;
     this.currentProduct = {
       name: "",
       description: "",
@@ -208,36 +197,53 @@ export class SellerProductsManagement {
       stock: 0,
       category: "Home Decor",
       status: "active",
-    }
-    this.showModal = true
-  }
-
-  editProduct(product: Product): void {
-    this.isEditing = true
-    this.currentProduct = { ...product }
-    this.showModal = true
-  }
-
-  deleteProduct(product: Product): void {
-    if (confirm("Are you sure you want to delete this product?")) {
-      this.products = this.products.filter((p) => p.id !== product.id)
-    }
+    };
+    this.showModal = true;
   }
 
   closeModal(): void {
-    this.showModal = false
-    this.currentProduct = {}
+    this.showModal = false;
+    this.currentProduct = {};
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.productToDelete = null;
+  }
+
+  onAction(event: { action: string; item: Product }): void {
+    const { action, item } = event;
+
+    switch (action) {
+      case "edit":
+        this.editProduct(item);
+        break;
+      case "delete":
+        this.deleteProduct(item);
+        break;
+    }
+  }
+
+  editProduct(product: Product): void {
+    this.isEditing = true;
+    this.currentProduct = { ...product };
+    this.showModal = true;
+  }
+
+  deleteProduct(product: Product): void {
+    this.productToDelete = product;
+    this.showDeleteModal = true;
   }
 
   saveProduct(): void {
     if (this.isEditing) {
-      const index = this.products.findIndex((p) => p.id === this.currentProduct.id)
+      const index = this.products.findIndex((p) => p.id === this.currentProduct.id);
       if (index !== -1) {
-        this.products[index] = { ...this.products[index], ...this.currentProduct }
+        this.products[index] = { ...this.products[index], ...this.currentProduct };
       }
     } else {
       const newProduct: Product = {
-        id: Date.now(),
+        id: Math.max(...this.products.map((p) => p.id)) + 1,
         name: this.currentProduct.name || "",
         description: this.currentProduct.description || "",
         price: this.currentProduct.price || 0,
@@ -247,9 +253,20 @@ export class SellerProductsManagement {
         image: "/placeholder.svg?height=40&width=40",
         createdAt: new Date().toISOString().split("T")[0],
         sales: 0,
-      }
-      this.products.push(newProduct)
+      };
+      this.products.push(newProduct);
     }
-    this.closeModal()
+    this.closeModal();
+  }
+
+  confirmDelete(): void {
+    if (this.productToDelete) {
+      this.products = this.products.filter((p) => p.id !== this.productToDelete!.id);
+      this.closeDeleteModal();
+    }
+  }
+
+  onExport(): void {
+    console.log("Export products data");
   }
 }

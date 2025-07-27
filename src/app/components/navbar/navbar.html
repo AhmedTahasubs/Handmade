@@ -60,10 +60,10 @@
           </button>
 
           <!-- Cart -->
-          <button class="relative p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+          <a routerLink="/cart" class="relative p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
             <i class="text-lg fa-solid fa-cart-shopping"></i>
             <span class="absolute flex items-center justify-center w-4 h-4 text-xs text-white bg-blue-600 rounded-full -top-1 -right-1">3</span>
-          </button>
+          </a>
 
           <!-- Auth Buttons -->
           <ng-container *ngIf="isLoggedIn; else guest">

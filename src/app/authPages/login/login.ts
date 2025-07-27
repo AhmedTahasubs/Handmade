@@ -1,16 +1,17 @@
+import { AuthService } from './../../services/authService.service';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
 import { Component } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule } from "@angular/router"
+import { Router, RouterModule } from "@angular/router"
 import { FormButton } from "../../components/form-button/form-button";
 import { FormInputComponent } from "../../components/form-input/form-input";
 import { SocialButton } from "../../components/social-button/social-button";
 import { FormsModule } from '@angular/forms';
-
 @Component({
   selector: "app-login",
-  imports: [CommonModule, RouterModule, FormButton, FormInputComponent, SocialButton,FormsModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormButton, FormInputComponent, SocialButton, FormsModule],
   templateUrl: './login.html',
   styles: [
     `
@@ -99,6 +100,8 @@ export class Login {
   constructor(
     public ThemeService: ThemeService,
     public LanguageService: LanguageService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   get labels() {
@@ -161,52 +164,67 @@ export class Login {
     }
   }
 
-  validateForm(): boolean {
-    let isValid = true
+  // validateForm(): boolean {
+  //   let isValid = true
 
-    if (!this.email) {
-      this.emailError =
-        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
-      isValid = false
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-      this.emailError =
-        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
-      isValid = false
-    } else {
-      this.emailError = ""
-    }
+  //   if (!this.email) {
+  //     this.emailError =
+  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
+  //     isValid = false
+  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+  //     this.emailError =
+  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
+  //     isValid = false
+  //   } else {
+  //     this.emailError = ""
+  //   }
 
-    if (!this.password) {
-      this.passwordError =
-        this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
-      isValid = false
-    } else if (this.password.length < 6) {
-      this.passwordError =
-        this.LanguageService.currentLanguage() === "ar"
-          ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
-          : "Password must be at least 6 characters"
-      isValid = false
-    } else {
-      this.passwordError = ""
-    }
+  //   if (!this.password) {
+  //     this.passwordError =
+  //       this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
+  //     isValid = false
+  //   } else if (this.password.length < 6) {
+  //     this.passwordError =
+  //       this.LanguageService.currentLanguage() === "ar"
+  //         ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+  //         : "Password must be at least 6 characters"
+  //     isValid = false
+  //   } else {
+  //     this.passwordError = ""
+  //   }
 
-    return isValid
-  }
+  //   return isValid
+  // }
 
-  async onSubmit(): Promise<void> {
-    if (!this.validateForm()) {
-      return
-    }
+  onSubmit(): void {
+    // if (!this.validateForm()) {
+    //   return
+    // }
 
     this.isLoading = true
+    this.emailError = ""
+    this.passwordError = ""
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log("Login successful:", { email: this.email, rememberMe: this.rememberMe })
-    } catch (error) {
-      console.error("Login failed:", error)
-    } finally {
-      this.isLoading = false
-    }
+    const credentials = {
+      userName: this.email,
+      password: this.password
+    };
+
+    this.authService.login(credentials).subscribe({
+      next: (e) => {
+        this.isLoading = false;
+        console.log(e);
+        // Success - AuthService handles the redirect
+      },
+      error: (error) => {
+        this.isLoading = false;
+        if (this.LanguageService.currentLanguage() === "ar") {
+          this.passwordError = "بيانات الدخول غير صحيحة";
+        } else {
+          this.passwordError = "Invalid login credentials";
+        }
+        console.error("Login error:", error);
+      }
+    });
   }
 }
