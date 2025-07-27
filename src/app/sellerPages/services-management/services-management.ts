@@ -1,3 +1,4 @@
+import { TableAction, TableColumn, DataTable } from './../../components/data-table/data-table';
 import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
@@ -5,6 +6,7 @@ import { Component, effect, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from '@angular/router';
+
 interface Service {
   id: number;
   title: string;
@@ -21,7 +23,7 @@ interface Service {
 @Component({
   selector: "app-seller-services-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, Modal,RouterModule],
+  imports: [CommonModule, FormsModule, DataTable, Modal, RouterModule],
   templateUrl: './services-management.html'
 })
 export class SellerServicesManagement {
@@ -29,9 +31,10 @@ export class SellerServicesManagement {
   private languageService = inject(LanguageService);
 
   currentLanguage: "en" | "ar" = "en";
-  searchTerm = "";
   showModal = false;
+  showDeleteModal = false;
   isEditing = false;
+  serviceToDelete: Service | null = null;
   currentService: Partial<Service> = {};
 
   services: Service[] = [
@@ -73,29 +76,40 @@ export class SellerServicesManagement {
     },
   ];
 
+  columns: TableColumn[] = [
+    { key: "image", label: "Image", type: "image", width: "80px" },
+    { key: "title", label: "Service", sortable: true, type: "text" },
+    { key: "category", label: "Category", sortable: true, type: "text" },
+    { key: "price", label: "Price", sortable: true, type: "currency" },
+    { 
+      key: "status", 
+      label: "Status", 
+      sortable: true, 
+      type: "badge"
+    },
+    { key: "orders", label: "Orders", sortable: true, type: "text" },
+    { key: "createdAt", label: "Created", sortable: true, type: "date" },
+  ];
+
+  actions: TableAction[] = [
+    { label: "Edit", icon: "edit", color: "secondary", action: "edit" },
+    { label: "Delete", icon: "trash", color: "danger", action: "delete" },
+  ];
+
   private translations = {
     en: {
       title: "Services Management",
       subtitle: "Manage your services and offerings",
       addService: "Add Service",
-      totalServices: "Total Services",
-      activeServices: "Active Services",
-      pendingServices: "Pending Services",
-      totalOrders: "Total Orders",
-      servicesTable: "Your Services",
-      searchPlaceholder: "Search services...",
-      service: "Service",
-      category: "Category",
-      price: "Price",
-      status: "Status",
-      orders: "Orders",
-      actions: "Actions",
       editService: "Edit Service",
+      deleteService: "Delete Service",
       serviceTitle: "Service Title",
       description: "Description",
       duration: "Duration",
       update: "Update",
       create: "Create",
+      deleteConfirm: "Are you sure?",
+      deleteMessage: "This will permanently delete the service and all its data.",
       woodworking: "Woodworking",
       pottery: "Pottery",
       textiles: "Textiles",
@@ -109,24 +123,15 @@ export class SellerServicesManagement {
       title: "إدارة الخدمات",
       subtitle: "إدارة خدماتك وعروضك",
       addService: "إضافة خدمة",
-      totalServices: "إجمالي الخدمات",
-      activeServices: "الخدمات النشطة",
-      pendingServices: "الخدمات المعلقة",
-      totalOrders: "إجمالي الطلبات",
-      servicesTable: "خدماتك",
-      searchPlaceholder: "البحث في الخدمات...",
-      service: "الخدمة",
-      category: "الفئة",
-      price: "السعر",
-      status: "الحالة",
-      orders: "الطلبات",
-      actions: "الإجراءات",
       editService: "تعديل الخدمة",
+      deleteService: "حذف الخدمة",
       serviceTitle: "عنوان الخدمة",
       description: "الوصف",
       duration: "المدة",
       update: "تحديث",
       create: "إنشاء",
+      deleteConfirm: "هل أنت متأكد؟",
+      deleteMessage: "سيتم حذف هذه الخدمة وبياناتها بشكل دائم.",
       woodworking: "النجارة",
       pottery: "الفخار",
       textiles: "المنسوجات",
@@ -140,21 +145,16 @@ export class SellerServicesManagement {
 
   constructor() {
     effect(() => {
-    this.currentLanguage = this.languageService.currentLanguage()
-  })
-  }
-
-  get filteredServices(): Service[] {
-    if (!this.searchTerm) return this.services;
-    return this.services.filter(
-      (service) =>
-        service.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        service.category.toLowerCase().includes(this.searchTerm.toLowerCase()),
-    );
+      this.currentLanguage = this.languageService.currentLanguage();
+    });
   }
 
   getTranslation(key: string): string {
     return this.translations[this.currentLanguage][key as keyof typeof this.translations.en] || key;
+  }
+
+  get modalTitle(): string {
+    return this.isEditing ? this.getTranslation('editService') : this.getTranslation('addService');
   }
 
   getActiveServicesCount(): number {
@@ -167,23 +167,6 @@ export class SellerServicesManagement {
 
   getTotalOrders(): number {
     return this.services.reduce((total, service) => total + service.orders, 0);
-  }
-
-  getBadgeClass(status: string): string {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300";
-      case "inactive":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300";
-    }
-  }
-
-  getStatusText(status: string): string {
-    return this.getTranslation(status);
   }
 
   openCreateModal(): void {
@@ -199,6 +182,29 @@ export class SellerServicesManagement {
     this.showModal = true;
   }
 
+  closeModal(): void {
+    this.showModal = false;
+    this.currentService = {};
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.serviceToDelete = null;
+  }
+
+  onAction(event: { action: string; item: Service }): void {
+    const { action, item } = event;
+
+    switch (action) {
+      case "edit":
+        this.editService(item);
+        break;
+      case "delete":
+        this.deleteService(item);
+        break;
+    }
+  }
+
   editService(service: Service): void {
     this.isEditing = true;
     this.currentService = { ...service };
@@ -206,14 +212,8 @@ export class SellerServicesManagement {
   }
 
   deleteService(service: Service): void {
-    if (confirm("Are you sure you want to delete this service?")) {
-      this.services = this.services.filter((s) => s.id !== service.id);
-    }
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-    this.currentService = {};
+    this.serviceToDelete = service;
+    this.showDeleteModal = true;
   }
 
   saveService(): void {
@@ -224,7 +224,7 @@ export class SellerServicesManagement {
       }
     } else {
       const newService: Service = {
-        id: Date.now(),
+        id: Math.max(...this.services.map((s) => s.id)) + 1,
         title: this.currentService.title || "",
         description: this.currentService.description || "",
         price: this.currentService.price || 0,
@@ -238,5 +238,16 @@ export class SellerServicesManagement {
       this.services.push(newService);
     }
     this.closeModal();
+  }
+
+  confirmDelete(): void {
+    if (this.serviceToDelete) {
+      this.services = this.services.filter((s) => s.id !== this.serviceToDelete!.id);
+      this.closeDeleteModal();
+    }
+  }
+
+  onExport(): void {
+    console.log("Export services data");
   }
 }
