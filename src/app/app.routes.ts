@@ -54,7 +54,11 @@ export const routes: Routes = [
       {
         path: 'orders',
         loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
-      }
+      },
+      {
+        path: 'chat/:userId',
+        loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
+      },
     ]
   },
   {
