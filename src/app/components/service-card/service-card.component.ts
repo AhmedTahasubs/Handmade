@@ -9,7 +9,7 @@ export interface Service {
   price: number;
   rating: number;
   reviewCount: number;
-  imageUrl: string;
+  imageUrl: string | null; 
   category: string;
   seller: string;
   isCustomizable: boolean;
@@ -18,13 +18,13 @@ export interface Service {
 
 @Component({
   selector: 'app-service-card',
-  templateUrl: './service-card.component.html',
-  styleUrls: ['./service-card.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
+  templateUrl: './service-card.component.html',
+  styleUrls: ['./service-card.component.css']
 })
 export class ServiceCardComponent {
-  @Input() service!: Service;
+  @Input() service!: Service ;
   @Input() language: 'en' | 'ar' = 'en';
   public Math = Math;
 

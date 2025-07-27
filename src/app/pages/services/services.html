@@ -1,11 +1,9 @@
-<div class=" px-4 py-8 mx-auto transition-colors duration-300 bg-white dark:bg-gray-900">
-  <!-- Page Header -->
+<div class="px-4 py-8 mx-auto transition-colors duration-300 bg-white dark:bg-gray-900">
   <div class="mb-8 text-center">
     <h1 class="pb-5 mb-6 text-4xl font-bold text-transparent transition-all duration-300 md:text-6xl bg-gradient-to-r from-gray-900 via-indigo-700 to-purple-600 dark:from-gray-100 dark:via-purple-300 dark:to-white bg-clip-text hover:scale-105">{{ labels.title }}</h1>
     <p class="max-w-2xl mx-auto mb-8 text-xl text-gray-600 dark:text-gray-400">{{ labels.subtitle }}</p>
   </div>
   
-  <!-- Search and Filter Section -->
   <div class="mb-8">
     <app-search-filter
       [language]="currentLanguage"
@@ -21,14 +19,12 @@
     ></app-search-filter>
   </div>
   
-  <!-- Results Controls -->
   <div class="flex flex-col items-center justify-between mb-6 sm:flex-row">
     <p class="mb-4 text-gray-600 dark:text-gray-400 sm:mb-0">
       <span class="font-medium">{{ filteredServices.length }}</span> {{ labels.results }}
     </p>
     
     <div class="flex items-center space-x-4">
-      <!-- View Mode Toggle -->
       <div class="flex items-center mr-4 space-x-2">
         <button 
           (click)="viewMode = 'grid'" 
@@ -54,7 +50,6 @@
         </button>
       </div>
       
-      <!-- Sort Dropdown -->
       <div class="flex items-center space-x-2">
         <label for="sort" class="text-sm text-gray-600 dark:text-gray-400">{{ labels.sort }}</label>
         <select 
@@ -71,18 +66,15 @@
     </div>
   </div>
   
-  <!-- Services Grid/List -->
   <div *ngIf="filteredServices.length > 0; else noResults">
-    <!-- Grid View -->
     <div *ngIf="viewMode === 'grid'" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <div *ngFor="let service of filteredServices">
+      <div *ngFor="let service of filteredServices; trackBy: trackByServiceId">
         <app-service-card [service]="service" [language]="currentLanguage"></app-service-card>
       </div>
     </div>
     
-    <!-- List View -->
     <div *ngIf="viewMode === 'list'" class="space-y-6">
-      <div *ngFor="let service of filteredServices" class="flex flex-col overflow-hidden bg-white border border-gray-200 rounded-lg shadow-md md:flex-row dark:bg-gray-800 dark:border-gray-700">
+      <div *ngFor="let service of filteredServices; trackBy: trackByServiceId" class="flex flex-col overflow-hidden bg-white border border-gray-200 rounded-lg shadow-md md:flex-row dark:bg-gray-800 dark:border-gray-700">
         <div class="h-48 md:w-1/3 md:h-auto">
           <img [src]="service.imageUrl" [alt]="service.title" class="object-cover w-full h-full">
         </div>
@@ -126,7 +118,6 @@
     </div>
   </div>
   
-  <!-- No Results Template -->
   <ng-template #noResults>
     <div class="py-12 text-center">
       <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
