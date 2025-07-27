@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ServiceCardComponent, Service } from '../../components/service-card/service-card.component';
 import { ReviewItemComponent, Review } from '../../components/review-item/review-item';
 import { LanguageService } from '../../services/language.service';
+import { ProductCardComponent } from "../../components/product-card/product-card";
 
 export interface ServiceDetail extends Service {
   fullDescription: {
@@ -83,7 +84,7 @@ export interface SellerInfo {
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent],
+  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent, ProductCardComponent],
   templateUrl: './service-detail.html',
   styleUrl: './service-detail.css'
 })
@@ -100,6 +101,8 @@ export class ServiceDetailPage implements OnInit {
   // Contact form
   showContactForm = false;
   contactMessage = '';
+  sellerProducts: any[] = [];
+  displayedSellerProducts: any[] = [];
   
   constructor(
     private route: ActivatedRoute,
@@ -321,6 +324,9 @@ export class ServiceDetailPage implements OnInit {
       }
     ];
     
+    // Load seller products
+    this.loadSellerProducts();
+    
     this.loading = false;
   }
   
@@ -368,6 +374,93 @@ export class ServiceDetailPage implements OnInit {
   
   goBackToServices(): void {
     this.router.navigate(['/services']);
+  }
+
+  private loadSellerProducts(): void {
+    // Mock seller products data
+    this.sellerProducts = [
+      {
+        id: 1,
+        name: { en: 'Handcrafted Wooden Bowl', ar: 'وعاء خشبي يدوي الصنع' },
+        description: { 
+          en: 'Beautiful handcrafted wooden bowl made from sustainable oak.',
+          ar: 'وعاء خشبي جميل مصنوع يدوياً من خشب البلوط المستدام.'
+        },
+        price: 45.99,
+        category: 'Home & Garden',
+        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
+        seller: 'ArtisticSoul',
+        rating: 4.8,
+        customizable: true
+      },
+      {
+        id: 2,
+        name: { en: 'Custom Ceramic Vase', ar: 'مزهرية خزفية مخصصة' },
+        description: { 
+          en: 'Handcrafted ceramic vase with unique designs.',
+          ar: 'مزهرية خزفية مصنوعة يدوياً بتصاميم فريدة.'
+        },
+        price: 35.99,
+        category: 'Home & Garden',
+        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500',
+        seller: 'ArtisticSoul',
+        rating: 4.6,
+        customizable: true
+      },
+      {
+        id: 3,
+        name: { en: 'Leather Wallet', ar: 'محفظة جلدية' },
+        description: { 
+          en: 'Handmade leather wallet with premium quality.',
+          ar: 'محفظة جلدية مصنوعة يدوياً بجودة فاخرة.'
+        },
+        price: 29.99,
+        category: 'Accessories',
+        image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500',
+        seller: 'ArtisticSoul',
+        rating: 4.5,
+        customizable: false
+      },
+      {
+        id: 4,
+        name: { en: 'Artistic Wall Art', ar: 'عمل فني جداري' },
+        description: { 
+          en: 'Unique wall art piece created by the artist.',
+          ar: 'قطعة فنية جدارية فريدة من نوعها من إنشاء الفنان.'
+        },
+        price: 89.99,
+        category: 'Art',
+        image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500',
+        seller: 'ArtisticSoul',
+        rating: 4.9,
+        customizable: true
+      }
+    ];
+    
+    // Set displayed products (max 3)
+    this.displayedSellerProducts = this.sellerProducts.slice(0, 3);
+  }
+
+  onAddToCart(product: any): void {
+    console.log('Adding to cart:', product);
+    // Implement add to cart functionality
+  }
+
+  onAddToWishlist(product: any): void {
+    console.log('Adding to wishlist:', product);
+    // Implement add to wishlist functionality
+  }
+
+  viewAllSellerProducts(): void {
+    if (this.service) {
+      // Navigate to products page with seller filter
+      this.router.navigate(['/products'], { 
+        queryParams: { 
+          seller: this.service.sellerInfo.name,
+          sellerId: this.service.sellerInfo.id 
+        } 
+      });
+    }
   }
   
   getStarArray(): number[] {
@@ -434,7 +527,11 @@ export class ServiceDetailPage implements OnInit {
       
       // States
       online: this.currentLanguage === 'en' ? 'Online' : 'متصل',
-      verified: this.currentLanguage === 'en' ? 'Verified Seller' : 'بائع موثق'
+      verified: this.currentLanguage === 'en' ? 'Verified Seller' : 'بائع موثق',
+      
+      // Seller Products
+      seller_products: this.currentLanguage === 'en' ? 'Seller Products' : 'منتجات البائع',
+      view_all_products: this.currentLanguage === 'en' ? 'View All Products' : 'عرض جميع المنتجات'
     };
   }
 }
