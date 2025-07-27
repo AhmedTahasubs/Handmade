@@ -37,6 +37,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     console.log('🚀 Chat Component Init - Current User:', this.currentUserId, 'Other User:', this.otherUserId);
 
+    // Handle browser/tab close events
+    this.setupDisconnectionHandlers();
+
     this.chatService.connect();
     this.subs.push(
       this.chatService.connectionStatus$.subscribe(status => {
@@ -170,7 +173,93 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     console.log('🔌 Chat Component Destroy');
+    this.cleanupConnections();
+  }
+
+  private setupDisconnectionHandlers(): void {
+    // Handle page refresh/close
+    window.addEventListener('beforeunload', (event) => {
+      console.log('🚪 Page unloading - disconnecting SignalR');
+      this.chatService.disconnect();
+    });
+
+    // Handle browser back/forward navigation
+    window.addEventListener('pagehide', (event) => {
+      console.log('🚪 Page hiding - disconnecting SignalR');
+      this.chatService.disconnect();
+    });
+
+    // Handle visibility change (tab switching, minimizing)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        console.log('👁️ Page hidden - user may have left');
+        // Optional: You might want to set a timeout here instead of immediate disconnect
+        // setTimeout(() => {
+        //   if (document.hidden) {
+        //     this.chatService.disconnect();
+        //   }
+        // }, 30000); // Disconnect after 30 seconds of being hidden
+      } else {
+        console.log('👁️ Page visible - reconnecting if needed');
+        if (this.connectionStatus === 'disconnected') {
+          this.chatService.connect();
+        }
+      }
+    });
+
+    // Handle online/offline events
+    window.addEventListener('online', () => {
+      console.log('🌐 Back online - reconnecting');
+      if (this.connectionStatus === 'disconnected') {
+        this.chatService.connect();
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('🌐 Gone offline - disconnecting');
+      this.chatService.disconnect();
+    });
+  }
+
+  private cleanupConnections(): void {
     this.subs.forEach(s => s.unsubscribe());
     this.chatService.disconnect();
+
+    // Remove event listeners to prevent memory leaks
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    window.removeEventListener('pagehide', this.handlePageHide);
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleOffline);
   }
+
+  // Event handler methods for proper cleanup
+  private handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    this.chatService.disconnect();
+  };
+
+  private handlePageHide = (event: PageTransitionEvent) => {
+    this.chatService.disconnect();
+  };
+
+  private handleVisibilityChange = () => {
+    if (document.hidden) {
+      console.log('👁️ Page hidden');
+    } else {
+      console.log('👁️ Page visible');
+      if (this.connectionStatus === 'disconnected') {
+        this.chatService.connect();
+      }
+    }
+  };
+
+  private handleOnline = () => {
+    if (this.connectionStatus === 'disconnected') {
+      this.chatService.connect();
+    }
+  };
+
+  private handleOffline = () => {
+    this.chatService.disconnect();
+  };
 }
