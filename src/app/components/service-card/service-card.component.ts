@@ -39,7 +39,7 @@ export class ServiceCardComponent {
   }
 
   onServiceClick(): void {
-    this.router.navigate(['/service', this.service.id]);
+    this.router.navigate(['/services', this.service.id]);
   }
 
   onViewDetails(event: Event): void {
