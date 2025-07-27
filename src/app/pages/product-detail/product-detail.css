@@ -1,0 +1,186 @@
+/* Product Detail Page Styles */
+
+/* Star Rating Animation */
+.star-rating {
+  display: flex;
+  align-items: center;
+}
+
+.star-rating .star {
+  transition: all 0.2s ease-in-out;
+}
+
+.star-rating:hover .star {
+  transform: scale(1.1);
+}
+
+/* Image Gallery */
+.product-image-gallery img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-image-gallery img:hover {
+  transform: scale(1.05);
+}
+
+/* Quantity Input */
+.quantity-input {
+  -moz-appearance: textfield;
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Review Form Modal */
+.review-modal {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Rating Distribution Bars */
+.rating-bar {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Loading Animation */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Product Badge Animation */
+.customizable-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Hover Effects */
+.product-card-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.product-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Review Item Hover */
+.review-card:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Button Animations */
+.btn-bounce {
+  animation: bounce-once 0.6s ease-in-out;
+}
+
+@keyframes bounce-once {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .review-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .related-products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quantity-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Dark Mode Enhancements */
+.dark .product-image-gallery {
+  background-color: #1f2937;
+}
+
+.dark .review-card:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus States */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .product-actions,
+  .review-form,
+  .related-products {
+    display: none;
+  }
+  
+  .product-detail {
+    color: black;
+    background: white;
+  }
+} 
