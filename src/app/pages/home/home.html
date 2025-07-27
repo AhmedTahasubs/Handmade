@@ -1,6 +1,5 @@
 <div class="min-h-screen transition-colors duration-300 bg-white dark:bg-gray-900">
   <main class="container px-4 py-8 mx-auto">
-    <!-- Hero Section -->
     <section class="py-12 mb-12 text-center">
       <h1 class="pb-5 mb-6 text-4xl font-bold text-transparent transition-all duration-300 md:text-6xl bg-gradient-to-r from-gray-900 via-indigo-700 to-purple-600 dark:from-gray-100 dark:via-purple-300 dark:to-white bg-clip-text hover:scale-105">
         {{ language === 'en' ? 'Discover Unique Handmade Treasures' : 'اكتشف الكنوز المصنوعة يدوياً الفريدة' }}
@@ -12,80 +11,26 @@
       </p>
     </section>
 
-    <!-- Search and Filter Section -->
-    <!-- <app-search-filter
-      [language]="language"
-      [searchTerm]="searchTerm"
-      [selectedCategory]="selectedCategory"
-      [priceRange]="priceRange"
-      [showCustomizable]="showCustomizable"
-      (searchTermChange)="onSearchTermChange($event)"
-      (selectedCategoryChange)="onSelectedCategoryChange($event)"
-      (priceRangeChange)="onPriceRangeChange($event)"
-      (showCustomizableChange)="onShowCustomizableChange($event)"
-      (clearAllFilters)="onClearAllFilters()">
-    </app-search-filter> -->
-
-    <!-- Products Grid -->
-    <!-- <section class="mt-12">
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ language === 'en' ? 'Featured Products' : 'المنتجات المميزة' }}
-        </h2>
-        <p class="text-gray-600 dark:text-gray-400">
-          {{ language === 'en' 
-            ? filteredProducts.length + ' products found'
-            : 'تم العثور على ' + filteredProducts.length + ' منتج' }}
-        </p>
-      </div>
-
-      <div *ngIf="filteredProducts.length === 0" class="py-12 text-center">
-        <div class="mb-4 text-gray-400">
-          <i class="text-6xl text-gray-400 fa-solid fa-box-open dark:text-gray-500 animate-bounce"></i>
-        </div>
-        <p class="text-lg text-gray-500 dark:text-gray-400">
-          {{ language === 'en'
-            ? 'No products found matching your criteria'
-            : 'لم يتم العثور على منتجات تطابق معاييرك' }}
-        </p>
-      </div>
-
-      <div *ngIf="filteredProducts.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <app-product-card 
-          *ngFor="let product of filteredProducts; trackBy: trackByProductId"
-          [product]="product" 
-          [language]="language"
-          (addToCart)="onAddToCart($event)"
-          (addToWishlist)="onAddToWishlist($event)">
-        </app-product-card>
-      </div>
-    </section> -->
-
-
-    <!-- Categories Grid -->
-      <div class="mb-16">
+    <div class="mb-16">
       <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
         {{ language === 'en' ? 'Featured Categories' : 'الفئات المميزة' }}
       </h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        <div *ngFor="let category of featuredCategories" 
+        <div *ngFor="let category of featuredCategories; trackbyid : trackByCategoryId " 
              class="relative overflow-hidden transition-all duration-300 transform bg-white shadow-lg group rounded-xl dark:bg-gray-800 hover:shadow-xl hover:scale-105">
           <div class="relative overflow-hidden aspect-w-16 aspect-h-9">
-            <img [src]="category.image" 
-                 [alt]="category.name[language]"
+            <img [src]="category.imageUrl || 'assets/placeholder.jpg'" 
+                 [alt]="category.name"
                  class="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-110">
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             <div class="absolute text-white bottom-4 left-4">
-              <h3 class="mb-1 text-xl font-bold">{{ category.name[language] }}</h3>
+              <h3 class="mb-1 text-xl font-bold">{{ category.name }}</h3> 
               <p class="text-sm opacity-90">
-                {{ category.productCount }} {{ language === 'en' ? 'products' : 'منتج' }}
+                {{ category.productCount || 0 }} {{ language === 'en' ? 'products' : 'منتج' }}
               </p>
             </div>
           </div>
           <div class="p-6">
-            <p class="mb-4 text-gray-600 dark:text-gray-400">
-              {{ category.description[language] }}
-            </p>
             <button class="w-full px-4 py-2 align-bottom text-white transition-colors duration-200 bg-indigo-600 rounded-lg hover:bg-indigo-700">
               {{ language === 'en' ? 'Explore Category' : 'استكشف الفئة' }}
             </button>
@@ -94,28 +39,26 @@
       </div>
     </div>
 
-     <!-- All Categories Grid -->
     <div>
       <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
         {{ language === 'en' ? 'All Categories' : 'جميع الفئات' }}
       </h2>
       <div class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        <div *ngFor="let category of allCategories" 
+        <div *ngFor="let category of allCategories; trackBy: trackByCategoryId" 
              class="p-6 text-center transition-all duration-300 transform bg-white shadow-md cursor-pointer group dark:bg-gray-800 rounded-xl hover:shadow-lg hover:scale-105">
           <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600">
             <i class="fas fa-{{ getCategoryIcon(category.id) }} text-white text-2xl"></i>
           </div>
           <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">
-            {{ category.name[language] }}
+            {{ category.name }}
           </h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ category.productCount }} {{ language === 'en' ? 'items' : 'عنصر' }}
+            {{ category.productCount || 0 }} {{ language === 'en' ? 'items' : 'عنصر' }}
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Call to Action Section -->
     <section class="py-16 mt-16 text-center rounded-lg bg-gray-50 dark:bg-gray-800">
       <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white transition-transform hover:translate-y-[-3px] duration-300">
         {{ language === 'en' ? 'Are you an artisan?' : 'هل أنت حرفي؟' }}
@@ -130,5 +73,4 @@
       </button>
     </section>
   </main>
-
 </div>

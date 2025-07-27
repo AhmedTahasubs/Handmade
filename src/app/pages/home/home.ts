@@ -1,15 +1,21 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core'; // استيراد OnInit
 import { Product, ProductCardComponent } from '../../components/product-card/product-card';
 import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
 import { LanguageService } from '../../services/language.service';
+import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
+import { HttpClientModule } from '@angular/common/http'; // استيراد HttpClientModule
+
+// تحديث واجهة Category لتتوافق مع DTO من API لاسم الفئة
+// قد ترغب في الاحتفاظ بالاسم: { en: string; ar: string } لأغراض العرض،
+// ولكن بالنسبة للبيانات التي تم جلبها، سنستخدم بنية CategoryDto.
+// لتبسيط هذا المثال، سأقوم بضبط `Category` لتعكس البيانات التي تم جلبها مبدئيًا.
 interface Category {
-  id: string;
-  name: { en: string; ar: string };
-  description: { en: string; ar: string };
-  image: string;
-  productCount: number;
-  featured: boolean;
+  id: number; // تم التغيير إلى number ليتوافق مع CategoryDto
+  name: string; // الآن مجرد string من API
+  imageUrl: string | null; // من API
+  productCount: number; // من المحتمل أن يأتي هذا من API منفصل أو يتم حسابه
+  featured: boolean; // من المحتمل أن يأتي هذا من API منفصل أو يتم تحديده من جانب العميل
 }
 
 @Component({
@@ -17,26 +23,31 @@ interface Category {
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [
+    CommonModule,
+    ProductCardComponent, // تأكد من استيراد ProductCardComponent إذا تم استخدامه في القالب
+    SearchFilterComponent, // تأكد من استيراد SearchFilterComponent إذا تم استخدامه في القالب
+    HttpClientModule // إضافة HttpClientModule هنا
+  ]
 })
-export class HomeComponent {
-  
+export class HomeComponent implements OnInit { // تطبيق OnInit
   private languageService = inject(LanguageService);
+  private categoryService = inject(CategoryService); // حقن الخدمة الجديدة
 
-  // Get language from service for template usage
+  // الحصول على اللغة من الخدمة لاستخدامها في القالب
   get language(): 'en' | 'ar' {
     return this.languageService.currentLanguage();
   }
 
-
-  // Filter states
+  // حالات الفلتر
   searchTerm = '';
-  selectedCategory = 'all';
+  selectedCategory: string | number = 'all'; // السماح بـ string 'all' أو number لمعرف الفئة
   priceRange = [0, 200];
   showCustomizable = false;
 
-  // Dummy products data
+  // بيانات المنتجات الوهمية (مع الاحتفاظ بها مؤقتًا، ولكن ستطبق نفس المنطق لجلبها)
   products: Product[] = [
+    // ... (بيانات المنتجات الوهمية الموجودة لديك)
     {
       id: 1,
       name: {
@@ -48,7 +59,7 @@ export class HomeComponent {
         ar: 'مزهرية خزفية جميلة مصنوعة يدوياً بأنماط معقدة'
       },
       price: 45.99,
-      category: 'ceramics',
+      category: 'ceramics', // سيحتاج هذا إلى المطابقة مع معرف الفئة التي تم جلبها
       image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
       seller: 'ArtisanCrafts',
       rating: 4.8,
@@ -174,83 +185,114 @@ export class HomeComponent {
       customizable: true
     }
   ];
-  // dummy categories Data
-  featuredCategories: Category[] = [
-    {
-      id: 'ceramics',
-      name: { en: 'Ceramics & Pottery', ar: 'السيراميك والفخار' },
-      description: { en: 'Beautiful handcrafted ceramic pieces and pottery', ar: 'قطع سيراميك وفخار جميلة مصنوعة يدوياً' },
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-      productCount: 156,
-      featured: true
-    },
-    {
-      id: 'textiles',
-      name: { en: 'Textiles & Fabrics', ar: 'المنسوجات والأقمشة' },
-      description: { en: 'Handwoven fabrics, scarves, and textile art', ar: 'أقمشة منسوجة يدوياً، أوشحة، وفنون نسيجية' },
-      image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400&h=300&fit=crop',
-      productCount: 203,
-      featured: true
-    },
-    {
-      id: 'woodwork',
-      name: { en: 'Woodwork & Furniture', ar: 'الأعمال الخشبية والأثاث' },
-      description: { en: 'Handcrafted wooden furniture and decorative pieces', ar: 'أثاث خشبي وقطع زينة مصنوعة يدوياً' },
-      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop',
-      productCount: 89,
-      featured: true
-    }
-  ];
+
+  // تهيئة allCategories كمصفوفة فارغة
+  allCategories: Category[] = [];
+  featuredCategories: Category[] = []; // ستقوم بملء هذا بناءً على البيانات التي تم جلبها
+
+  constructor() {} // بناء (constructor) للوضوح، على الرغم من استخدام inject
+
+  ngOnInit(): void {
+    this.fetchCategories();
+  }
+
+  fetchCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (data: CategoryDto[]) => {
+        // قم بتحويل CategoryDto التي تم جلبها إلى واجهة Category المحلية الخاصة بك
+        // ستحتاج إلى تحديد كيفية التعامل مع 'productCount' و 'featured'
+        // إذا لم تكن متاحة مباشرة من نقطة نهاية API.
+        this.allCategories = data.map(dto => ({
+          id: dto.id,
+          name: dto.name,
+          imageUrl: dto.imageUrl,
+          productCount: 0, // قيمة افتراضية، قم بجلبها أو حسابها من API آخر إذا لزم الأمر
+          featured: false // قيمة افتراضية، قم بتحديدها بناءً على بيانات API أو قاعدة
+        }));
+
+        // بالنسبة للفئات المميزة، يمكنك التصفية من allCategories
+        // أو لديك نقطة نهاية API منفصلة للفئات المميزة.
+        // في الوقت الحالي، دعنا نختار القليل الأول كمثال.
+        this.featuredCategories = this.allCategories.slice(0, 3).map(cat => ({
+          ...cat,
+          featured: true // وضع علامة عليها كمميزة للعرض
+        }));
+
+        console.log('Fetched Categories:', this.allCategories);
+        console.log('Featured Categories:', this.featuredCategories);
+      },
+      error: (error) => {
+        console.error('Error fetching categories:', error);
+        // التعامل مع الخطأ، على سبيل المثال، إظهار رسالة سهلة الاستخدام
+      }
+    });
+  }
+
   get filteredProducts(): Product[] {
     return this.products.filter(product => {
+      // لتصفية الفئات، ستحتاج إلى مقارنة `product.category` (string)
+      // مع `this.selectedCategory` (string 'all' أو معرف رقمي للفئة).
+      // ستحتاج إلى طريقة لربط اسم فئة المنتج (مثل 'ceramics')
+      // بمعرف الفئة الفعلي (مثل 1) الذي تحصل عليه من API الخاص بك. عادةً ما يتطلب هذا جدول بحث.
+      const categoryMatches = this.selectedCategory === 'all' ||
+                              this.findCategoryIdByName(product.category) === this.selectedCategory;
+
       const matchesSearch =
         product.name[this.language].toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         product.description[this.language].toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      const matchesCategory = this.selectedCategory === 'all' || product.category === this.selectedCategory;
       const matchesPrice = product.price >= this.priceRange[0] && product.price <= this.priceRange[1];
       const matchesCustomizable = !this.showCustomizable || product.customizable;
 
-      return matchesSearch && matchesCategory && matchesPrice && matchesCustomizable;
+      return matchesSearch && categoryMatches && matchesPrice && matchesCustomizable;
     });
   }
-   allCategories: Category[] = [
-    { id: 'ceramics', name: { en: 'Ceramics', ar: 'السيراميك' }, description: { en: '', ar: '' }, image: '', productCount: 156, featured: false },
-    { id: 'textiles', name: { en: 'Textiles', ar: 'المنسوجات' }, description: { en: '', ar: '' }, image: '', productCount: 203, featured: false },
-    { id: 'woodwork', name: { en: 'Woodwork', ar: 'الأعمال الخشبية' }, description: { en: '', ar: '' }, image: '', productCount: 89, featured: false },
-    { id: 'leather', name: { en: 'Leather Goods', ar: 'الجلديات' }, description: { en: '', ar: '' }, image: '', productCount: 67, featured: false },
-    { id: 'jewelry', name: { en: 'Jewelry', ar: 'المجوهرات' }, description: { en: '', ar: '' }, image: '', productCount: 134, featured: false },
-    { id: 'art', name: { en: 'Art & Paintings', ar: 'الفن واللوحات' }, description: { en: '', ar: '' }, image: '', productCount: 78, featured: false },
-    { id: 'beauty', name: { en: 'Beauty & Care', ar: 'الجمال والعناية' }, description: { en: '', ar: '' }, image: '', productCount: 45, featured: false },
-    { id: 'home', name: { en: 'Home Decor', ar: 'ديكور المنزل' }, description: { en: '', ar: '' }, image: '', productCount: 112, featured: false },
-    { id: 'bags', name: { en: 'Bags & Accessories', ar: 'الحقائب والإكسسوارات' }, description: { en: '', ar: '' }, image: '', productCount: 91, featured: false },
-    { id: 'toys', name: { en: 'Toys & Games', ar: 'الألعاب' }, description: { en: '', ar: '' }, image: '', productCount: 34, featured: false },
-    { id: 'candles', name: { en: 'Candles & Scents', ar: 'الشموع والعطور' }, description: { en: '', ar: '' }, image: '', productCount: 56, featured: false },
-    { id: 'stationery', name: { en: 'Stationery', ar: 'القرطاسية' }, description: { en: '', ar: '' }, image: '', productCount: 29, featured: false }
-  ];
 
-  getCategoryIcon(categoryId: string): string {
-    const icons: { [key: string]: string } = {
-      ceramics: 'palette',
-      textiles: 'tshirt',
-      woodwork: 'tree',
-      leather: 'shoe-prints',
-      jewelry: 'gem',
-      art: 'paint-brush',
-      beauty: 'spa',
-      home: 'home',
-      bags: 'shopping-bag',
-      toys: 'gamepad',
-      candles: 'fire',
-      stationery: 'pen'
+  // دالة مساعدة للعثور على معرف الفئة بالاسم، وهي حاسمة لتصفية المنتجات
+  private findCategoryIdByName(categoryName: string): number | undefined {
+    // ستحتاج إلى ربط أسماء فئات المنتجات الوهمية (مثل 'ceramics')
+    // بمعرفات الفئات الفعلية التي تحصل عليها من API الخاص بك.
+    // في الوقت الحالي، سأقدم جدول بحث مبسط.
+    const categoryMap: { [key: string]: number } = {
+      'ceramics': 1,
+      'textiles': 2,
+      'woodwork': 3,
+      'leather': 4,
+      'art': 6,
+      'beauty': 7
+      // أضف المزيد حسب الحاجة بناءً على فئات المنتجات الوهمية ومعرفات API
     };
-    return icons[categoryId] || 'tag';
+    return categoryMap[categoryName];
   }
+
+
+  getCategoryIcon(categoryId: string | number): string { // السماح بـ string أو number
+    // قد تحتاج إلى تعديل هذا لاستخدام المعرف الرقمي من API
+    // إذا كانت أيقوناتك مرتبطة بالمعرفات بدلاً من الأسماء النصية.
+    const icons: { [key: string]: string } = {
+      'ceramics': 'palette', // بافتراض أن فئات منتجاتك لا تزال تستخدم أسماء نصية
+      'textiles': 'tshirt',
+      'woodwork': 'tree',
+      'leather': 'shoe-prints',
+      'jewelry': 'gem',
+      'art': 'paint-brush',
+      'beauty': 'spa',
+      'home': 'home',
+      'bags': 'shopping-bag',
+      'toys': 'gamepad',
+      'candles': 'fire',
+      'stationery': 'pen'
+    };
+    // إذا كنت بحاجة إلى ربط معرف رقمي باسم نصي للبحث عن الأيقونة:
+    const categoryName = this.allCategories.find(c => c.id === categoryId)?.name.toLowerCase() || String(categoryId);
+    return icons[categoryName] || 'tag';
+  }
+
   onSearchTermChange(searchTerm: string): void {
     this.searchTerm = searchTerm;
   }
 
-  onSelectedCategoryChange(category: string): void {
+  onSelectedCategoryChange(category: string | number): void { // السماح بـ string أو number
     this.selectedCategory = category;
   }
 
@@ -271,15 +313,19 @@ export class HomeComponent {
 
   onAddToCart(product: Product): void {
     console.log('Added to cart:', product);
-    // Implement cart functionality
+    // تنفيذ وظيفة سلة التسوق
   }
 
   onAddToWishlist(product: Product): void {
     console.log('Added to wishlist:', product);
-    // Implement wishlist functionality
+    // تنفيذ وظيفة قائمة الأمنيات
   }
 
   trackByProductId(index: number, product: Product): number {
     return product.id;
+  }
+  // **** أضف هذه الدالة الجديدة ****
+  trackByCategoryId(index: number, category: Category): number {
+    return category.id;
   }
 }
