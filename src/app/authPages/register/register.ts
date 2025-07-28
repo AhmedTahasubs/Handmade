@@ -1,3 +1,4 @@
+import { AuthService } from './../../services/authService.service';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
 import { Component } from "@angular/core"
@@ -5,121 +6,152 @@ import { CommonModule } from "@angular/common"
 import { RouterModule } from "@angular/router"
 import { FormButton } from "../../components/form-button/form-button";
 import { FormInputComponent } from "../../components/form-input/form-input";
-import { SocialButton } from "../../components/social-button/social-button";
 import { FormsModule } from '@angular/forms';
 
+type FieldNames = 
+  'userName' | 
+  'fullName' | 
+  'email' | 
+  'mobileNumber' | 
+  'address' | 
+  'password' | 
+  'confirmPassword' | 
+  'nationalId' | 
+  'bio';
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormButton, SocialButton, FormInputComponent ,FormsModule],
+  imports: [CommonModule, RouterModule, FormButton, FormInputComponent, FormsModule],
   templateUrl: './register.html',
-  styles: [
-    `
-      @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-      }
+  styles: [`
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
 
-      .animate-shake {
-        animation: shake 0.5s ease-in-out;
-      }
-      @keyframes fade-in-up {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes slide-in-up {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes slide-in-left {
-        from {
-          opacity: 0;
-          transform: translateX(-30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      @keyframes slide-in-right {
-        from {
-          opacity: 0;
-          transform: translateX(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .animate-fade-in-up {
-        animation: fade-in-up 0.6s ease-out forwards;
+    .animate-shake {
+      animation: shake 0.5s ease-in-out;
+    }
+    @keyframes fade-in-up {
+      from {
         opacity: 0;
+        transform: translateY(20px);
       }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-      .animate-slide-in-up {
-        animation: slide-in-up 0.6s ease-out forwards;
+    @keyframes slide-in-up {
+      from {
         opacity: 0;
+        transform: translateY(30px);
       }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-      .animate-slide-in-left {
-        animation: slide-in-left 0.6s ease-out forwards;
+    @keyframes slide-in-left {
+      from {
         opacity: 0;
+        transform: translateX(-30px);
       }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
 
-      .animate-slide-in-right {
-        animation: slide-in-right 0.6s ease-out forwards;
+    @keyframes slide-in-right {
+      from {
         opacity: 0;
+        transform: translateX(30px);
       }
-    `,
-  ],
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fade-in-up 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-slide-in-up {
+      animation: slide-in-up 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-slide-in-left {
+      animation: slide-in-left 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-slide-in-right {
+      animation: slide-in-right 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .requirement-met {
+      color: #10B981;
+    }
+
+    .requirement-not-met {
+      color: #6B7280;
+    }
+  `],
 })
 export class Register {
-  firstName = ""
-  lastName = ""
-  email = ""
-  phone = ""
-  company = ""
-  password = ""
-  confirmPassword = ""
-  acceptTerms = false
-  isLoading = false
+  userType: 'customer' | 'seller' = 'customer';
+  userName = "";
+  fullName = "";
+  email = "";
+  mobileNumber = "";
+  address = "";
+  hasWhatsApp = true;
+  password = "";
+  confirmPassword = "";
+  acceptTerms = false;
+  isLoading = false;
 
-  socialLoading = {
-    google: false,
-    facebook: false,
-    github: false,
-    apple: false,
-  }
+  // Seller specific fields
+  nationalId = "";
+  bio = "";
 
-  firstNameError = ""
-  lastNameError = ""
-  emailError = ""
-  phoneError = ""
-  companyError = ""
-  passwordError = ""
-  confirmPasswordError = ""
-  termsError = ""
+  // Track field interactions
+  fieldInteracted: Record<FieldNames, boolean> = {
+  userName: false,
+  fullName: false,
+  email: false,
+  mobileNumber: false,
+  address: false,
+  password: false,
+  confirmPassword: false,
+  nationalId: false,
+  bio: false
+};
+
+  // Error messages
+  userNameError = "";
+  fullNameError = "";
+  emailError = "";
+  mobileNumberError = "";
+  addressError = "";
+  passwordError = "";
+  confirmPasswordError = "";
+  termsError = "";
+  nationalIdError = "";
+  bioError = "";
 
   constructor(
     public ThemeService: ThemeService,
     public LanguageService: LanguageService,
+    private authService: AuthService
   ) {}
 
   get labels() {
@@ -128,215 +160,291 @@ export class Register {
       ? {
           createAccount: "إنشاء حساب جديد",
           subtitle: "انضم إلى مجتمع إدارة الحرفيين",
-          continueWithGoogle: "المتابعة مع Google",
-          facebook: "Facebook",
-          github: "GitHub",
-          firstName: "الاسم الأول",
-          firstNamePlaceholder: "أدخل اسمك الأول",
-          lastName: "اسم العائلة",
-          lastNamePlaceholder: "أدخل اسم العائلة",
+          userType: "نوع المستخدم",
+          customer: "عميل",
+          seller: "بائع",
+          userName: "اسم المستخدم",
+          userNamePlaceholder: "أدخل اسم المستخدم",
+          fullName: "الاسم الكامل",
+          fullNamePlaceholder: "أدخل اسمك الكامل",
           email: "البريد الإلكتروني",
           emailPlaceholder: "أدخل بريدك الإلكتروني",
-          phone: "رقم الهاتف",
-          phonePlaceholder: "أدخل رقم هاتفك",
-          company: "الشركة (اختياري)",
-          companyPlaceholder: "أدخل اسم شركتك",
+          mobileNumber: "رقم الهاتف",
+          mobileNumberPlaceholder: "أدخل رقم هاتفك",
+          address: "العنوان",
+          addressPlaceholder: "أدخل عنوانك",
+          hasWhatsApp: "لديك واتساب؟",
           password: "كلمة المرور",
           passwordPlaceholder: "أدخل كلمة المرور",
           confirmPassword: "تأكيد كلمة المرور",
           confirmPasswordPlaceholder: "أعد إدخال كلمة المرور",
-          passwordStrength: "قوة كلمة المرور",
           acceptTerms: "أوافق على",
           termsOfService: "شروط الخدمة",
           and: "و",
           privacyPolicy: "سياسة الخصوصية",
-          or: "أو",
           haveAccount: "لديك حساب بالفعل؟",
           signIn: "تسجيل الدخول",
+          nationalId: "الرقم القومي",
+          nationalIdPlaceholder: "أدخل الرقم القومي",
+          bio: "السيرة الذاتية",
+          bioPlaceholder: "أدخل سيرتك الذاتية",
+          passwordRequirements: "متطلبات كلمة المرور",
+          passwordMinLength: "8 أحرف على الأقل",
+          passwordLowercase: "حرف صغير واحد على الأقل",
+          passwordUppercase: "حرف كبير واحد على الأقل",
+          passwordNumber: "رقم واحد على الأقل",
+          passwordSpecialChar: "رمز خاص واحد على الأقل",
+          passwordsMatch: "كلمات المرور متطابقة",
         }
       : {
           createAccount: "Create Account",
           subtitle: "Join the artisan management community",
-          continueWithGoogle: "Continue with Google",
-          facebook: "Facebook",
-          github: "GitHub",
-          firstName: "First Name",
-          firstNamePlaceholder: "Enter your first name",
-          lastName: "Last Name",
-          lastNamePlaceholder: "Enter your last name",
+          userType: "User Type",
+          customer: "Customer",
+          seller: "Seller",
+          userName: "Username",
+          userNamePlaceholder: "Enter your username",
+          fullName: "Full Name",
+          fullNamePlaceholder: "Enter your full name",
           email: "Email Address",
           emailPlaceholder: "Enter your email",
-          phone: "Phone Number",
-          phonePlaceholder: "Enter your phone number",
-          company: "Company (Optional)",
-          companyPlaceholder: "Enter your company name",
+          mobileNumber: "Phone Number",
+          mobileNumberPlaceholder: "Enter your phone number",
+          address: "Address",
+          addressPlaceholder: "Enter your address",
+          hasWhatsApp: "Has WhatsApp?",
           password: "Password",
           passwordPlaceholder: "Enter your password",
           confirmPassword: "Confirm Password",
-          confirmPasswordPlaceholder: "Re-enter your password",
-          passwordStrength: "Password Strength",
+          confirmPasswordPlaceholder: "Confirm Password",
           acceptTerms: "I agree to the",
           termsOfService: "Terms of Service",
           and: "and",
           privacyPolicy: "Privacy Policy",
-          or: "OR",
           haveAccount: "Already have an account?",
           signIn: "Sign in",
+          nationalId: "National ID",
+          nationalIdPlaceholder: "Enter your national ID",
+          bio: "Bio",
+          bioPlaceholder: "Enter your bio",
+          passwordRequirements: "Password Requirements",
+          passwordMinLength: "8 characters minimum",
+          passwordLowercase: "One lowercase letter",
+          passwordUppercase: "One uppercase letter",
+          passwordNumber: "One number",
+          passwordSpecialChar: "One special character",
+          passwordsMatch: "Passwords match",
         }
   }
 
-  get passwordStrengthBars(): string[] {
-    const strength = this.calculatePasswordStrength()
-    const bars = [
-      "bg-gray-200 dark:bg-gray-600",
-      "bg-gray-200 dark:bg-gray-600",
-      "bg-gray-200 dark:bg-gray-600",
-      "bg-gray-200 dark:bg-gray-600",
-    ]
-
-    if (strength >= 1) bars[0] = "bg-red-500"
-    if (strength >= 2) bars[1] = "bg-yellow-500"
-    if (strength >= 3) bars[2] = "bg-blue-500"
-    if (strength >= 4) bars[3] = "bg-green-500"
-
-    return bars
+  get hasMinLength(): boolean {
+    return this.password?.length >= 8;
   }
 
-  get passwordStrengthText(): string {
-    const strength = this.calculatePasswordStrength()
-    const isArabic = this.LanguageService.currentLanguage() === "ar"
-
-    const texts = isArabic
-      ? ["ضعيف جداً", "ضعيف", "متوسط", "قوي", "قوي جداً"]
-      : ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"]
-
-    return texts[strength] || texts[0]
+  get hasLowercase(): boolean {
+    return /[a-z]/.test(this.password);
   }
 
-  calculatePasswordStrength(): number {
-    if (!this.password) return 0
-
-    let strength = 0
-    if (this.password.length >= 8) strength++
-    if (/[a-z]/.test(this.password)) strength++
-    if (/[A-Z]/.test(this.password)) strength++
-    if (/[0-9]/.test(this.password)) strength++
-    if (/[^A-Za-z0-9]/.test(this.password)) strength++
-
-    return Math.min(strength, 4)
+  get hasUppercase(): boolean {
+    return /[A-Z]/.test(this.password);
   }
 
-  toggleTheme(): void {
-    this.ThemeService.toggleTheme()
+  get hasNumber(): boolean {
+    return /[0-9]/.test(this.password);
   }
 
-  toggleLanguage(): void {
-    this.LanguageService.toggleLanguage()
+  get hasSpecialChar(): boolean {
+    return /[^A-Za-z0-9]/.test(this.password);
   }
 
-  async onSocialLogin(provider: "google" | "facebook" | "github" | "apple"): Promise<void> {
-    this.socialLoading[provider] = true
+  validateField(fieldName: FieldNames, isBlur: boolean = false): void {
+    const isArabic = this.LanguageService.currentLanguage() === 'ar';
+    
+    if (isBlur) {
+    this.fieldInteracted[fieldName] = true;
+  }
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log(`${provider} registration successful`)
-    } catch (error) {
-      console.error(`${provider} registration failed:`, error)
-    } finally {
-      this.socialLoading[provider] = false
+    const showError = this.fieldInteracted[fieldName];
+
+    switch (fieldName) {
+      case 'userName':
+  if (!this.userName.trim()) {
+    this.userNameError = showError
+      ? (isArabic ? 'اسم المستخدم مطلوب' : 'Username is required')
+      : '';
+  } else if (this.userName.trim().length < 3) {
+    this.userNameError = showError
+      ? (isArabic ? 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل' : 'Username must be at least 3 characters')
+      : '';
+  } else if (/\s/.test(this.userName)) {
+    this.userNameError = showError
+      ? (isArabic ? 'يجب ألا يحتوي اسم المستخدم على مسافات' : 'Username must not contain spaces')
+      : '';
+  } else {
+    this.userNameError = '';
+  }
+  break;
+
+
+      case 'fullName':
+        if (!this.fullName.trim()) {
+          this.fullNameError = showError ? (isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required') : '';
+        } else if (this.fullName.trim().length < 3) {
+          this.fullNameError = showError ? (isArabic ? 'يجب أن يكون الاسم الكامل 3 أحرف على الأقل' : 'Full name must be at least 3 characters') : '';
+        } else {
+          this.fullNameError = '';
+        }
+        break;
+
+      case 'email':
+        if (!this.email) {
+          this.emailError = showError ? (isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required') : '';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+          this.emailError = showError ? (isArabic ? 'يجب أن يكون البريد الإلكتروني صالحاً' : 'Email must be valid') : '';
+        } else {
+          this.emailError = '';
+        }
+        break;
+
+      case 'mobileNumber':
+        if (!this.mobileNumber) {
+          this.mobileNumberError = showError ? (isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required') : '';
+        } else if (!/^01[0,1,2,5]{1}[0-9]{8}$/.test(this.mobileNumber)) {
+          this.mobileNumberError = showError ? (isArabic ? 'يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقماً' : 'Phone must start with 010, 011, 012, or 015 and be 11 digits') : '';
+        } else {
+          this.mobileNumberError = '';
+        }
+        break;
+
+      case 'address':
+        if (!this.address) {
+          this.addressError = showError ? (isArabic ? 'العنوان مطلوب' : 'Address is required') : '';
+        } else if (this.address.length < 5) {
+          this.addressError = showError ? (isArabic ? 'يجب أن يكون العنوان 5 أحرف على الأقل' : 'Address must be at least 5 characters') : '';
+        } else {
+          this.addressError = '';
+        }
+        break;
+
+      case 'nationalId':
+        if (this.userType === 'seller') {
+          if (!this.nationalId) {
+            this.nationalIdError = showError ? (isArabic ? 'الرقم القومي مطلوب' : 'National ID is required') : '';
+          } else if (!/^[2,3]{1}[0-9]{13}$/.test(this.nationalId)) {
+            this.nationalIdError = showError ? (isArabic ? 'يجب أن يبدأ الرقم القومي بـ 2 أو 3 ويتكون من 14 رقماً' : 'National ID must start with 2 or 3 and be 14 digits') : '';
+          } else {
+            this.nationalIdError = '';
+          }
+        }
+        break;
+
+      case 'password':
+        if (!this.password) {
+          this.passwordError = showError ? (isArabic ? 'كلمة المرور مطلوبة' : 'Password is required') : '';
+        } else if (this.password.length < 8) {
+          this.passwordError = showError ? (isArabic ? 'يجب أن تكون كلمة المرور 8 أحرف على الأقل' : 'Password must be at least 8 characters') : '';
+        } else {
+          this.passwordError = '';
+        }
+        break;
+     case 'bio':
+  if (this.userType === 'seller') {
+    const trimmedBio = this.bio.trim();
+
+    if (!trimmedBio) {
+      this.bioError = showError
+        ? (isArabic ? 'السيرة الذاتية مطلوبة' : 'Bio is required')
+        : '';
+    } else if (trimmedBio.length < 10) {
+      this.bioError = showError
+        ? (isArabic ? 'يجب أن تكون السيرة الذاتية 10 أحرف على الأقل' : 'Bio must be at least 10 characters')
+        : '';
+    } else if (trimmedBio.length > 500) {
+      this.bioError = showError
+        ? (isArabic ? 'يجب ألا تتجاوز السيرة الذاتية 500 حرف' : 'Bio must not exceed 500 characters')
+        : '';
+    } else {
+      this.bioError = '';
     }
   }
+  break;
+
+      case 'confirmPassword':
+        if (!this.confirmPassword) {
+          this.confirmPasswordError = showError ? (isArabic ? 'تأكيد كلمة المرور مطلوب' : 'Password confirmation is required') : '';
+        } else if (this.password !== this.confirmPassword) {
+          this.confirmPasswordError = showError ? (isArabic ? 'كلمات المرور غير متطابقة' : 'Passwords do not match') : '';
+        } else {
+          this.confirmPasswordError = '';
+        }
+        break;
+    }
+  }
+
+  markAllFieldsTouched(): void {
+  Object.keys(this.fieldInteracted).forEach(field => {
+    this.fieldInteracted[field as FieldNames] = true;
+    this.validateField(field as FieldNames);
+  });
+}
 
   validateForm(): boolean {
-    let isValid = true
-    const isArabic = this.LanguageService.currentLanguage() === "ar"
-
-    if (!this.firstName.trim()) {
-      this.firstNameError = isArabic ? "الاسم الأول مطلوب" : "First name is required"
-      isValid = false
-    } else {
-      this.firstNameError = ""
-    }
-
-    if (!this.lastName.trim()) {
-      this.lastNameError = isArabic ? "اسم العائلة مطلوب" : "Last name is required"
-      isValid = false
-    } else {
-      this.lastNameError = ""
-    }
-
-    if (!this.email) {
-      this.emailError = isArabic ? "البريد الإلكتروني مطلوب" : "Email is required"
-      isValid = false
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-      this.emailError = isArabic ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
-      isValid = false
-    } else {
-      this.emailError = ""
-    }
-
-    if (!this.phone) {
-      this.phoneError = isArabic ? "رقم الهاتف مطلوب" : "Phone number is required"
-      isValid = false
-    } else if (!/^[+]?[1-9][\d]{0,15}$/.test(this.phone.replace(/\s/g, ""))) {
-      this.phoneError = isArabic ? "رقم الهاتف غير صحيح" : "Invalid phone number"
-      isValid = false
-    } else {
-      this.phoneError = ""
-    }
-
-    if (!this.password) {
-      this.passwordError = isArabic ? "كلمة المرور مطلوبة" : "Password is required"
-      isValid = false
-    } else if (this.password.length < 8) {
-      this.passwordError = isArabic
-        ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
-        : "Password must be at least 8 characters"
-      isValid = false
-    } else {
-      this.passwordError = ""
-    }
-
-    if (!this.confirmPassword) {
-      this.confirmPasswordError = isArabic ? "تأكيد كلمة المرور مطلوب" : "Password confirmation is required"
-      isValid = false
-    } else if (this.password !== this.confirmPassword) {
-      this.confirmPasswordError = isArabic ? "كلمات المرور غير متطابقة" : "Passwords do not match"
-      isValid = false
-    } else {
-      this.confirmPasswordError = ""
-    }
-
+    this.markAllFieldsTouched();
+    
     if (!this.acceptTerms) {
-      this.termsError = isArabic ? "يجب الموافقة على الشروط والأحكام" : "You must accept the terms and conditions"
-      isValid = false
+      this.termsError = this.LanguageService.currentLanguage() === 'ar' 
+        ? 'يجب الموافقة على الشروط والأحكام' 
+        : 'You must accept the terms and conditions';
+      return false;
     } else {
-      this.termsError = ""
+      this.termsError = '';
     }
 
-    return isValid
+    return !this.userNameError && !this.fullNameError && !this.emailError && 
+           !this.mobileNumberError && !this.addressError && !this.passwordError && 
+           !this.confirmPasswordError && !this.nationalIdError && !this.bioError;
   }
 
   async onSubmit(): Promise<void> {
     if (!this.validateForm()) {
-      return
+      return;
     }
 
-    this.isLoading = true
+    this.isLoading = true;
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log("Registration successful:", {
-        firstName: this.firstName,
-        lastName: this.lastName,
+      const registerData = {
+        userName: this.userName,
+        name: this.fullName,
         email: this.email,
-        phone: this.phone,
-        company: this.company,
-      })
+        password: this.password,
+        mobileNumber: this.mobileNumber,
+        address: this.address || null,
+        hasWhatsApp: true
+      };
+
+      if (this.userType === 'seller') {
+        const sellerData = {
+          ...registerData,
+          nationalId: this.nationalId,
+          bio: this.bio
+        };
+        await this.authService.registerSeller(sellerData).toPromise();
+      } else {
+        await this.authService.registerCustomer(registerData).toPromise();
+      }
     } catch (error) {
-      console.error("Registration failed:", error)
+      console.error("Registration failed:", error);
     } finally {
-      this.isLoading = false
+      this.isLoading = false;
     }
+  }
+
+  toggleTheme(): void {
+    this.ThemeService.toggleTheme();
+  }
+
+  toggleLanguage(): void {
+    this.LanguageService.toggleLanguage();
   }
 }

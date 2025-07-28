@@ -20,79 +20,72 @@
         </p>
       </div>
 
-      <div class="space-y-3 mb-6">
-        <div class="animate-slide-in-left" style="animation-delay: 0.3s">
-          <app-social-button
-            provider="google"
-            [text]="labels.continueWithGoogle"
-            [loading]="socialLoading.google"
-            (buttonClick)="onSocialLogin('google')"
-          ></app-social-button>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <div class="animate-slide-in-left" style="animation-delay: 0.4s">
-            <app-social-button
-              provider="facebook"
-              [text]="labels.facebook"
-              [loading]="socialLoading.facebook"
-              (buttonClick)="onSocialLogin('facebook')"
-            ></app-social-button>
-          </div>
-          <div class="animate-slide-in-right" style="animation-delay: 0.4s">
-            <app-social-button
-              provider="github"
-              [text]="labels.github"
-              [loading]="socialLoading.github"
-              (buttonClick)="onSocialLogin('github')"
-            ></app-social-button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.5s">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">{{ labels.or }}</span>
-          </div>
-        </div>
-      </div>
-
       <form (ngSubmit)="onSubmit()" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="animate-slide-in-left" style="animation-delay: 0.6s">
-            <app-form-input
-              [label]="labels.firstName"
-              [placeholder]="labels.firstNamePlaceholder"
-              type="text"
-              icon="fa-solid fa-user"
-              [required]="true"
-              [error]="firstNameError"
-              autocomplete="given-name"
-              [(ngModel)]="firstName"
-              name="firstName"
-            ></app-form-input>
-          </div>
-
-          <div class="animate-slide-in-right" style="animation-delay: 0.6s">
-            <app-form-input
-              [label]="labels.lastName"
-              [placeholder]="labels.lastNamePlaceholder"
-              type="text"
-              icon="fa-solid fa-user"
-              [required]="true"
-              [error]="lastNameError"
-              autocomplete="family-name"
-              [(ngModel)]="lastName"
-              name="lastName"
-            ></app-form-input>
+        <!-- User Type Selection -->
+        <div class="animate-slide-in-up" style="animation-delay: 0.6s">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ labels.userType }}</label>
+          <div class="flex space-x-4">
+            <label class="inline-flex items-center">
+              <input 
+                type="radio" 
+                class="form-radio text-blue-600 dark:text-blue-400" 
+                name="userType" 
+                [(ngModel)]="userType"
+                value="customer"
+                (change)="validateField('nationalId')"
+              >
+              <span class="ml-2 text-gray-700 dark:text-gray-300">{{ labels.customer }}</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input 
+                type="radio" 
+                class="form-radio text-blue-600 dark:text-blue-400" 
+                name="userType" 
+                [(ngModel)]="userType"
+                value="seller"
+                (change)="validateField('nationalId')"
+              >
+              <span class="ml-2 text-gray-700 dark:text-gray-300">{{ labels.seller }}</span>
+            </label>
           </div>
         </div>
 
+        <!-- Username -->
         <div class="animate-slide-in-up" style="animation-delay: 0.7s">
+          <app-form-input
+            [label]="labels.userName"
+            [placeholder]="labels.userNamePlaceholder"
+            type="text"
+            icon="fa-solid fa-user"
+            [required]="true"
+            [error]="userNameError"
+            autocomplete="username"
+            [(ngModel)]="userName"
+            name="userName"
+            (ngModelChange)="validateField('userName')"
+            (blur)="validateField('userName', true)"
+          ></app-form-input>
+        </div>
+
+        <!-- Full Name -->
+        <div class="animate-slide-in-up" style="animation-delay: 0.8s">
+          <app-form-input
+            [label]="labels.fullName"
+            [placeholder]="labels.fullNamePlaceholder"
+            type="text"
+            icon="fa-solid fa-id-card"
+            [required]="true"
+            [error]="fullNameError"
+            autocomplete="name"
+            [(ngModel)]="fullName"
+            name="fullName"
+            (ngModelChange)="validateField('fullName')"
+            (blur)="validateField('fullName', true)"
+          ></app-form-input>
+        </div>
+
+        <!-- Email -->
+        <div class="animate-slide-in-up" style="animation-delay: 0.9s">
           <app-form-input
             [label]="labels.email"
             [placeholder]="labels.emailPlaceholder"
@@ -103,79 +96,135 @@
             autocomplete="email"
             [(ngModel)]="email"
             name="email"
+            (ngModelChange)="validateField('email')"
+            (blur)="validateField('email', true)"
           ></app-form-input>
         </div>
 
-        <div class="animate-slide-in-up" style="animation-delay: 0.8s">
+        <!-- Mobile Number -->
+        <div class="animate-slide-in-up" style="animation-delay: 1s">
           <app-form-input
-            [label]="labels.phone"
-            [placeholder]="labels.phonePlaceholder"
+            [label]="labels.mobileNumber"
+            [placeholder]="labels.mobileNumberPlaceholder"
             type="tel"
             icon="fa-solid fa-phone"
             [required]="true"
-            [error]="phoneError"
+            [error]="mobileNumberError"
             autocomplete="tel"
-            [(ngModel)]="phone"
-            name="phone"
+            [(ngModel)]="mobileNumber"
+            name="mobileNumber"
+            (ngModelChange)="validateField('mobileNumber')"
+            (blur)="validateField('mobileNumber', true)"
           ></app-form-input>
         </div>
 
-        <div class="animate-slide-in-up" style="animation-delay: 0.9s">
+        <!-- Address -->
+        <div class="animate-slide-in-up" style="animation-delay: 1.1s">
           <app-form-input
-            [label]="labels.company"
-            [placeholder]="labels.companyPlaceholder"
+            [label]="labels.address"
+            [placeholder]="labels.addressPlaceholder"
             type="text"
-            icon="fa-solid fa-building"
-            [required]="false"
-            [error]="companyError"
-            autocomplete="organization"
-            [(ngModel)]="company"
-            name="company"
+            icon="fa-solid fa-map-marker-alt"
+            [required]="true"
+            [error]="addressError"
+            autocomplete="street-address"
+            [(ngModel)]="address"
+            name="address"
+            (ngModelChange)="validateField('address')"
+            (blur)="validateField('address', true)"
           ></app-form-input>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="animate-slide-in-left" style="animation-delay: 1s">
+        <!-- Seller Specific Fields -->
+        <div *ngIf="userType === 'seller'" class="space-y-4 animate-slide-in-up" style="animation-delay: 1.2s">
+          <!-- National ID -->
+          <div>
             <app-form-input
-              [label]="labels.password"
-              [placeholder]="labels.passwordPlaceholder"
-              type="password"
-              icon="fa-solid fa-lock"
+              [label]="labels.nationalId"
+              [placeholder]="labels.nationalIdPlaceholder"
+              type="text"
+              icon="fa-solid fa-id-card"
               [required]="true"
-              [error]="passwordError"
-              autocomplete="new-password"
-              [(ngModel)]="password"
-              name="password"
+              [error]="nationalIdError"
+              [(ngModel)]="nationalId"
+              name="nationalId"
+              (ngModelChange)="validateField('nationalId')"
+              (blur)="validateField('nationalId', true)"
             ></app-form-input>
           </div>
 
-          <div class="animate-slide-in-right" style="animation-delay: 1s">
+          <!-- Bio -->
+          <div>
             <app-form-input
-              [label]="labels.confirmPassword"
-              [placeholder]="labels.confirmPasswordPlaceholder"
-              type="password"
-              icon="fa-solid fa-lock"
+              [label]="labels.bio"
+              [placeholder]="labels.bioPlaceholder"
+              type="text"
+              icon="fa-solid fa-pen"
               [required]="true"
-              [error]="confirmPasswordError"
-              autocomplete="new-password"
-              [(ngModel)]="confirmPassword"
-              name="confirmPassword"
+              [error]="bioError"
+              [(ngModel)]="bio"
+              name="bio"
+              (ngModelChange)="validateField('bio')"
+              (blur)="validateField('bio', true)"
             ></app-form-input>
           </div>
         </div>
 
-        <div *ngIf="password" class="space-y-2 animate-fade-in-up" style="animation-delay: 1.1s">
-          <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ labels.passwordStrength }}</div>
-          <div class="flex space-x-1">
-            <div
-              *ngFor="let strength of passwordStrengthBars"
-              [class]="'h-2 flex-1 rounded-full transition-all duration-500 ' + strength"
-            ></div>
+        <!-- Password -->
+        <div class="animate-slide-in-up" style="animation-delay: 1.4s">
+          <app-form-input
+            [label]="labels.password"
+            [placeholder]="labels.passwordPlaceholder"
+            type="password"
+            icon="fa-solid fa-lock"
+            [required]="true"
+            [error]="passwordError"
+            autocomplete="new-password"
+            [(ngModel)]="password"
+            name="password"
+            (ngModelChange)="validateField('password')"
+            (blur)="validateField('password', true)"
+          ></app-form-input>
+          
+          <div *ngIf="password" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <div class="font-medium mb-1">{{ labels.passwordRequirements }}</div>
+            <ul class="list-disc list-inside space-y-1">
+              <li [class.text-green-500]="hasMinLength">{{ hasMinLength ? '✓' : '•' }} 
+                {{ labels.passwordMinLength }}</li>
+              <li [class.text-green-500]="hasLowercase">{{ hasLowercase ? '✓' : '•' }} 
+                {{ labels.passwordLowercase }}</li>
+              <li [class.text-green-500]="hasUppercase">{{ hasUppercase ? '✓' : '•' }} 
+                {{ labels.passwordUppercase }}</li>
+              <li [class.text-green-500]="hasNumber">{{ hasNumber ? '✓' : '•' }} 
+                {{ labels.passwordNumber }}</li>
+              <li [class.text-green-500]="hasSpecialChar">{{ hasSpecialChar ? '✓' : '•' }} 
+                {{ labels.passwordSpecialChar }}</li>
+            </ul>
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400">{{ passwordStrengthText }}</div>
         </div>
 
-        <div class="flex items-start animate-slide-in-up" style="animation-delay: 1.2s">
+        <!-- Confirm Password -->
+        <div class="animate-slide-in-up" style="animation-delay: 1.5s">
+          <app-form-input
+            [label]="labels.confirmPassword"
+            [placeholder]="labels.confirmPasswordPlaceholder"
+            type="password"
+            icon="fa-solid fa-lock"
+            [required]="true"
+            [error]="confirmPasswordError"
+            autocomplete="new-password"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            (ngModelChange)="validateField('confirmPassword')"
+            (blur)="validateField('confirmPassword', true)"
+          ></app-form-input>
+          <div *ngIf="password && confirmPassword && password === confirmPassword" class="mt-1 text-xs text-green-500">
+            {{ labels.passwordsMatch }}
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="flex items-start animate-slide-in-up" style="animation-delay: 1.6s">
           <input
             type="checkbox"
             [(ngModel)]="acceptTerms"
@@ -195,7 +244,8 @@
         </div>
         <div *ngIf="termsError" class="text-sm text-red-600 dark:text-red-400 animate-shake">{{ termsError }}</div>
 
-        <div class="animate-slide-in-up" style="animation-delay: 1.3s">
+        <!-- Submit Button -->
+        <div class="animate-slide-in-up" style="animation-delay: 1.7s">
           <app-form-button
             [text]="labels.createAccount"
             type="submit"
@@ -203,11 +253,12 @@
             [fullWidth]="true"
             [loading]="isLoading"
             icon="fa-solid fa-check"
+            [disabled]="isLoading"
           ></app-form-button>
         </div>
       </form>
 
-      <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 1.4s">
+      <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 1.8s">
         <p class="text-sm text-gray-600 dark:text-gray-400">
           {{ labels.haveAccount }}
           <a
