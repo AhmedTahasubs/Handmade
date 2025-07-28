@@ -19,4 +19,10 @@ export class ServiceService {
    getServiceById(id: number): Observable<ServiceDto> {
     return this.http.get<ServiceDto>(`${this.apiUrl}/${id}`);
   }
+  getServicesByCategoryId(categoryId: number): Observable<ServiceDto[]> {
+  return this.http.get<ServiceDto[]>(`https://localhost:7047/api/Service/category/${categoryId}`);
+}
+getServicesByCategoryName(categoryName: string): Observable<ServiceDto[]> {
+  return this.http.get<ServiceDto[]>(`/api/services/category/${categoryName}`);
+}
 }

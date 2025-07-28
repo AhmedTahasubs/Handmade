@@ -29,11 +29,11 @@ export const routes: Routes = [
       },
 
 
-      // to do ya hammad 
-      // {
-      //   path: 'category/services/:id', // el id da bta3 el category ya hammad
-      //   loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
-      // },
+      
+      {
+        path: 'category/services/:id', // el id da bta3 el category ya hammad
+        loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
+      },
       {
         path: 'services/:id',
         loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
