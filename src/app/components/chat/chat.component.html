@@ -1,0 +1,41 @@
+<!-- chat.component.html -->
+<div class="chat-container">
+  <div class="status-indicator" [ngClass]="connectionStatus">
+    <span *ngIf="connectionStatus === 'connected'">🟢 Connected</span>
+    <span *ngIf="connectionStatus === 'connecting'">🟡 Connecting...</span>
+    <span *ngIf="connectionStatus === 'disconnected'">🔴 Disconnected</span>
+  </div>
+
+  <div #messagesContainer class="messages-list">
+    <div *ngFor="let msg of messages"
+         [ngClass]="{
+           'outgoing': msg.senderId === currentUserId,
+           'incoming': msg.senderId !== currentUserId,
+           'optimistic': msg.isOptimistic || isOptimisticMessage(msg)
+         }">
+      <div class="bubble">
+        <span class="content">{{ msg.content }}</span>
+        <span class="meta">
+          {{ msg.sentAt | date:'shortTime' }}
+          <span *ngIf="msg.senderId === currentUserId && msg.delivered">✔</span>
+          <span *ngIf="msg.senderId === currentUserId && (msg.isOptimistic || isOptimisticMessage(msg))" class="sending">⏳</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <form class="input-row" (ngSubmit)="sendMessage()">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      name="message"
+      placeholder="Type a message..."
+      autocomplete="off"
+      [disabled]="connectionStatus !== 'connected'" />
+    <button
+      type="submit"
+      [disabled]="!newMessage.trim() || connectionStatus !== 'connected'">
+      Send
+    </button>
+  </form>
+</div>

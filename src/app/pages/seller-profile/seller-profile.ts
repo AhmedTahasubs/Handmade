@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ProductCardComponent, Product } from '../../components/product-card/product-card';
 import { LanguageService } from '../../services/language.service';
+import { Router } from '@angular/router';
 
 export interface SellerProfile {
   id: number;
@@ -46,7 +47,8 @@ export class SellerProfilePage implements OnInit {
   
   constructor(
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private router: Router
   ) {}
   
   ngOnInit() {
@@ -238,8 +240,9 @@ export class SellerProfilePage implements OnInit {
   }
   
   sendMessage(): void {
-    console.log('Send message to seller');
-    // Implement messaging functionality
+    if (this.seller) {
+      this.router.navigate(['/chat', this.seller.id]);
+    }
   }
   
   getStarArray(): number[] {
