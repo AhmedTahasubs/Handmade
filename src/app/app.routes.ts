@@ -27,10 +27,13 @@ export const routes: Routes = [
         path: 'categories', 
         loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
-      {
-        path: 'services',
-        loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
-      },
+
+
+      // to do ya hammad 
+      // {
+      //   path: 'category/services/:id', // el id da bta3 el category ya hammad
+      //   loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
+      // },
       {
         path: 'services/:id',
         loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
@@ -44,7 +47,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
       },
       {
-        path: 'seller/:id',
+        path: 'sellerProfile/:id',
         loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
       },
       {
@@ -57,6 +60,7 @@ export const routes: Routes = [
       }
     ]
   },
+  //dashboard layout
   {
     path: '',
     component: DashboardLayout,

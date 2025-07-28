@@ -18,7 +18,7 @@ export class SearchFilterComponent {
   @Input() language: 'en' | 'ar' = 'en';
   @Input() searchTerm: string = '';
   @Input() selectedCategory: string = 'all';
-  @Input() priceRange: number[] = [0, 200];
+  @Input() priceRange: number[] = [0, 1000];
   @Input() showCustomizable: boolean = false;
 
   @Output() searchTermChange = new EventEmitter<string>();

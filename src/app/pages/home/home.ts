@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
 import { LanguageService } from '../../services/language.service';
 import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
-import { HttpClientModule } from '@angular/common/http'; // استيراد HttpClientModule
 
 // تحديث واجهة Category لتتوافق مع DTO من API لاسم الفئة
 // قد ترغب في الاحتفاظ بالاسم: { en: string; ar: string } لأغراض العرض،
@@ -27,7 +26,6 @@ interface Category {
     CommonModule,
     ProductCardComponent, // تأكد من استيراد ProductCardComponent إذا تم استخدامه في القالب
     SearchFilterComponent, // تأكد من استيراد SearchFilterComponent إذا تم استخدامه في القالب
-    HttpClientModule // إضافة HttpClientModule هنا
   ]
 })
 export class HomeComponent implements OnInit { // تطبيق OnInit

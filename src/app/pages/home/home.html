@@ -16,7 +16,7 @@
         {{ language === 'en' ? 'Featured Categories' : 'الفئات المميزة' }}
       </h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        <div *ngFor="let category of featuredCategories; trackbyid : trackByCategoryId " 
+        <div *ngFor="let category of featuredCategories; trackbyid : trackByCategoryId" 
              class="relative overflow-hidden transition-all duration-300 transform bg-white shadow-lg group rounded-xl dark:bg-gray-800 hover:shadow-xl hover:scale-105">
           <div class="relative overflow-hidden aspect-w-16 aspect-h-9">
             <img [src]="category.imageUrl || 'assets/placeholder.jpg'" 
