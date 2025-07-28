@@ -7,29 +7,29 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      { 
-        path: '', 
+      {
+        path: '',
         loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent)
       },
-      { 
-        path: 'login', 
+      {
+        path: 'login',
         loadComponent: () => import('./authPages/login/login').then(m => m.Login)
       },
-      { 
-        path: 'register', 
+      {
+        path: 'register',
         loadComponent: () => import('./authPages/register/register').then(m => m.Register)
       },
-      { 
-        path: 'forgot-password', 
+      {
+        path: 'forgot-password',
         loadComponent: () => import('./authPages/forgot-password/forgot-password').then(m => m.ForgotPassword)
       },
-      { 
-        path: 'categories', 
+      {
+        path: 'categories',
         loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
 
 
-      // to do ya hammad 
+      // to do ya hammad
       // {
       //   path: 'category/services/:id', // el id da bta3 el category ya hammad
       //   loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
@@ -47,7 +47,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
       },
       {
-        path: 'sellerProfile/:id',
+        path: 'sellerprofile/:id',
         loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
       },
       {
@@ -73,28 +73,28 @@ export const routes: Routes = [
         path: 'admin',
         loadComponent: () => import('./pages/admin/admin').then(m => m.Admin),
         children: [
-          { 
-            path: '', 
+          {
+            path: '',
             loadComponent: () => import('./adminPages/users-management/users-management').then(m => m.UsersManagement)
           },
-          { 
-            path: 'products-management', 
+          {
+            path: 'products-management',
             loadComponent: () => import('./adminPages/products-management/products-management').then(m => m.ProductsManagement)
           },
-          { 
-            path: 'orders-management', 
+          {
+            path: 'orders-management',
             loadComponent: () => import('./adminPages/orders-management/orders-management').then(m => m.OrdersManagement)
           },
-          { 
-            path: 'services-management', 
+          {
+            path: 'services-management',
             loadComponent: () => import('./adminPages/services-management/services-management').then(m => m.ServicesManagement)
           },
-          { 
-            path: 'users-management', 
+          {
+            path: 'users-management',
             loadComponent: () => import('./adminPages/users-management/users-management').then(m => m.UsersManagement)
           },
-          { 
-            path: 'categories-management', 
+          {
+            path: 'categories-management',
             loadComponent: () => import('./adminPages/categories-management/categories-management').then(m => m.CategoriesManagement)
           },
         ]
@@ -103,21 +103,21 @@ export const routes: Routes = [
         path: 'seller',
         loadComponent: () => import('./pages/seller/seller').then(m => m.Seller),
         children:[
-          { 
-            path: '', 
+          {
+            path: '',
             redirectTo: 'services-management',
             pathMatch: 'full'
           },
-          { 
-            path: 'services-management', 
+          {
+            path: 'services-management',
             loadComponent: () => import('./sellerPages/services-management/services-management').then(m => m.SellerServicesManagement)
           },
-          { 
-            path: 'products-management', 
+          {
+            path: 'products-management',
             loadComponent: () => import('./sellerPages/products-management/products-management').then(m => m.SellerProductsManagement)
           },
-          { 
-            path: 'orders-management', 
+          {
+            path: 'orders-management',
             loadComponent: () => import('./sellerPages/orders-management/orders-management').then(m => m.SellerOrdersManagement)
           },
         ]
@@ -125,8 +125,8 @@ export const routes: Routes = [
     ]
   },
   // wildcard for unknown routes
-  { 
-    path: '**', 
+  {
+    path: '**',
     loadComponent: () => import('./pages/error/error').then(m => m.ErrorPage)
   }
 ];
