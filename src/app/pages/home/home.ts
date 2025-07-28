@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
 import { LanguageService } from '../../services/language.service';
 import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
+import { Router } from '@angular/router';
 
 // تحديث واجهة Category لتتوافق مع DTO من API لاسم الفئة
 // قد ترغب في الاحتفاظ بالاسم: { en: string; ar: string } لأغراض العرض،
@@ -184,11 +185,11 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
     }
   ];
 
-  // تهيئة allCategories كمصفوفة فارغة
+  
   allCategories: Category[] = [];
-  featuredCategories: Category[] = []; // ستقوم بملء هذا بناءً على البيانات التي تم جلبها
+  featuredCategories: Category[] = []; 
 
-  constructor() {} // بناء (constructor) للوضوح، على الرغم من استخدام inject
+  constructor(private router : Router) {} 
 
   ngOnInit(): void {
     this.fetchCategories();
@@ -245,6 +246,9 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
       return matchesSearch && categoryMatches && matchesPrice && matchesCustomizable;
     });
   }
+  navigateToCategoryServices(categoryId: number): void {
+  this.router.navigate(['/category/services', categoryId]);
+}
 
   // دالة مساعدة للعثور على معرف الفئة بالاسم، وهي حاسمة لتصفية المنتجات
   private findCategoryIdByName(categoryName: string): number | undefined {

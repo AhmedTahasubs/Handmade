@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 // تأكد من مسار الـ import ده للـ ServiceService والـ ServiceDto
 import { ServiceService} from '../../services/service'; // المسار الصحيح للخدمة
 import { ServiceDto } from '../../shared/service.interface'; // المسار الصحيح للDTO
+import { ActivatedRoute } from '@angular/router';
 
 
 // **هام**: يجب أن تتطابق هذه الواجهة مع الواجهة الموجودة في ServiceCardComponent.
@@ -52,10 +53,42 @@ export class ServicesPage implements OnInit {
   allServices: Service[] = [];
   
   constructor() {}
-
+private router = inject(ActivatedRoute)
   ngOnInit(): void {
+   const idParam = this.router.snapshot.paramMap.get('id');
+  const categoryId = idParam ? Number(idParam) : null;
+
+  if (categoryId !== null) {
+    this.fetchServicesByCategoryId(categoryId);
+  } else {
     this.fetchServices();
   }
+    
+  }
+  fetchServicesByCategoryId(categoryId: number): void {
+  this.serviceService.getServicesByCategoryId(categoryId).subscribe({
+    next: (data: ServiceDto[]) => {
+      this.allServices = data.map(dto => ({
+        id: dto.id,
+        title: dto.title,
+        description: dto.description,
+        price: dto.basePrice,
+        rating: dto.avgRating,
+        reviewCount: 0,
+        imageUrl: dto.imageUrl,
+        category: dto.categoryName,
+        seller: dto.sellerName,
+        isCustomizable: false,
+        deliveryTime: this.formatDeliveryTime(dto.deliveryTime)
+      }));
+      console.log('Services for category', categoryId, this.allServices);
+    },
+    error: (error) => {
+      console.error('Error fetching services by category:', error);
+    }
+  });
+}
+
 
   fetchServices(): void {
     this.serviceService.getServices().subscribe({
