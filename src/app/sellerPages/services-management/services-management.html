@@ -26,31 +26,37 @@
           <i class="fas fa-tools text-blue-600 dark:text-blue-400"></i>
         </div>
         <div class="ml-3 rtl:mr-3 rtl:ml-0">
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Services</p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {{ getTranslation('totalServices') }}
+          </p>
           <p class="text-xl font-bold text-gray-900 dark:text-white">{{ services.length }}</p>
         </div>
       </div>
     </div>
-    
+
     <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div class="flex items-center">
         <div class="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
           <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
         </div>
         <div class="ml-3 rtl:mr-3 rtl:ml-0">
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Services</p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {{ getTranslation('activeServices') }}
+          </p>
           <p class="text-xl font-bold text-gray-900 dark:text-white">{{ getActiveServicesCount() }}</p>
         </div>
       </div>
     </div>
-    
+
     <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div class="flex items-center">
         <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
           <i class="fas fa-shopping-cart text-purple-600 dark:text-purple-400"></i>
         </div>
         <div class="ml-3 rtl:mr-3 rtl:ml-0">
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {{ getTranslation('totalOrders') }}
+          </p>
           <p class="text-xl font-bold text-gray-900 dark:text-white">{{ getTotalOrders() }}</p>
         </div>
       </div>
@@ -62,11 +68,10 @@
     [data]="services"
     [columns]="columns"
     [actions]="actions"
-    searchPlaceholder="Search services..."
+    [searchPlaceholder]="getTranslation('searchServices')"
     (actionClicked)="onAction($event)"
     (exportClicked)="onExport()"
   ></app-data-table>
-
   <!-- Create/Edit Modal -->
   <app-modal
     [isOpen]="showModal"
@@ -87,7 +92,7 @@
           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
-      
+
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {{ getTranslation('description') }}
@@ -99,11 +104,11 @@
           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         ></textarea>
       </div>
-      
+
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Price
+            {{ getTranslation('price') }}
           </label>
           <input
             type="number"
@@ -112,7 +117,7 @@
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
-        
+
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ getTranslation('duration') }}
@@ -125,10 +130,10 @@
           />
         </div>
       </div>
-      
+
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Category
+          {{ getTranslation('category') }}
         </label>
         <select
           [(ngModel)]="currentService.category"
@@ -145,7 +150,7 @@
 
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Status
+          {{ getTranslation('status') }}
         </label>
         <select
           [(ngModel)]="currentService.status"
@@ -164,7 +169,7 @@
   <app-modal
     [isOpen]="showDeleteModal"
     [title]="getTranslation('deleteService')"
-    confirmText="Delete"
+    [confirmText]="getTranslation('delete')"
     confirmButtonType="danger"
     (closed)="closeDeleteModal()"
     (confirmed)="confirmDelete()"
@@ -173,7 +178,9 @@
       <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fas fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{{ getTranslation('deleteConfirm') }}</h3>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        {{ getTranslation('deleteConfirm') }}
+      </h3>
       <p class="text-gray-500 dark:text-gray-400">
         {{ getTranslation('deleteMessage') }}
       </p>

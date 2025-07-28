@@ -39,15 +39,15 @@ export class SellerSidebar implements OnInit {
         exact: false
       },
       { 
-        name: isArabic ? "الطلبات" : "Orders", 
-        icon: "faShoppingBag", 
-        href: "/seller/orders-management",
-        exact: false
-      },
-      { 
         name: isArabic ? "المنتجات" : "Products", 
         icon: "faBox", 
         href: "/seller/products-management",
+        exact: false
+      },
+            { 
+        name: isArabic ? "الطلبات" : "Orders", 
+        icon: "faShoppingBag", 
+        href: "/seller/orders-management",
         exact: false
       },
       { 
