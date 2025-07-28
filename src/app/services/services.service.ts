@@ -57,8 +57,8 @@ export class ServiceSellerService {
   }
 
   // POST new service
-  create(service: ServiceRequest): Observable<ServiceRequest> {
-    return this.http.post<ServiceRequest>(this.baseUrl, service);
+   create(formData: FormData): Observable<ServiceDto> {
+    return this.http.post<ServiceDto>(this.baseUrl, formData);
   }
 
   // DELETE service by ID
@@ -66,7 +66,7 @@ export class ServiceSellerService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
   // PUT update service by ID
-  update(id: number, service: ServiceRequest): Observable<ServiceRequest> {
-    return this.http.put<ServiceRequest>(`${this.baseUrl}/${id}`, service);
+  update(id: number, formData: FormData): Observable<ServiceDto> {
+    return this.http.put<ServiceDto>(`${this.baseUrl}/${id}`, formData);
   }
 }

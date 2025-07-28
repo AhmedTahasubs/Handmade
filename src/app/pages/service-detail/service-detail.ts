@@ -21,7 +21,7 @@ import {
   ServiceDto,
   ProductDisplayDto as ProductDto, // هنحتاجها لتحويل الـ ProductDto
   Product, // الواجهة اللي بيعرضها ProductCardComponent
-  ProductDisplayDto
+  ProductDisplayDto,
 } from '../../shared/service.interface'; // تأكد من المسار الصحيح
 
 
@@ -180,10 +180,12 @@ private loadRelatedServices(): void {
   if (!this.service || !this.service.category) return;
 
   this.serviceService.getServicesByCategoryName(this.service.category).subscribe({
-    next: (services: Service[]) => {
-      // استبعد الخدمة الحالية من النتائج
-      this.relatedServices = services.filter(s => s.id !== this.service?.id);
-    },
+
+    //fe error hna ya 7mad
+    // next: (services: Service[]) => {
+    //   // استبعد الخدمة الحالية من النتائج
+    //   this.relatedServices = services.filter(s => s.id !== this.service?.id);
+    // },
     error: (err) => {
       console.error('Error loading related services:', err);
     }

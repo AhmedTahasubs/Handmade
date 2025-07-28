@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ThemeService } from './../../../services/theme.service';
 import { LanguageService } from './../../../services/language.service';
+import { AuthService } from './../../../services/authService.service';
 
 @Component({
   selector: "app-seller-header",
@@ -14,16 +15,16 @@ export class SellerHeader {
 
   private themeService = inject(ThemeService);
   private languageService = inject(LanguageService);
-
+  private authService = inject(AuthService);
   isDarkMode = this.themeService.isDark;
   currentLanguage = this.languageService.currentLanguage;
-
+  user = this.authService.getUser();
   private translations = {
     en: {
       welcome: "Welcome to Your Dashboard",
       toggleTheme: "Toggle Theme",
       toggleLanguage: "Toggle Language",
-      sellerName: "Ahmed Hassan",
+      sellerName: this.user?.fullName,
       seller: "Seller",
     },
     ar: {
