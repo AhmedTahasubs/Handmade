@@ -89,17 +89,17 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   // Image gallery
   selectedImage: string | null = null;
   productImages: string[] = [];
-  
+
   // Quantity
   quantity = 1;
-  
+
   // Wishlist
   isInWishlist = false;
-  
+
   // Cart operations
   addingToCart = false;
   buyingNow = false;
-  
+
   // Reviews
   reviews: Review[] = [];
   filteredReviews: Review[] = [];
@@ -110,15 +110,15 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   selectedFilter = 'all';
   hasMoreReviews = false;
   loadingReviews = false;
-  
+
   // Review form
   showReviewForm = false;
   reviewRating = 0;
   reviewComment = '';
   submittingReview = false;
-  
+
   // Related products
-  relatedProducts: Product[] = [];  
+  relatedProducts: Product[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -184,70 +184,70 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   private loadProduct(productId: number): void {
     this.loading = true;
-    
+
     // Simulate API call
-    setTimeout(() => {
-      this.product = this.getMockProduct(productId);
-      this.productImages = this.product.images || [this.product.image];
-      this.selectedImage = this.productImages[0];
-      this.loadReviews();
-      this.loadRelatedProducts();
-      this.checkWishlistStatus();
-      this.loading = false;
-    }, 1000);
+    // setTimeout(() => {
+    //   this.product = this.getMockProduct(productId);
+    //   this.productImages = this.product.images || [this.product.imageUrl];
+    //   this.selectedImage = this.productImages[0];
+    //   this.loadReviews();
+    //   this.loadRelatedProducts();
+    //   this.checkWishlistStatus();
+    //   this.loading = false;
+    // }, 1000);
   }
 
-  private getMockProduct(id: number): ExtendedProduct {
-    const mockProducts: ExtendedProduct[] = [
-      {
-        id: 1,
-        name: { en: 'Handcrafted Wooden Bowl', ar: 'وعاء خشبي يدوي الصنع' },
-        description: { 
-          en: 'Beautiful handcrafted wooden bowl made from sustainable oak. Perfect for serving or as a decorative piece.',
-          ar: 'وعاء خشبي جميل مصنوع يدوياً من خشب البلوط المستدام. مثالي للتقديم أو كقطعة ديكور.'
-        },
-        price: 45.99,
-        originalPrice: 59.99,
-        category: 'Home & Garden',
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
-        images: [
-          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
-          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=center',
-          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=top',
-          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=bottom'
-        ],
-        seller: 'WoodMasters',
-        rating: 4.8,
-        customizable: true,
-        material: 'Oak Wood',
-        dimensions: '12" x 8" x 3"',
-        weight: '2.5 lbs',
-        stock: 15,
-        sku: 'WM-BOWL-001'
-      },
-      {
-        id: 2,
-        name: { en: 'Handwoven Cotton Rug', ar: 'سجادة قطنية منسوجة يدوياً' },
-        description: { 
-          en: 'Traditional handwoven cotton rug with geometric patterns. Adds warmth and style to any room.',
-          ar: 'سجادة قطنية تقليدية منسوجة يدوياً بنقوش هندسية. تضيف الدفء والأناقة لأي غرفة.'
-        },
-        price: 89.99,
-        category: 'Home & Garden',
-        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500',
-        seller: 'ArtisanCrafts',
-        rating: 4.6,
-        customizable: false,
-        material: '100% Cotton',
-        dimensions: '4\' x 6\'',
-        weight: '8 lbs',
-        stock: 8,
-        sku: 'AC-RUG-002'
-      }
-    ];
+  // private getMockProduct(id: number): ExtendedProduct {
+  //   const mockProducts: ExtendedProduct[] = [
+  //     {
+  //       id: 1,
+  //       name: { en: 'Handcrafted Wooden Bowl', ar: 'وعاء خشبي يدوي الصنع' },
+  //       description: {
+  //         en: 'Beautiful handcrafted wooden bowl made from sustainable oak. Perfect for serving or as a decorative piece.',
+  //         ar: 'وعاء خشبي جميل مصنوع يدوياً من خشب البلوط المستدام. مثالي للتقديم أو كقطعة ديكور.'
+  //       },
+  //       price: 45.99,
+  //       originalPrice: 59.99,
+  //       category: 'Home & Garden',
+  //       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
+  //       images: [
+  //         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
+  //         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=center',
+  //         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=top',
+  //         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&crop=bottom'
+  //       ],
+  //       seller: 'WoodMasters',
+  //       rating: 4.8,
+  //       customizable: true,
+  //       material: 'Oak Wood',
+  //       dimensions: '12" x 8" x 3"',
+  //       weight: '2.5 lbs',
+  //       stock: 15,
+  //       sku: 'WM-BOWL-001'
+  //     },
+  //     {
+  //       id: 2,
+  //       name: { en: 'Handwoven Cotton Rug', ar: 'سجادة قطنية منسوجة يدوياً' },
+  //       description: {
+  //         en: 'Traditional handwoven cotton rug with geometric patterns. Adds warmth and style to any room.',
+  //         ar: 'سجادة قطنية تقليدية منسوجة يدوياً بنقوش هندسية. تضيف الدفء والأناقة لأي غرفة.'
+  //       },
+  //       price: 89.99,
+  //       category: 'Home & Garden',
+  //       image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500',
+  //       seller: 'ArtisanCrafts',
+  //       rating: 4.6,
+  //       customizable: false,
+  //       material: '100% Cotton',
+  //       dimensions: '4\' x 6\'',
+  //       weight: '8 lbs',
+  //       stock: 8,
+  //       sku: 'AC-RUG-002'
+  //     }
+  //   ];
 
-    return mockProducts.find(p => p.id === id) || mockProducts[0];
-  }
+  //   return mockProducts.find(p => p.id === id) || mockProducts[0];
+  // }
 
   private loadReviews(): void {
     // Mock reviews data
@@ -313,30 +313,30 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   private loadRelatedProducts(): void {
     // Mock related products
-    this.relatedProducts = [
-      {
-        id: 3,
-        name: { en: 'Ceramic Vase', ar: 'مزهرية خزفية' },
-        description: { en: 'Handcrafted ceramic vase', ar: 'مزهرية خزفية مصنوعة يدوياً' },
-        price: 35.99,
-        category: 'Home & Garden',
-        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500',
-        seller: 'CeramicArt',
-        rating: 4.7,
-        customizable: true
-      },
-      {
-        id: 4,
-        name: { en: 'Leather Wallet', ar: 'محفظة جلدية' },
-        description: { en: 'Handmade leather wallet', ar: 'محفظة جلدية مصنوعة يدوياً' },
-        price: 29.99,
-        category: 'Accessories',
-        image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500',
-        seller: 'LeatherCraft Co',
-        rating: 4.5,
-        customizable: false
-      }
-    ];
+    // this.relatedProducts = [
+    //   {
+    //     id: 3,
+    //     name: { en: 'Ceramic Vase', ar: 'مزهرية خزفية' },
+    //     description: { en: 'Handcrafted ceramic vase', ar: 'مزهرية خزفية مصنوعة يدوياً' },
+    //     price: 35.99,
+    //     category: 'Home & Garden',
+    //     image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500',
+    //     seller: 'CeramicArt',
+    //     rating: 4.7,
+    //     customizable: true
+    //   },
+    //   {
+    //     id: 4,
+    //     name: { en: 'Leather Wallet', ar: 'محفظة جلدية' },
+    //     description: { en: 'Handmade leather wallet', ar: 'محفظة جلدية مصنوعة يدوياً' },
+    //     price: 29.99,
+    //     category: 'Accessories',
+    //     image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500',
+    //     seller: 'LeatherCraft Co',
+    //     rating: 4.5,
+    //     customizable: false
+    //   }
+    // ];
   }
 
   private checkWishlistStatus(): void {
@@ -363,10 +363,10 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   // Cart and wishlist methods
   onAddToCart(): void {
     if (!this.product) return;
-    
+
     this.addingToCart = true;
     setTimeout(() => {
-      console.log(`Added ${this.quantity} of ${this.product?.name[this.language]} to cart`);
+      console.log(`Added ${this.quantity} of ${this.product?.title} to cart`);
       this.addingToCart = false;
       // Here you would typically call a service to add to cart
     }, 1000);
@@ -374,10 +374,10 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   onBuyNow(): void {
     if (!this.product) return;
-    
+
     this.buyingNow = true;
     setTimeout(() => {
-      console.log(`Buying ${this.quantity} of ${this.product?.name[this.language]}`);
+      console.log(`Buying ${this.quantity} of ${this.product?.title}`);
       this.buyingNow = false;
       // Here you would typically navigate to checkout
     }, 1000);
@@ -385,16 +385,16 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   onAddToWishlist(): void {
     if (!this.product) return;
-    
+
     this.isInWishlist = !this.isInWishlist;
-    console.log(`${this.isInWishlist ? 'Added' : 'Removed'} ${this.product.name[this.language]} from wishlist`);
+    console.log(`${this.isInWishlist ? 'Added' : 'Removed'} ${this.product.title} from wishlist`);
   }
 
   onShare(): void {
     if (navigator.share) {
       navigator.share({
-        title: this.product?.name[this.language],
-        text: this.product?.description[this.language],
+        title: this.product?.title,
+        text: this.product?.description,
         url: window.location.href
       });
     } else {
@@ -406,15 +406,15 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   onSellerClick(): void {
     if (!this.product) return;
-    
-    const sellerId = this.getSellerIdFromName(this.product.seller);
+
+    const sellerId = this.getSellerIdFromName(this.product.sellerId);
     this.router.navigate(['/seller', sellerId]);
   }
 
   private getSellerIdFromName(sellerName: string): number {
     const sellerMap: { [key: string]: number } = {
       'ArtisanCrafts': 1,
-      'WoolWonders': 2, 
+      'WoolWonders': 2,
       'WoodMasters': 3,
       'LeatherCraft Co': 4,
       'BohoVibes': 5,
@@ -428,13 +428,13 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   // Review methods
   filterReviews(filter: string): void {
-    this.selectedFilter = filter;
-    if (filter === 'all') {
-      this.filteredReviews = [...this.reviews];
-    } else {
-      const rating = parseInt(filter);
-      this.filteredReviews = this.reviews.filter(review => review.rating === rating);
-    }
+    // this.selectedFilter = filter;
+    // if (filter === 'all') {
+    //   this.filteredReviews = [...this.reviews];
+    // } else {
+    //   const rating = parseInt(filter);
+    //   this.filteredReviews = this.reviews.filter(review => review.rating === rating);
+    // }
   }
 
   loadMoreReviews(): void {
@@ -477,7 +477,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       this.reviews.unshift(newReview);
       this.calculateReviewStats();
       this.filterReviews(this.selectedFilter);
-      
+
       this.showReviewForm = false;
       this.reviewRating = 0;
       this.reviewComment = '';
@@ -490,13 +490,13 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     return Array(5).fill(0).map((_, i) => i);
   }
 
-  isStarFilled(index: number, rating?: number): boolean {
-    const targetRating = rating || this.product?.rating || 0;
-    return index < Math.floor(targetRating);
-  }
+  // isStarFilled(index: number, rating?: number): boolean {
+  //   const targetRating = rating || this.product?.rating || 0;
+  //   return index < Math.floor(targetRating);
+  // }
 
   getDiscountPercentage(): number {
     if (!this.product?.originalPrice) return 0;
     return Math.round(((this.product.originalPrice - this.product.price) / this.product.originalPrice) * 100);
   }
-} 
+}
