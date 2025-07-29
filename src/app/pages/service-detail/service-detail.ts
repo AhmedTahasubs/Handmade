@@ -57,6 +57,7 @@ export class ServiceDetailPage implements OnInit {
   ) {}
   
   ngOnInit() {
+    console.log('seller profile:', this.service?.sellerInfo.id);
     this.route.params.subscribe(params => {
       this.serviceId = +params['id']; // تحويل الـ id من string إلى number
       if (isNaN(this.serviceId)) {
@@ -174,33 +175,59 @@ export class ServiceDetailPage implements OnInit {
       }
     });
   }
+  private mapDtoToService(dto: ServiceDto): Service {
+  return {
+    id: dto.id,
+    title: dto.title,
+    description: dto.description,
+    price: dto.basePrice,
+    rating: dto.avgRating,
+    reviewCount: dto.products.length, 
+    imageUrl: dto.imageUrl,
+    category: dto.categoryName,
+    seller: dto.sellerName,
+    isCustomizable: dto.products.length > 0, 
+    deliveryTime: dto.deliveryTime + ' days', 
+    categoryId: dto.categoryId
+  };
+}
+
 
   // هذه الدوال لسه بتجيب Mock data. لو عندك APIs ليها، عدلها.
 private loadRelatedServices(): void {
   if (!this.service || !this.service.category) return;
 
-  this.serviceService.getServicesByCategoryName(this.service.category).subscribe({
+  this.serviceService.getServicesByCategoryName(this.service.category).subscribe((dtos: ServiceDto[]) => {
+    const services = dtos
+      .filter(dto => dto.id !== this.service?.id)
+      .map(dto => this.mapDtoToService(dto));
 
-    //fe error hna ya 7mad
-    // next: (services: Service[]) => {
-    //   // استبعد الخدمة الحالية من النتائج
-    //   this.relatedServices = services.filter(s => s.id !== this.service?.id);
-    // },
-    error: (err) => {
-      console.error('Error loading related services:', err);
-    }
+    this.relatedServices = services;
   });
 }
 
 
-  private loadReviews(): void {
-    this.reviews = [
-      {
-        id: 1, user: { name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b550?w=387', country: 'United States' },
-        rating: 5.0, comment: { en: 'Amazing work!', ar: 'عمل رائع!' }, date: '2024-01-15', isVerified: true
-      }
-    ];
-  }
+private loadReviews(): void {
+  if (!this.service) return;
+
+  this.serviceService.getReviewsByServiceId(this.service.id).subscribe({
+    next: (reviews: Review[]) => {
+      this.reviews = reviews.map(r => ({
+        ...r,
+        user: {
+          id: r.reviewerId,
+          name: r.reviewerName
+        },
+        date: r.createdAt,
+        isVerified: true  
+      }));
+    },
+    error: (err) => {
+      console.error('Error loading reviews:', err);
+    }
+  });}
+
+
 
   private formatDeliveryTime(timeInDays: number): string {
     if (timeInDays === 0) {
@@ -250,8 +277,9 @@ private loadRelatedServices(): void {
   }
   
   goToSellerProfile(): void {
+    console.log('Going to seller profile:', this.service?.sellerInfo.id);
     if (this.service) {
-      this.router.navigate(['/seller', this.service.sellerInfo.id]);
+      this.router.navigate(['/sellerProfile', this.service.sellerInfo.id]);
     }
   }
   

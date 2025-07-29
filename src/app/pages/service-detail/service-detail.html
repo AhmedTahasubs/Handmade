@@ -199,13 +199,19 @@
           </div>
         </div>
 
-        <!-- Reviews -->
-        <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">{{ labels.reviews }} ({{ reviews.length }})</h2>
-          <div class="space-y-6">
-            <app-review-item *ngFor="let review of reviews" [review]="review" [language]="currentLanguage"></app-review-item>
-          </div>
-        </div>
+       <!-- Reviews -->
+<div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+  <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+    {{ labels.reviews }} ({{ reviews.length }})
+  </h2>
+  <div class="space-y-6">
+    <app-review-item
+      *ngFor="let review of reviews"
+      [review]="review"
+    ></app-review-item>
+  </div>
+</div>
+
 
         <!-- Related Services -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800" *ngIf="relatedServices.length">

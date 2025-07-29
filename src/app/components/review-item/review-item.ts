@@ -1,21 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Review } from '../../shared/service.interface';
 
-export interface Review {
-  id: number;
-  user: {
-    name: string;
-    avatar: string;
-    country: string;
-  };
-  rating: number;
-  comment: {
-    en: string;
-    ar: string;
-  };
-  date: string;
-  isVerified: boolean;
-}
+
 
 @Component({
   selector: 'app-review-item',
