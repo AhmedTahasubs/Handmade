@@ -63,6 +63,10 @@ export const routes: Routes = [
         path: 'chat/:userId',
         loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
       },
+      {
+        path: 'contacts',
+        loadComponent: () => import('./pages/contacts/contacts').then(m => m.ContactsPageComponent)
+      },
     ]
   },
   //dashboard layout

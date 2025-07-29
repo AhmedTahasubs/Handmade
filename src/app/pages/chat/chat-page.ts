@@ -8,12 +8,11 @@ import { ChatComponent } from '../../components/chat/chat.component';
   standalone: true,
   imports: [CommonModule, ChatComponent],
   template: `
-    <div class="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
-      <app-chat *ngIf="otherUserId && currentUserId"
-        [otherUserId]="otherUserId"
-        [currentUserId]="currentUserId">
-      </app-chat>
-    </div>
+    <app-chat *ngIf="otherUserId && currentUserId"
+      [otherUserId]="otherUserId"
+      [currentUserId]="currentUserId"
+      class="full-chat-screen">
+    </app-chat>
   `
 })
 export class ChatPageComponent {

@@ -30,6 +30,15 @@ export class ChatSignalrService implements OnDestroy {
     return this.connectionStatusSubject.asObservable();
   }
 
+  /**
+   * Fetches the user's chat contacts.
+   */
+  getChatContacts(): Observable<{ userId: string; fullName: string; profileImage?: string | null }[]> {
+    const jwt = localStorage.getItem('jwt');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${jwt}` });
+    return this.http.get<{ userId: string; fullName: string; profileImage?: string | null }[]>(`${this.apiUrl}/contacts`, { headers });
+  }
+
   connect(): void {
     if (this.hubConnection) return;
     this.connectionStatusSubject.next('connecting');
@@ -100,4 +109,4 @@ export class ChatSignalrService implements OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-} 
+}
