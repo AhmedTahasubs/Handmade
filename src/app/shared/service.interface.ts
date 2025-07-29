@@ -52,6 +52,17 @@ export interface Service {
   deliveryTime: string;
   categoryId: number;
 }
+export interface Review {
+  id: number;
+  serviceId: number;
+  serviceTitle: string;
+  reviewerId: string;
+  reviewerName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 
 // **هذه الواجهة تمثل بيانات تفاصيل الخدمة التي يستخدمها ServiceDetailPage**
 export interface ServiceDetail extends Service {
@@ -114,18 +125,18 @@ export interface Product {
   customizable: boolean;
 }
 
-export interface Review {
-  id: number;
-  user: {
-    name: string;
-    avatar: string;
-    country: string;
-  };
-  rating: number;
-  comment: {
-    en: string;
-    ar: string;
-  };
-  date: string;
-  isVerified: boolean;
-}
+// export interface Review {
+//   id: number;
+//   user: {
+//     name: string;
+//     avatar: string;
+//     country: string;
+//   };
+//   rating: number;
+//   comment: {
+//     en: string;
+//     ar: string;
+//   };
+//   date: string;
+//   isVerified: boolean;
+// }

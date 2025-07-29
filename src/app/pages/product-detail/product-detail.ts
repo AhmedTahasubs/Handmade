@@ -428,13 +428,13 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   // Review methods
   filterReviews(filter: string): void {
-    this.selectedFilter = filter;
-    if (filter === 'all') {
-      this.filteredReviews = [...this.reviews];
-    } else {
-      const rating = parseInt(filter);
-      this.filteredReviews = this.reviews.filter(review => review.rating === rating);
-    }
+    // this.selectedFilter = filter;
+    // if (filter === 'all') {
+    //   this.filteredReviews = [...this.reviews];
+    // } else {
+    //   const rating = parseInt(filter);
+    //   this.filteredReviews = this.reviews.filter(review => review.rating === rating);
+    // }
   }
 
   loadMoreReviews(): void {
