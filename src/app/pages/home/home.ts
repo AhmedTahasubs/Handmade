@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core'; // استيراد OnInit
-import { Product, ProductCardComponent } from '../../components/product-card/product-card';
+import { Product } from '../../components/product-card/product-card';
 import { CommonModule } from '@angular/common';
-import { SearchFilterComponent } from "../../components/search-filter/search-filter";
+
 import { LanguageService } from '../../services/language.service';
 import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
 import { Router } from '@angular/router';
@@ -25,8 +25,6 @@ interface Category {
   standalone: true,
   imports: [
     CommonModule,
-    ProductCardComponent, // تأكد من استيراد ProductCardComponent إذا تم استخدامه في القالب
-    SearchFilterComponent, // تأكد من استيراد SearchFilterComponent إذا تم استخدامه في القالب
   ]
 })
 export class HomeComponent implements OnInit { // تطبيق OnInit

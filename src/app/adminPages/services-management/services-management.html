@@ -6,7 +6,7 @@
 
 <div class="space-y-6">
  <!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
+<div class="flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between">
   <div>
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
       {{ languageService.currentLanguage() === 'en' ? 'Services Management' : 'إدارة الخدمات' }}
@@ -21,16 +21,16 @@
     <button
       *ngIf="selectedServices.size > 0"
       (click)="openBulkDeleteModal()"
-      class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 gap-2"
+      class="inline-flex items-center gap-2 px-4 py-2 text-white transition-colors duration-200 bg-red-600 rounded-lg hover:bg-red-700"
     >
-      <i class="fa-solid fa-trash w-4 h-4"></i>
+      <i class="w-4 h-4 fa-solid fa-trash"></i>
       Delete Selected ({{ selectedServices.size }})
     </button>
     <button
       (click)="openCreateModal()"
-      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 gap-2"
+      class="inline-flex items-center gap-2 px-4 py-2 text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700"
     >
-      <i class="fa-solid fa-plus w-4 h-4"></i>
+      <i class="w-4 h-4 fa-solid fa-plus"></i>
       {{ languageService.currentLanguage() === 'en' ? 'Add Service' : 'إضافة خدمة' }}
     </button>
   </div>
@@ -42,14 +42,14 @@
     *ngFor="let status of statusFilters"
     (click)="setStatusFilter(status.value)"
     [class]="getFilterButtonClass(status.value)"
-    class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+    class="flex items-center gap-2 px-4 py-2 transition-colors duration-200 rounded-lg"
   >
     <i [class]="status.icon" class="w-4 h-4"></i>
     {{ languageService.currentLanguage() === 'en' ? status.label : 
        status.value === 'all' ? 'الكل' :
        status.value === 'awaiting' ? 'بانتظار المراجعة' :
        status.value === 'approved' ? 'مقبول' : 'مرفوض' }}
-    <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+    <span class="px-2 py-1 text-xs bg-white rounded-full dark:bg-gray-800">
       {{ getStatusCount(status.value) }}
     </span>
   </button>
@@ -81,7 +81,7 @@
     <form [formGroup]="serviceForm" class="space-y-6">
       <!-- Service Title -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Service Title <span class="text-red-500">*</span>
         </label>
         <input 
@@ -89,7 +89,7 @@
           formControlName="title" 
           [class.border-red-500]="isFieldInvalid('title')"
           [class.border-gray-300]="!isFieldInvalid('title')"
-          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
           placeholder="Enter service title (2-100 characters)" 
         />
         <div *ngIf="isFieldInvalid('title')" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -99,7 +99,7 @@
 
       <!-- Service Description -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Description <span class="text-red-500">*</span>
         </label>
         <textarea 
@@ -107,7 +107,7 @@
           rows="3" 
           [class.border-red-500]="isFieldInvalid('description')"
           [class.border-gray-300]="!isFieldInvalid('description')"
-          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
           placeholder="Enter detailed service description (10-1000 characters)"
         ></textarea>
         <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -121,7 +121,7 @@
       <!-- Price and Delivery Time -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Base Price <span class="text-red-500">*</span>
           </label>
           <input 
@@ -131,7 +131,7 @@
             step="0.01"
             [class.border-red-500]="isFieldInvalid('basePrice')"
             [class.border-gray-300]="!isFieldInvalid('basePrice')"
-            class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+            class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
             placeholder="0.00" 
           />
           <div *ngIf="isFieldInvalid('basePrice')" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -139,7 +139,7 @@
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Delivery Time <span class="text-red-500">*</span>
           </label>
           <input 
@@ -148,7 +148,7 @@
             min="1" 
             [class.border-red-500]="isFieldInvalid('deliveryTime')"
             [class.border-gray-300]="!isFieldInvalid('deliveryTime')"
-            class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+            class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
             placeholder="Days" 
           />
           <div *ngIf="isFieldInvalid('deliveryTime')" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -159,14 +159,14 @@
 
       <!-- Category -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Category <span class="text-red-500">*</span>
         </label>
         <select 
           formControlName="categoryId" 
           [class.border-red-500]="isFieldInvalid('categoryId')"
           [class.border-gray-300]="!isFieldInvalid('categoryId')"
-          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
         >
           <option value="">Select a category</option>
           <option value="1">Web Development</option>
@@ -182,10 +182,10 @@
 
       <!-- Status (Edit Mode Only) -->
       <div *ngIf="isEditMode">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+        <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
         <select 
           formControlName="status" 
-          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          class="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
         >
           <option value="approved">Approved</option>
           <option value="awaiting">Awaiting</option>
@@ -195,9 +195,9 @@
 
       <!-- Image ID (Optional) -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Image ID 
-          <span class="text-gray-400 text-xs">(Optional)</span>
+          <span class="text-xs text-gray-400">(Optional)</span>
         </label>
         <input 
           type="number" 
@@ -205,7 +205,7 @@
           min="0" 
           [class.border-red-500]="isFieldInvalid('imageId')"
           [class.border-gray-300]="!isFieldInvalid('imageId')"
-          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          class="w-full px-4 py-2 text-gray-900 bg-white border rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
           placeholder="Enter image ID (optional)" 
         />
         <div *ngIf="isFieldInvalid('imageId')" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -227,12 +227,12 @@
     (confirmed)="confirmDelete()"
   >
     <div class="text-center">
-      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
-        <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+      <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full dark:bg-red-900/50">
+        <i class="w-6 h-6 text-red-600 fa-solid fa-trash dark:text-red-400"></i>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+      <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">Are you sure?</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone. This will permanently delete the service.</p>
-      <div *ngIf="serviceToDelete" class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div *ngIf="serviceToDelete" class="p-3 mt-4 rounded-lg bg-gray-50 dark:bg-gray-700">
         <p class="font-medium text-gray-900 dark:text-white">{{ serviceToDelete.title }}</p>
       </div>
     </div>
@@ -249,21 +249,21 @@
     <div *ngIf="selectedService" class="space-y-6">
       <!-- Service Images -->
       <div *ngIf="selectedService.images.length > 0">
-        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Service Images</h4>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <h4 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Service Images</h4>
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
           <img
             *ngFor="let image of selectedService.images"
             [src]="image"
             [alt]="selectedService.title"
-            class="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+            class="object-cover w-full h-24 border border-gray-200 rounded-lg dark:border-gray-700"
           />
         </div>
       </div>
 
       <!-- Service Info -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Service Information</h4>
+          <h4 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Service Information</h4>
           <div class="space-y-3">
             <div>
               <label class="text-xs text-gray-500 dark:text-gray-400">Title</label>
@@ -289,13 +289,13 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Artisan Information</h4>
+          <h4 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Artisan Information</h4>
           <div class="space-y-3">
             <div class="flex items-center gap-3">
               <img
                 [src]="selectedService.artisan.avatar"
                 [alt]="selectedService.artisan.name"
-                class="w-10 h-10 rounded-full object-cover"
+                class="object-cover w-10 h-10 rounded-full"
               />
               <div>
                 <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedService.artisan.name }}</p>
@@ -320,11 +320,11 @@
 
       <!-- Tags -->
       <div *ngIf="selectedService.tags.length > 0">
-        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Tags</h4>
+        <h4 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Tags</h4>
         <div class="flex flex-wrap gap-2">
           <span
             *ngFor="let tag of selectedService.tags"
-            class="px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs rounded-full"
+            class="px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900/50 dark:text-blue-300"
           >
             {{ tag }}
           </span>
@@ -333,8 +333,8 @@
 
       <!-- Rejection Reason -->
       <div *ngIf="selectedService.status === 'rejected' && selectedService.rejectionReason">
-        <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3">Rejection Reason</h4>
-        <p class="text-sm text-gray-900 dark:text-white bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+        <h4 class="mb-3 text-sm font-medium text-red-600 dark:text-red-400">Rejection Reason</h4>
+        <p class="p-3 text-sm text-gray-900 rounded-lg dark:text-white bg-red-50 dark:bg-red-900/20">
           {{ selectedService.rejectionReason }}
         </p>
       </div>
@@ -343,16 +343,16 @@
       <div *ngIf="selectedService.status === 'awaiting'" class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           (click)="approveService(selectedService)"
-          class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2"
+          class="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-white transition-colors duration-200 bg-green-600 rounded-lg hover:bg-green-700"
         >
-          <i class="fa-solid fa-check w-4 h-4"></i>
+          <i class="w-4 h-4 fa-solid fa-check"></i>
           Approve Service
         </button>
         <button
           (click)="openRejectModal(selectedService)"
-          class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
+          class="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-white transition-colors duration-200 bg-red-600 rounded-lg hover:bg-red-700"
         >
-          <i class="fa-solid fa-times w-4 h-4"></i>
+          <i class="w-4 h-4 fa-solid fa-times"></i>
           Reject Service
         </button>
       </div>
@@ -376,7 +376,7 @@
         [(ngModel)]="rejectionReason"
         placeholder="Enter rejection reason..."
         rows="4"
-        class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+        class="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg resize-none dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-white dark:placeholder-gray-400"
       ></textarea>
     </div>
   </app-modal>
@@ -393,15 +393,15 @@
     (confirmed)="confirmBulkDelete()"
   >
     <div class="text-center">
-      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
-        <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+      <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full dark:bg-red-900/50">
+        <i class="w-6 h-6 text-red-600 fa-solid fa-trash dark:text-red-400"></i>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Multiple Services?</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">Delete Multiple Services?</h3>
+      <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
         This action cannot be undone. This will permanently delete {{ selectedServices.size }} selected service(s).
       </p>
-      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-        <p class="text-sm text-red-800 dark:text-red-200 font-medium">
+      <div class="p-3 border border-red-200 rounded-lg bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+        <p class="text-sm font-medium text-red-800 dark:text-red-200">
           {{ selectedServices.size }} service(s) will be permanently deleted
         </p>
       </div>

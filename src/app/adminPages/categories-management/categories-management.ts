@@ -1,4 +1,4 @@
-import { type TableAction , DataTable, type TableColumn } from './../../components/data-table/data-table';
+import { type TableAction, type TableColumn } from './../../components/data-table/data-table';
 import { LanguageService } from './../../services/language.service';
 import { Modal } from './../../components/modal/modal';
 import { ThemeService } from './../../services/theme.service';
@@ -51,7 +51,7 @@ function mapCategoryDtoToCategory(dto: CategoryDto): Category {
 @Component({
   selector: "app-categories-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal, RouterModule, LoadingComponent, ToastComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, Modal, RouterModule, LoadingComponent, ToastComponent],
   templateUrl: "./categories-management.html",
 })
 export class CategoriesManagement implements OnInit {
