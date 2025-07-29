@@ -16,7 +16,7 @@
         </li>
         <li class="flex items-center">
           <i class="mx-2 text-gray-400 fas fa-chevron-right"></i>
-          <span class="text-gray-900 dark:text-white">{{ product?.name?.[language] }}</span>
+          <span class="text-gray-900 dark:text-white">{{ product?.title }}</span>
         </li>
       </ol>
     </nav>
@@ -37,21 +37,21 @@
       <div class="space-y-4">
         <!-- Main Image -->
         <div class="relative overflow-hidden bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-          <img 
-            [src]="selectedImage || product.image" 
-            [alt]="product.name[language]"
+          <img
+            [src]="selectedImage || product.imageUrl"
+            [alt]="product.title"
             class="object-cover w-full h-96 transition-transform duration-300 hover:scale-105"
           />
-          
+
           <!-- Image Overlay Actions -->
           <div class="absolute top-4 right-4 flex flex-col space-y-2">
-            <button 
+            <button
               (click)="onAddToWishlist()"
               class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
               [attr.aria-label]="labels.add_to_wishlist">
               <i class="text-lg fas fa-heart" [class.text-red-500]="isInWishlist"></i>
             </button>
-            <button 
+            <button
               (click)="onShare()"
               class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
               [attr.aria-label]="labels.share">
@@ -60,25 +60,25 @@
           </div>
 
           <!-- Custom Badge -->
-          <div *ngIf="product.customizable" class="absolute top-4 left-4">
+          <!-- <div *ngIf="product.customizable" class="absolute top-4 left-4">
             <span class="flex items-center gap-1 px-3 py-1 text-sm text-white bg-blue-600 rounded-full animate-pulse">
               <i class="text-sm fas fa-pencil-alt"></i>
               <span>{{ labels.customizable }}</span>
             </span>
           </div>
-        </div>
+        </div> -->
 
         <!-- Thumbnail Images -->
         <div class="grid grid-cols-4 gap-2">
-          <button 
+          <button
             *ngFor="let image of productImages; let i = index"
             (click)="selectImage(image)"
             [class.ring-2]="selectedImage === image"
             [class.ring-blue-500]="selectedImage === image"
             class="overflow-hidden transition-all border border-gray-200 rounded-lg dark:border-gray-700 hover:border-blue-500">
-            <img 
-              [src]="image" 
-              [alt]="product.name[language] + ' - ' + (i + 1)"
+            <img
+              [src]="image"
+              [alt]="product.title + ' - ' + (i + 1)"
               class="object-cover w-full h-20 transition-transform hover:scale-110"
             />
           </button>
@@ -89,24 +89,24 @@
       <div class="space-y-6">
         <!-- Title and Rating -->
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.name[language] }}</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.title }}</h1>
           <div class="flex items-center gap-4 mt-2">
             <div class="flex items-center gap-2">
-              <div class="flex items-center star-rating">
+              <!-- <div class="flex items-center star-rating">
                 <ng-container *ngFor="let star of getStarArray(); let i = index">
-                  <i class="text-lg text-yellow-400 fas fa-star star" 
+                  <i class="text-lg text-yellow-400 fas fa-star star"
                      *ngIf="isStarFilled(i)"></i>
-                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star" 
+                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star"
                      *ngIf="!isStarFilled(i)"></i>
                 </ng-container>
-              </div>
-              <span class="font-medium text-gray-900 dark:text-white">{{ product.rating }}</span>
+              </div> -->
+              <!-- <span class="font-medium text-gray-900 dark:text-white">{{ product.rating }}</span> -->
             </div>
             <span class="text-gray-500 dark:text-gray-400">•</span>
-            <button 
-              (click)="onSellerClick()" 
+            <button
+              (click)="onSellerClick()"
               class="text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-              {{ product.seller }}
+              {{ product.sellerId }}
             </button>
             <span class="text-gray-500 dark:text-gray-400">•</span>
             <span class="text-sm text-gray-600 dark:text-gray-400">{{ labels.in_stock }}</span>
@@ -124,15 +124,15 @@
               {{ getDiscountPercentage() }}% {{ labels.off }}
             </span>
           </div>
-          <p *ngIf="product.customizable" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <!-- <p *ngIf="product.customizable" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {{ labels.starting_price }}
-          </p>
+          </p> -->
         </div>
 
         <!-- Description -->
         <div>
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{{ labels.description }}</h3>
-          <p class="text-gray-700 leading-relaxed dark:text-gray-300">{{ product.description[language] }}</p>
+          <p class="text-gray-700 leading-relaxed dark:text-gray-300">{{ product.description }}</p>
         </div>
 
         <!-- Product Details -->
@@ -160,18 +160,18 @@
           <div class="flex items-center gap-4">
             <label class="font-medium text-gray-900 dark:text-white">{{ labels.quantity }}:</label>
             <div class="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
-              <button 
+              <button
                 (click)="decreaseQuantity()"
                 class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                 <i class="fas fa-minus"></i>
               </button>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 [(ngModel)]="quantity"
                 min="1"
                 class="w-16 px-2 py-2 text-center border-0 focus:ring-0 dark:bg-gray-800 dark:text-white"
               />
-              <button 
+              <button
                 (click)="increaseQuantity()"
                 class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                 <i class="fas fa-plus"></i>
@@ -180,15 +180,15 @@
           </div>
 
           <div class="flex gap-4">
-            <app-form-button 
+            <app-form-button
               (click)="onAddToCart()"
               [loading]="addingToCart"
               class="flex-1"
               [text]="labels.add_to_cart"
               [icon]="'fas fa-cart-plus'">
             </app-form-button>
-            
-            <app-form-button 
+
+            <app-form-button
               (click)="onBuyNow()"
               [loading]="buyingNow"
               class="flex-1"
@@ -216,7 +216,7 @@
     <div class="mt-16">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ labels.reviews }}</h2>
-        <button 
+        <button
           (click)="showReviewForm = true"
           class="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
           {{ labels.write_review }}
@@ -229,14 +229,14 @@
           <div class="text-center">
             <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ averageRating }}</div>
             <div class="flex justify-center mt-2">
-              <div class="flex items-center star-rating">
+              <!-- <div class="flex items-center star-rating">
                 <ng-container *ngFor="let star of getStarArray(); let i = index">
-                  <i class="text-lg text-yellow-400 fas fa-star star" 
+                  <i class="text-lg text-yellow-400 fas fa-star star"
                      *ngIf="isStarFilled(i, averageRating)"></i>
-                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star" 
+                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star"
                      *ngIf="!isStarFilled(i, averageRating)"></i>
                 </ng-container>
-              </div>
+              </div> -->
             </div>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ totalReviews }} {{ labels.reviews }}</p>
           </div>
@@ -248,7 +248,7 @@
             <div *ngFor="let rating of ratingDistribution; let i = index" class="flex items-center gap-2">
               <span class="text-sm text-gray-600 dark:text-gray-400">{{ 5 - i }} {{ labels.stars }}</span>
               <div class="flex-1 h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                <div 
+                <div
                   class="h-2 bg-yellow-400 rounded-full transition-all duration-300"
                   [style.width.%]="rating.percentage">
                 </div>
@@ -261,7 +261,7 @@
         <div class="p-6 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
           <h4 class="mb-4 font-medium text-gray-900 dark:text-white">{{ labels.review_filters }}</h4>
           <div class="space-y-2">
-            <button 
+            <button
               *ngFor="let filter of reviewFilters"
               (click)="filterReviews(filter.value)"
               [class.bg-blue-100]="selectedFilter === filter.value"
@@ -284,7 +284,7 @@
 
       <!-- Load More Reviews -->
       <div *ngIf="hasMoreReviews" class="mt-8 text-center">
-        <app-form-button 
+        <app-form-button
           (click)="loadMoreReviews()"
           [loading]="loadingReviews"
           [text]="labels.load_more_reviews"
@@ -297,7 +297,7 @@
     <div class="mt-16">
       <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">{{ labels.related_products }}</h2>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <app-product-card 
+        <app-product-card
           *ngFor="let relatedProduct of relatedProducts"
           [product]="relatedProduct"
           [language]="language"
@@ -313,7 +313,7 @@
     <div class="w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl dark:bg-gray-800">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ labels.write_review }}</h3>
-        <button 
+        <button
           (click)="showReviewForm = false"
           class="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300">
           <i class="fas fa-times"></i>
@@ -325,7 +325,7 @@
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ labels.rating }}</label>
           <div class="flex items-center gap-2">
             <ng-container *ngFor="let star of getStarArray(); let i = index">
-              <button 
+              <button
                 type="button"
                 (click)="setReviewRating(i + 1)"
                 class="text-2xl transition-colors"
@@ -339,7 +339,7 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ labels.comment }}</label>
-          <textarea 
+          <textarea
             [(ngModel)]="reviewComment"
             name="comment"
             rows="4"
@@ -349,14 +349,14 @@
         </div>
 
         <div class="flex gap-3">
-          <app-form-button 
+          <app-form-button
             type="button"
             (click)="showReviewForm = false"
             [text]="labels.cancel"
             [variant]="'secondary'">
           </app-form-button>
-          
-          <app-form-button 
+
+          <app-form-button
             type="submit"
             [loading]="submittingReview"
             [text]="labels.submit_review"
@@ -366,4 +366,4 @@
       </form>
     </div>
   </div>
-</div> 
+</div>
