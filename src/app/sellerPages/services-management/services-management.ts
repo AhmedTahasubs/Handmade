@@ -2,23 +2,12 @@ import { TableAction, TableColumn, DataTable } from './../../components/data-tab
 import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component, effect, inject } from "@angular/core";
+import { Component, effect, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from '@angular/router';
-
-interface Service {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  duration: string;
-  category: string;
-  status: "active" | "inactive" | "pending";
-  image: string;
-  createdAt: string;
-  orders: number;
-}
+import { ServiceSellerService, ServiceDto, ServiceRequest } from '../../services/services.service';
+import { CategorySellerService, Category } from '../../services/categories.service';
 
 @Component({
   selector: "app-seller-services-management",
@@ -26,69 +15,36 @@ interface Service {
   imports: [CommonModule, FormsModule, DataTable, Modal, RouterModule],
   templateUrl: './services-management.html'
 })
-export class SellerServicesManagement {
+export class SellerServicesManagement implements OnInit {
   private themeService = inject(ThemeService);
   private languageService = inject(LanguageService);
+  private serviceSellerService = inject(ServiceSellerService);
+  private categoryService = inject(CategorySellerService);
 
   currentLanguage: "en" | "ar" = "en";
   showModal = false;
   showDeleteModal = false;
   isEditing = false;
-  serviceToDelete: Service | null = null;
-  currentService: Partial<Service> = {};
-
-  services: Service[] = [
-    {
-      id: 1,
-      title: "Custom Wooden Furniture",
-      description: "Handcrafted wooden furniture made to order",
-      price: 500,
-      duration: "2-3 weeks",
-      category: "Woodworking",
-      status: "active",
-      image: "/assets/images/placeholder.png",
-      createdAt: "2024-01-15",
-      orders: 12,
-    },
-    {
-      id: 2,
-      title: "Ceramic Pottery Classes",
-      description: "Learn pottery making with expert guidance",
-      price: 150,
-      duration: "4 hours",
-      category: "Pottery",
-      status: "active",
-      image: "/assets/images/placeholder.png",
-      createdAt: "2024-01-10",
-      orders: 8,
-    },
-    {
-      id: 3,
-      title: "Custom Leather Goods",
-      description: "Personalized leather accessories and bags",
-      price: 200,
-      duration: "1-2 weeks",
-      category: "Leather",
-      status: "pending",
-      image: "/assets/images/placeholder.png",
-      createdAt: "2024-01-20",
-      orders: 5,
-    },
-  ];
+  serviceToDelete: ServiceDto | null = null;
+  currentService: Partial<ServiceRequest> = {};
+  services: ServiceDto[] = [];
+  categories: Category[] = [];
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   columns: TableColumn[] = [
-    { key: "image", label: "Image", type: "image", width: "80px" },
+    { key: "imageUrl", label: "Image", type: "image", width: "80px" },
     { key: "title", label: "Service", sortable: true, type: "text" },
-    { key: "category", label: "Category", sortable: true, type: "text" },
-    { key: "price", label: "Price", sortable: true, type: "currency" },
+    { key: "categoryName", label: "Category", sortable: true, type: "text" },
+    { key: "basePrice", label: "Price", sortable: true, type: "currency" },
     { 
       key: "status", 
       label: "Status", 
       sortable: true, 
-      type: "badge"
+      type: "badge",
     },
-    { key: "orders", label: "Orders", sortable: true, type: "text" },
-    { key: "createdAt", label: "Created", sortable: true, type: "date" },
+    { key: "avgRating", label: "Rating", sortable: true, type: "text" },
+    { key: "deliveryTime", label: "Delivery Days", sortable: true, type: "text" },
   ];
 
   actions: TableAction[] = [
@@ -105,19 +61,24 @@ export class SellerServicesManagement {
       deleteService: "Delete Service",
       serviceTitle: "Service Title",
       description: "Description",
-      duration: "Duration",
+      duration: "Delivery Time (days)",
+      price: "Base Price",
+      category: "Category",
+      status: "Status",
       update: "Update",
       create: "Create",
       deleteConfirm: "Are you sure?",
       deleteMessage: "This will permanently delete the service and all its data.",
-      woodworking: "Woodworking",
-      pottery: "Pottery",
-      textiles: "Textiles",
-      jewelry: "Jewelry",
-      leather: "Leather",
       active: "Active",
       inactive: "Inactive",
       pending: "Pending",
+      totalServices: "Total Services",
+      activeServices: "Active Services",
+      totalOrders: "Average Rating",
+      searchServices: "Search services...",
+      loading: "Loading...",
+      noServices: "No services found",
+noServicesMessage: "You haven’t added any services yet. Start by creating one.",
     },
     ar: {
       title: "إدارة الخدمات",
@@ -127,25 +88,57 @@ export class SellerServicesManagement {
       deleteService: "حذف الخدمة",
       serviceTitle: "عنوان الخدمة",
       description: "الوصف",
-      duration: "المدة",
+      duration: "وقت التسليم (أيام)",
+      price: "السعر الأساسي",
+      category: "الفئة",
+      status: "الحالة",
       update: "تحديث",
       create: "إنشاء",
       deleteConfirm: "هل أنت متأكد؟",
       deleteMessage: "سيتم حذف هذه الخدمة وبياناتها بشكل دائم.",
-      woodworking: "النجارة",
-      pottery: "الفخار",
-      textiles: "المنسوجات",
-      jewelry: "المجوهرات",
-      leather: "الجلود",
       active: "نشط",
       inactive: "غير نشط",
       pending: "معلق",
+      totalServices: "إجمالي الخدمات",
+      activeServices: "الخدمات النشطة",
+      totalOrders: "متوسط التقييم",
+      searchServices: "ابحث عن خدمات...",
+      loading: "جاري التحميل...",
+      noServices: "لا توجد خدمات",
+      noServicesMessage: "لم تقم بإضافة أي خدمات بعد. ابدأ بإنشاء واحدة.",
     },
   };
 
   constructor() {
     effect(() => {
       this.currentLanguage = this.languageService.currentLanguage();
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadServices();
+    this.loadCategories();
+  }
+
+  loadServices(): void {
+    this.serviceSellerService.getBySeller().subscribe({
+      next: (services) => {
+        this.services = services;
+      },
+      error: (error) => {
+        console.error('Error loading services:', error);
+      }
+    });
+  }
+
+  loadCategories(): void {
+    this.categoryService.getAll().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
     });
   }
 
@@ -158,26 +151,35 @@ export class SellerServicesManagement {
   }
 
   getActiveServicesCount(): number {
-    return this.services.filter((s) => s.status === "active").length;
+    return this.services.filter(s => s.status.toLowerCase() === 'active').length;
   }
 
-  getPendingServicesCount(): number {
-    return this.services.filter((s) => s.status === "pending").length;
+  getTotalRating(): number {
+    if (this.services.length === 0) return 0;
+    const total = this.services.reduce((sum, service) => sum + (service.avgRating || 0), 0);
+    return parseFloat((total / this.services.length).toFixed(1));
   }
-
-  getTotalOrders(): number {
-    return this.services.reduce((total, service) => total + service.orders, 0);
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
   }
-
   openCreateModal(): void {
     this.isEditing = false;
     this.currentService = {
-      title: "",
-      description: "",
-      price: 0,
-      duration: "",
-      category: "Woodworking",
-      status: "active",
+      Title: "",
+      Description: "",
+      BasePrice: 0,
+      DeliveryTime: 0,
+      CategoryId: this.categories.length > 0 ? this.categories[0].id : 0,
     };
     this.showModal = true;
   }
@@ -192,7 +194,7 @@ export class SellerServicesManagement {
     this.serviceToDelete = null;
   }
 
-  onAction(event: { action: string; item: Service }): void {
+  onAction(event: { action: string; item: ServiceDto }): void {
     const { action, item } = event;
 
     switch (action) {
@@ -205,45 +207,95 @@ export class SellerServicesManagement {
     }
   }
 
-  editService(service: Service): void {
+  editService(service: ServiceDto): void {
     this.isEditing = true;
-    this.currentService = { ...service };
+    this.currentService = {
+      id: service.id,
+      Title: service.title,
+      Description: service.description,
+      BasePrice: service.basePrice,
+      DeliveryTime: service.deliveryTime,
+      CategoryId: service.categoryId,
+    };
     this.showModal = true;
   }
 
-  deleteService(service: Service): void {
+  deleteService(service: ServiceDto): void {
     this.serviceToDelete = service;
     this.showDeleteModal = true;
   }
 
-  saveService(): void {
-    if (this.isEditing) {
-      const index = this.services.findIndex((s) => s.id === this.currentService.id);
-      if (index !== -1) {
-        this.services[index] = { ...this.services[index], ...this.currentService };
+saveService(): void {
+    if (!this.currentService) return;
+
+    const formData = new FormData();
+    formData.append('Title', this.currentService.Title || '');
+    formData.append('Description', this.currentService.Description || '');
+    formData.append('BasePrice', (this.currentService.BasePrice || 0).toString());
+    formData.append('DeliveryTime', (this.currentService.DeliveryTime || 0).toString());
+    formData.append('CategoryId', (this.currentService.CategoryId || 0).toString());
+    
+    if (this.selectedFile) {
+      formData.append('File', this.selectedFile);
+    } else if (this.currentService.id && !this.selectedFile) {
+      // Keep existing image if editing and no new file selected
+      const existingService = this.services.find(s => s.id === this.currentService.id);
+      if (existingService?.imageUrl) {
+        formData.append('ImageUrl', existingService.imageUrl);
       }
-    } else {
-      const newService: Service = {
-        id: Math.max(...this.services.map((s) => s.id)) + 1,
-        title: this.currentService.title || "",
-        description: this.currentService.description || "",
-        price: this.currentService.price || 0,
-        duration: this.currentService.duration || "",
-        category: this.currentService.category || "Woodworking",
-        status: "active",
-        image: "/assets/images/placeholder.png",
-        createdAt: new Date().toISOString().split("T")[0],
-        orders: 0,
-      };
-      this.services.push(newService);
     }
-    this.closeModal();
+
+    if (this.isEditing && this.currentService.id) {
+      this.serviceSellerService.update(this.currentService.id, formData).subscribe({
+        next: () => {
+          this.loadServices();
+          this.resetFileInput();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error updating service:', error);
+        }
+      });
+    } else {
+      this.serviceSellerService.create(formData).subscribe({
+        next: () => {
+          this.loadServices();
+          this.resetFileInput();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error creating service:', error);
+        }
+      });
+    }
+  }
+  get currentImage(): string | null {
+  if (this.imagePreview) {
+    return this.imagePreview as string;
   }
 
+  if (this.isEditing && this.currentService.id) {
+    const service = this.services.find(s => s.id === this.currentService.id);
+    return service?.imageUrl || null;
+  }
+
+  return null;
+}
+   public resetFileInput(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+  }
   confirmDelete(): void {
-    if (this.serviceToDelete) {
-      this.services = this.services.filter((s) => s.id !== this.serviceToDelete!.id);
-      this.closeDeleteModal();
+    if (this.serviceToDelete?.id) {
+      this.serviceSellerService.delete(this.serviceToDelete.id).subscribe({
+        next: () => {
+          this.loadServices();
+          this.closeDeleteModal();
+        },
+        error: (error) => {
+          console.error('Error deleting service:', error);
+        }
+      });
     }
   }
 

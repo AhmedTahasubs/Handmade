@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, inject, effect } from "
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from '@angular/router';
 import { LanguageService } from './../../../services/language.service';
+import { AuthService } from "../../../services/authService.service";
 
 @Component({
   selector: "app-seller-sidebar",
@@ -15,7 +16,8 @@ export class SellerSidebar implements OnInit {
 
   navigation: any[] = [];
   languageService = inject(LanguageService);
-
+  private authService = inject(AuthService);
+  user = this.authService.getUser();
   constructor(public router: Router) {
     // Create an effect that rebuilds navigation when language changes
     effect(() => {
@@ -39,15 +41,15 @@ export class SellerSidebar implements OnInit {
         exact: false
       },
       { 
-        name: isArabic ? "الطلبات" : "Orders", 
-        icon: "faShoppingBag", 
-        href: "/seller/orders-management",
-        exact: false
-      },
-      { 
         name: isArabic ? "المنتجات" : "Products", 
         icon: "faBox", 
         href: "/seller/products-management",
+        exact: false
+      },
+            { 
+        name: isArabic ? "الطلبات" : "Orders", 
+        icon: "faShoppingBag", 
+        href: "/seller/orders-management",
         exact: false
       },
       { 
@@ -83,13 +85,13 @@ export class SellerSidebar implements OnInit {
     return this.languageService.currentLanguage() === 'ar'
       ? {
           title: 'لوحة البائع',
-          sellerName: 'اسم البائع',
-          sellerEmail: 'البريد الإلكتروني',
+          sellerName: this.user?.fullName,
+          sellerEmail: this.user?.email,
         }
       : {
           title: 'Seller Dashboard',
-          sellerName: 'Seller Name',
-          sellerEmail: 'seller@example.com',
+          sellerName: this.user?.fullName,
+          sellerEmail: this.user?.email,
         };
   }
 }

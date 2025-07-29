@@ -50,6 +50,7 @@ export interface Service {
   seller: string;
   isCustomizable: boolean;
   deliveryTime: string;
+  categoryId: number;
 }
 
 // **هذه الواجهة تمثل بيانات تفاصيل الخدمة التي يستخدمها ServiceDetailPage**
