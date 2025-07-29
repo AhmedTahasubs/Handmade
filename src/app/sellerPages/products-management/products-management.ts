@@ -2,23 +2,12 @@ import { TableAction, TableColumn, DataTable } from './../../components/data-tab
 import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component, effect, inject } from "@angular/core";
+import { Component, effect, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from '@angular/router';
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  status: "active" | "inactive" | "out_of_stock";
-  image: string;
-  createdAt: string;
-  sales: number;
-}
+import { Router, RouterModule } from '@angular/router';
+import { ProductService, Product, ProductRequest } from '../../services/products.service';
+import { ServiceSellerService, ServiceDto } from '../../services/services.service';
 
 @Component({
   selector: "app-seller-products-management",
@@ -26,81 +15,86 @@ interface Product {
   imports: [CommonModule, FormsModule, DataTable, Modal, RouterModule],
   templateUrl: './products-management.html'
 })
-export class SellerProductsManagement {
+export class SellerProductsManagement implements OnInit {
   private themeService = inject(ThemeService);
   private languageService = inject(LanguageService);
+  private productService = inject(ProductService);
+  private serviceService = inject(ServiceSellerService);
 
   currentLanguage: "en" | "ar" = "en";
   showModal = false;
   showDeleteModal = false;
+  showNoServicesModal = false;
   isEditing = false;
   productToDelete: Product | null = null;
   currentProduct: Partial<Product> = {};
+  services: ServiceDto[] = [];
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   products: Product[] = [
     {
       id: 1,
-      name: "Handwoven Ceramic Bowl",
+      title: "Handwoven Ceramic Bowl",
       description: "Beautiful handcrafted ceramic bowl perfect for serving",
       price: 45,
-      stock: 12,
-      category: "Home Decor",
+      quantity: 12,
       status: "active",
-      image: "/assets/placeholder.svg",
+      imageUrl: "/assets/placeholder.svg",
       createdAt: "2024-01-15",
-      sales: 28,
+      sellerId: "1",
+      serviceId: 1
     },
     {
       id: 2,
-      name: "Silver Wire Bracelet",
+      title: "Silver Wire Bracelet",
       description: "Elegant handmade silver wire bracelet with gemstones",
       price: 85,
-      stock: 0,
-      category: "Jewelry",
+      quantity: 0,
       status: "out_of_stock",
-      image: "/assets/placeholder.svg",
+      imageUrl: "/assets/placeholder.svg",
       createdAt: "2024-01-10",
-      sales: 15,
+      sellerId: "1",
+      serviceId: 1
     },
     {
       id: 3,
-      name: "Knitted Wool Scarf",
+      title: "Knitted Wool Scarf",
       description: "Soft and warm hand-knitted wool scarf in various colors",
       price: 35,
-      stock: 8,
-      category: "Clothing",
+      quantity: 8,
       status: "active",
-      image: "/assets/placeholder.svg",
+      imageUrl: "/assets/placeholder.svg",
       createdAt: "2024-01-20",
-      sales: 22,
+      sellerId: "1",
+      serviceId: 1
     },
     {
       id: 4,
-      name: "Leather Wallet",
+      title: "Leather Wallet",
       description: "Premium handcrafted leather wallet with multiple compartments",
       price: 65,
-      stock: 15,
-      category: "Accessories",
+      quantity: 15,
       status: "active",
-      image: "/assets/placeholder.svg",
+      imageUrl: "/assets/placeholder.svg",
       createdAt: "2024-01-18",
-      sales: 18,
+      sellerId: "1",
+      serviceId: 1
     },
   ];
 
   columns: TableColumn[] = [
-    { key: "image", label: "Image", type: "image", width: "80px" },
-    { key: "name", label: "Product", sortable: true, type: "text" },
-    { key: "category", label: "Category", sortable: true, type: "text" },
+    { key: "imageUrl", label: "Image", type: "image", width: "80px" },
+    { key: "title", label: "Product", sortable: true, type: "text" },
     { key: "price", label: "Price", sortable: true, type: "currency" },
-    { key: "stock", label: "Stock", sortable: true, type: "text" },
+    { key: "quantity", label: "Stock", sortable: true, type: "text" },
     { 
       key: "status", 
       label: "Status", 
       sortable: true, 
-      type: "badge"
+      type: "badge",
+
     },
-    { key: "sales", label: "Sales", sortable: true, type: "text" },
     { key: "createdAt", label: "Created", sortable: true, type: "date" },
   ];
 
@@ -118,22 +112,26 @@ export class SellerProductsManagement {
       deleteProduct: "Delete Product",
       productName: "Product Name",
       description: "Description",
+      price: "Price",
+      stock: "Stock",
+      service: "Service",
+      status: "Status",
       update: "Update",
       create: "Create",
       deleteConfirm: "Are you sure?",
       deleteMessage: "This will permanently delete the product and all its data.",
-      homeDecor: "Home Decor",
-      jewelry: "Jewelry",
-      clothing: "Clothing",
-      accessories: "Accessories",
-      art: "Art",
       active: "Active",
       inactive: "Inactive",
       out_of_stock: "Out of Stock",
       totalProducts: "Total Products",
       activeProducts: "Active Products",
       outOfStock: "Out of Stock",
-      totalSales: "Total Sales",
+      noServicesTitle: "No Services Found",
+      noServicesMessage: "You need to create at least one service before adding products. Would you like to create a service now?",
+      createService: "Create Service",
+      cancel: "Cancel",
+      imageUpload: "Product Image",
+      searchPlaceholder: "Search products..."
     },
     ar: {
       title: "إدارة المنتجات",
@@ -143,30 +141,66 @@ export class SellerProductsManagement {
       deleteProduct: "حذف المنتج",
       productName: "اسم المنتج",
       description: "الوصف",
+      price: "السعر",
+      stock: "المخزون",
+      service: "الخدمة",
+      status: "الحالة",
       update: "تحديث",
       create: "إنشاء",
       deleteConfirm: "هل أنت متأكد؟",
       deleteMessage: "سيتم حذف هذا المنتج وبياناته بشكل دائم.",
-      homeDecor: "ديكور المنزل",
-      jewelry: "المجوهرات",
-      clothing: "الملابس",
-      accessories: "الإكسسوارات",
-      art: "الفن",
       active: "نشط",
       inactive: "غير نشط",
       out_of_stock: "نفد من المخزون",
       totalProducts: "إجمالي المنتجات",
       activeProducts: "المنتجات النشطة",
       outOfStock: "نفد من المخزون",
-      totalSales: "إجمالي المبيعات",
+      noServicesTitle: "لا توجد خدمات",
+      noServicesMessage: "يجب إنشاء خدمة واحدة على الأقل قبل إضافة المنتجات. هل ترغب في إنشاء خدمة الآن؟",
+      createService: "إنشاء خدمة",
+      cancel: "إلغاء",
+      imageUpload: "صورة المنتج",
+      searchPlaceholder: "ابحث عن منتجات..."
     },
   };
 
-  constructor() {
+  constructor(public router: Router) {
     effect(() => {
       this.currentLanguage = this.languageService.currentLanguage();
     });
   }
+
+  ngOnInit(): void {
+    this.loadServicesAndThenProducts();
+  }
+
+  loadProducts(): void {
+    this.productService.getAll().subscribe({
+      next: (products) => {
+        this.products = products;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+      }
+    });
+  }
+
+  loadServicesAndThenProducts(): void {
+  this.serviceService.getBySeller().subscribe({
+    next: (services) => {
+      this.services = services;
+
+      if (this.services.length === 0) {
+        this.showNoServicesModal = true;
+      } else {
+        this.loadProducts();
+      }
+    },
+    error: (error) => {
+      console.error('Error loading services:', error);
+    }
+  });
+}
 
   getTranslation(key: string): string {
     return this.translations[this.currentLanguage][key as keyof typeof this.translations.en] || key;
@@ -177,26 +211,27 @@ export class SellerProductsManagement {
   }
 
   getActiveProductsCount(): number {
-    return this.products.filter((p) => p.status === "active").length;
+    return this.products.filter(p => p.status.toLowerCase() === 'active').length;
   }
 
   getOutOfStockCount(): number {
-    return this.products.filter((p) => p.status === "out_of_stock").length;
-  }
-
-  getTotalSales(): number {
-    return this.products.reduce((total, product) => total + product.sales, 0);
+    return this.products.filter(p => p.status.toLowerCase() === 'out_of_stock' || p.quantity === 0).length;
   }
 
   openCreateModal(): void {
+    if (this.services.length === 0) {
+      this.showNoServicesModal = true;
+      return;
+    }
+
     this.isEditing = false;
     this.currentProduct = {
-      name: "",
+      title: "",
       description: "",
       price: 0,
-      stock: 0,
-      category: "Home Decor",
-      status: "active",
+      quantity: 0,
+      serviceId: this.services[0]?.id || 0,
+      status: "active"
     };
     this.showModal = true;
   }
@@ -204,11 +239,16 @@ export class SellerProductsManagement {
   closeModal(): void {
     this.showModal = false;
     this.currentProduct = {};
+    this.resetFileInput();
   }
 
   closeDeleteModal(): void {
     this.showDeleteModal = false;
     this.productToDelete = null;
+  }
+
+  closeNoServicesModal(): void {
+    this.showNoServicesModal = false;
   }
 
   onAction(event: { action: string; item: Product }): void {
@@ -224,9 +264,40 @@ export class SellerProductsManagement {
     }
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
+  resetFileInput(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
   editProduct(product: Product): void {
     this.isEditing = true;
-    this.currentProduct = { ...product };
+    this.currentProduct = { 
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      quantity: product.quantity,
+      serviceId: product.serviceId,
+      status: product.status
+    };
+    this.imagePreview = product.imageUrl || null;
     this.showModal = true;
   }
 
@@ -234,39 +305,82 @@ export class SellerProductsManagement {
     this.productToDelete = product;
     this.showDeleteModal = true;
   }
+  get currentImage(): string | null {
+  if (this.imagePreview) {
+    return this.imagePreview as string;
+  }
 
-  saveProduct(): void {
-    if (this.isEditing) {
-      const index = this.products.findIndex((p) => p.id === this.currentProduct.id);
-      if (index !== -1) {
-        this.products[index] = { ...this.products[index], ...this.currentProduct };
+  if (this.isEditing && this.currentProduct.id) {
+    const product = this.products.find(p => p.id === this.currentProduct.id);
+    return product?.imageUrl || null;
+  }
+
+  return null;
+}
+    saveProduct(): void {
+    if (!this.currentProduct) return;
+
+    const formData = new FormData();
+    formData.append('title', this.currentProduct.title || '');
+    formData.append('description', this.currentProduct.description || '');
+    formData.append('price', (this.currentProduct.price || 0).toString());
+    formData.append('quantity', (this.currentProduct.quantity || 0).toString());
+    formData.append('serviceId', (this.currentProduct.serviceId || 0).toString());
+    formData.append('status', this.currentProduct.status || 'active');
+    
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    } else if (this.currentProduct.id && !this.selectedFile) {
+      const existingProduct = this.products.find(p => p.id === this.currentProduct.id);
+      if (existingProduct?.imageUrl) {
+        formData.append('imageUrl', existingProduct.imageUrl);
       }
-    } else {
-      const newProduct: Product = {
-        id: Math.max(...this.products.map((p) => p.id)) + 1,
-        name: this.currentProduct.name || "",
-        description: this.currentProduct.description || "",
-        price: this.currentProduct.price || 0,
-        stock: this.currentProduct.stock || 0,
-        category: this.currentProduct.category || "Home Decor",
-        status: "active",
-        image: "/assets/placeholder.svg",
-        createdAt: new Date().toISOString().split("T")[0],
-        sales: 0,
-      };
-      this.products.push(newProduct);
     }
-    this.closeModal();
+
+    if (this.isEditing && this.currentProduct.id) {
+      this.productService.updateWithImage(this.currentProduct.id, formData).subscribe({
+        next: () => {
+          this.loadProducts();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+        }
+      });
+    } else {
+      this.productService.createWithImage(formData).subscribe({
+        next: () => {
+          this.loadProducts();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error creating product:', error);
+        }
+      });
+    }
   }
 
   confirmDelete(): void {
-    if (this.productToDelete) {
-      this.products = this.products.filter((p) => p.id !== this.productToDelete!.id);
-      this.closeDeleteModal();
+    if (this.productToDelete?.id) {
+      this.productService.delete(this.productToDelete.id).subscribe({
+        next: () => {
+          this.loadProducts();
+          this.closeDeleteModal();
+        },
+        error: (error) => {
+          console.error('Error deleting product:', error);
+        }
+      });
     }
   }
 
   onExport(): void {
     console.log("Export products data");
+  }
+
+  navigateToServices(): void {
+    this.router.navigate(['/seller/services-management']);
+    this.closeNoServicesModal();
+    console.log("Navigate to services creation page");
   }
 }

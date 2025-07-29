@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
   {
@@ -27,8 +28,11 @@ export const routes: Routes = [
         path: 'categories', 
         loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
+
+
+      
       {
-        path: 'services',
+        path: 'category/services/:id', // el id da bta3 el category ya hammad
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
       },
       {
@@ -44,7 +48,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
       },
       {
-        path: 'seller/:id',
+        path: 'sellerProfile/:id',
         loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
       },
       {
@@ -54,12 +58,20 @@ export const routes: Routes = [
       {
         path: 'orders',
         loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
-      }
+      },
+      {
+        path: 'chat/:userId',
+        loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
+      },
     ]
   },
+  //dashboard layout
   {
     path: '',
     component: DashboardLayout,
+    // to do next
+    // canActivate: [authGuard],
+    // data: { roles: ['admin'] },
     children: [
       {
         path: 'admin',
@@ -93,6 +105,8 @@ export const routes: Routes = [
       },
       {
         path: 'seller',
+        canActivate: [authGuard],
+        data: { roles: ['seller'] },
         loadComponent: () => import('./pages/seller/seller').then(m => m.Seller),
         children:[
           { 

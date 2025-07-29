@@ -21,7 +21,7 @@ import {
   ServiceDto,
   ProductDisplayDto as ProductDto, // هنحتاجها لتحويل الـ ProductDto
   Product, // الواجهة اللي بيعرضها ProductCardComponent
-  ProductDisplayDto
+  ProductDisplayDto,
 } from '../../shared/service.interface'; // تأكد من المسار الصحيح
 
 
@@ -78,18 +78,16 @@ export class ServiceDetailPage implements OnInit {
           id: dto.id,
           title: dto.title,
           description: dto.description,
-          price: dto.basePrice, // تحويل basePrice إلى price
-          rating: dto.avgRating, // تحويل avgRating إلى rating
-          reviewCount: 0, // **ملاحظة:** DTO لا يحتوي على reviewCount، تحتاج لتعيين قيمة افتراضية أو جلبها من API آخر
-          imageUrl: dto.imageUrl, // هنا بتستخدم القيمة مباشرة، وهي string | null
-          category: dto.categoryName, // تحويل categoryName إلى category
-          seller: dto.sellerName, // تحويل sellerName إلى seller
-          isCustomizable: false, // **ملاحظة:** DTO لا يحتوي على isCustomizable، تحتاج لتعيين قيمة افتراضية
-          deliveryTime: this.formatDeliveryTime(dto.deliveryTime), // تحويل number إلى string
+          price: dto.basePrice, 
+          rating: dto.avgRating,
+          reviewCount: 0, 
+          imageUrl: dto.imageUrl, 
+          category: dto.categoryName, 
+          seller: dto.sellerName,
+          categoryId: dto.categoryId, 
+          isCustomizable: false, 
+          deliveryTime: this.formatDeliveryTime(dto.deliveryTime),
           
-          // **هنا تبدأ الخصائص الإضافية اللي مش موجودة في ServiceDto من الـ C#**
-          // بما إنها مش في الـ DTO اللي جاي من الـ API، هتفضل Mocked.
-          // الحل الأمثل هو تعديل الـ C# DTO ليشمل هذه البيانات.
           fullDescription: {
             en: 'Transform your photos into stunning digital portrait illustrations! I specialize in creating unique, personalized artwork that captures the essence of your personality. Using professional digital art techniques, I will create a one-of-a-kind portrait that you can use for social media profiles, print as wall art, or give as a memorable gift.',
             ar: 'حول صورك إلى رسوم بورتريه رقمية مذهلة! أنا متخصص في إنشاء أعمال فنية فريدة وشخصية تلتقط جوهر شخصيتك. باستخدام تقنيات الفن الرقمي المهنية، سأنشئ بورتريه فريد من نوعه يمكنك استخدامه لملفات وسائل التواصل الاجتماعي أو طباعته كعمل فني جداري أو تقديمه كهدية لا تُنسى.'
@@ -178,16 +176,22 @@ export class ServiceDetailPage implements OnInit {
   }
 
   // هذه الدوال لسه بتجيب Mock data. لو عندك APIs ليها، عدلها.
-  private loadRelatedServices(): void {
-    this.relatedServices = [
-      {
-        id: 2, title: 'Logo Design Service', description: 'Professional logo design for your business', price: 75, rating: 4.7, reviewCount: 89, imageUrl: 'https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67?w=500', category: 'design', seller: 'ArtisticSoul', isCustomizable: true, deliveryTime: '2-3 days'
-      },
-      {
-        id: 3, title: 'Character Illustration', description: 'Custom character design and illustration', price: 95, rating: 4.9, reviewCount: 67, imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500', category: 'art', seller: 'ArtisticSoul', isCustomizable: true, deliveryTime: '5-7 days'
-      }
-    ];
-  }
+private loadRelatedServices(): void {
+  if (!this.service || !this.service.category) return;
+
+  this.serviceService.getServicesByCategoryName(this.service.category).subscribe({
+
+    //fe error hna ya 7mad
+    // next: (services: Service[]) => {
+    //   // استبعد الخدمة الحالية من النتائج
+    //   this.relatedServices = services.filter(s => s.id !== this.service?.id);
+    // },
+    error: (err) => {
+      console.error('Error loading related services:', err);
+    }
+  });
+}
+
 
   private loadReviews(): void {
     this.reviews = [

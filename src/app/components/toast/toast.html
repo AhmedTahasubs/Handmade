@@ -1,0 +1,19 @@
+<div class="fixed bottom-4 right-4 z-50 w-full max-w-xs">
+  <div *ngFor="let toast of toastService.toasts$ | async" class="transition-all duration-300 ease-in-out">
+    <div [class]="getToastClass(toast)" role="alert">
+      <div class="flex items-center">
+        <i [class]="getToastIcon(toast)" class="mr-2"></i>
+        <span class="sr-only">{{toast.type}}</span>
+        <div class="flex-1">{{toast.message}}</div>
+        <button 
+          type="button" 
+          class="ml-2 -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-black/10 dark:hover:bg-white/10" 
+          (click)="toastService.removeToast(toast)"
+        >
+          <span class="sr-only">Close</span>
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

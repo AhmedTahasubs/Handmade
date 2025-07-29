@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ServiceDto } from '../shared/service.interface';
 
 // تعريف DTO لاستجابة الفئة من واجهة برمجة التطبيقات الخاصة بك
 export interface CategoryDto {
