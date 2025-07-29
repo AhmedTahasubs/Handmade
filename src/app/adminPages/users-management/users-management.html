@@ -41,35 +41,13 @@
   >
     <form class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <app-form-input
-          label="Full Name"
-          placeholder="Enter full name"
-          icon="user"
-          [(ngModel)]="currentUser.name"
-          name="name"
-          required
-        ></app-form-input>
+        <app-form-input label="Full Name" placeholder="Enter full name" icon="user" [(ngModel)]="currentUser.name" name="name" required></app-form-input>
 
-        <app-form-input
-          label="Email"
-          placeholder="Enter email address"
-          type="email"
-          icon="envelope"
-          [(ngModel)]="currentUser.email"
-          name="email"
-          required
-        ></app-form-input>
+        <app-form-input label="Email" placeholder="Enter email address" type="email" icon="envelope" [(ngModel)]="currentUser.email" name="email" required></app-form-input>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <app-form-input
-          label="Phone"
-          placeholder="Enter phone number"
-          type="tel"
-          icon="phone"
-          [(ngModel)]="currentUser.phone"
-          name="phone"
-        ></app-form-input>
+        <app-form-input label="Phone" placeholder="Enter phone number" type="tel" icon="phone" [(ngModel)]="currentUser.phone" name="phone"></app-form-input>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>

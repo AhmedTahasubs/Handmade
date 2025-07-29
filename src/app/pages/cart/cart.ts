@@ -28,7 +28,7 @@ export class CartComponent {
   cartItems: CartItem[] = [
     {
       id: 1,
-      image: '/placeholder.svg?height=100&width=100',
+      image: '/assets/placeholder.svg',
       name: 'Handmade Ceramic Vase',
       artisan: 'Emma Thompson',
       price: 85.99,
@@ -37,7 +37,7 @@ export class CartComponent {
     },
     {
       id: 2,
-      image: '/placeholder.svg?height=100&width=100',
+      image: '/assets/placeholder.svg',
       name: 'Leather Wallet',
       artisan: 'Michael Brown',
       price: 45.50,
@@ -46,7 +46,7 @@ export class CartComponent {
     },
     {
       id: 3,
-      image: '/placeholder.svg?height=100&width=100',
+      image: '/assets/placeholder.svg',
       name: 'Silver Necklace',
       artisan: 'Sarah Johnson',
       price: 120.00,

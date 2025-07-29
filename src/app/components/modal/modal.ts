@@ -16,6 +16,7 @@ export class Modal {
   @Input() cancelText = "Cancel"
   @Input() confirmText = "Confirm"
   @Input() confirmButtonType: "primary" | "danger" | "success" = "primary"
+  @Input() confirmDisabled = false
 
   @Output() closed = new EventEmitter<void>()
   @Output() confirmed = new EventEmitter<void>()

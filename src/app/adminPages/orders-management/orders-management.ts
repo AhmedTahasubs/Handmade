@@ -66,54 +66,7 @@ export class OrdersManagement {
     { label: "Cancelled", value: "cancelled", icon: "fas fa-times-circle" },
   ]
 
-  orders: Order[] = [
-    {
-      id: "ORD-2024-001",
-      customer: {
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1 (555) 123-4567",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      items: [
-        {
-          productId: 1,
-          productName: "Handwoven Ceramic Vase",
-          productImage: "/placeholder.svg?height=100&width=100",
-          quantity: 1,
-          price: 89.99,
-          customizations: "Custom blue glaze finish",
-        },
-        {
-          productId: 2,
-          productName: "Knitted Wool Scarf",
-          productImage: "/placeholder.svg?height=100&width=100",
-          quantity: 2,
-          price: 45.5,
-        },
-      ],
-      totalAmount: 180.99,
-      shippingCost: 15.0,
-      tax: 15.68,
-      finalAmount: 211.67,
-      status: "delivered",
-      paymentStatus: "paid",
-      paymentMethod: "Credit Card",
-      shippingAddress: {
-        street: "123 Main Street, Apt 4B",
-        city: "New York",
-        state: "NY",
-        zipCode: "10001",
-        country: "United States",
-      },
-      orderDate: "2024-01-15T10:30:00Z",
-      shippedDate: "2024-01-17T14:20:00Z",
-      deliveredDate: "2024-01-20T16:45:00Z",
-      trackingNumber: "TRK123456789",
-      artisans: ["Emma Thompson", "Sarah Mitchell"],
-    },
-    // ... rest of the orders data
-  ];
+  orders: Order[] = [];
 
   columns: TableColumn[] = [
     { key: "id", label: "Order ID", sortable: true, type: "text" },
@@ -245,7 +198,6 @@ export class OrdersManagement {
   }
 
   onExport(): void {
-    console.log("Export orders data")
     // Implement export logic
   }
 }

@@ -19,4 +19,30 @@ export class CategoryService {
   getCategories(): Observable<CategoryDto[]> {
     return this.http.get<CategoryDto[]>(this.apiUrl);
   }
+
+  getCategory(id: number): Observable<CategoryDto> {
+    return this.http.get<CategoryDto>(`${this.apiUrl}/${id}`);
+  }
+
+  createCategory(name: string, file?: File): Observable<CategoryDto> {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.post<CategoryDto>(this.apiUrl, formData);
+  }
+
+  updateCategory(id: number, name: string, file?: File): Observable<CategoryDto> {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.put<CategoryDto>(`${this.apiUrl}/${id}`, formData);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

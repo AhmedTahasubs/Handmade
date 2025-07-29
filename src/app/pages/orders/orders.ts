@@ -38,13 +38,13 @@ export class CustomerOrdersComponent {
       items: [
         {
           name: 'Handcrafted Ceramic Vase',
-          image: '/placeholder.svg?height=80&width=80',
+          image: '/assets/placeholder.svg',
           quantity: 1,
           price: 85.99
         },
         {
           name: 'Artisan Leather Wallet',
-          image: '/placeholder.svg?height=80&width=80',
+          image: '/assets/placeholder.svg',
           quantity: 2,
           price: 45.50
         }
@@ -61,7 +61,7 @@ export class CustomerOrdersComponent {
       items: [
         {
           name: 'Silver Filigree Necklace',
-          image: '/placeholder.svg?height=80&width=80',
+          image: '/assets/placeholder.svg',
           quantity: 1,
           price: 120.00
         }
@@ -78,7 +78,7 @@ export class CustomerOrdersComponent {
       items: [
         {
           name: 'Handwoven Wool Rug',
-          image: '/placeholder.svg?height=80&width=80',
+          image: '/assets/placeholder.svg',
           quantity: 1,
           price: 250.00
         }

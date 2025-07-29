@@ -16,7 +16,7 @@ export class TopArtisans {
     return [
       {
         name: "Emma's Ceramics",
-        avatar: "/placeholder.svg?height=40&width=40",
+        avatar: "/assets/placeholder.svg",
         specialty: isArabic ? "الفخار المصنوع يدوياً" : "Handmade Pottery",
         sales: "$12,450",
         rating: 4.9,
@@ -26,7 +26,7 @@ export class TopArtisans {
       },
       {
         name: "WoolCraft Studio",
-        avatar: "/placeholder.svg?height=40&width=40",
+        avatar: "/assets/placeholder.svg",
         specialty: isArabic ? "البضائع المحبوكة" : "Knitted Goods",
         sales: "$9,230",
         rating: 4.8,
@@ -36,7 +36,7 @@ export class TopArtisans {
       },
       {
         name: "Wood & Wonder",
-        avatar: "/placeholder.svg?height=40&width=40",
+        avatar: "/assets/placeholder.svg",
         specialty: isArabic ? "الحرف الخشبية" : "Wooden Crafts",
         sales: "$8,750",
         rating: 4.7,
@@ -46,7 +46,7 @@ export class TopArtisans {
       },
       {
         name: "Leather Legacy",
-        avatar: "/placeholder.svg?height=40&width=40",
+        avatar: "/assets/placeholder.svg",
         specialty: isArabic ? "المنتجات الجلدية" : "Leather Goods",
         sales: "$7,890",
         rating: 4.9,
@@ -56,7 +56,7 @@ export class TopArtisans {
       },
       {
         name: "Boho Vibes Co",
-        avatar: "/placeholder.svg?height=40&width=40",
+        avatar: "/assets/placeholder.svg",
         specialty: isArabic ? "المكرمية والمنسوجات" : "Macrame & Textiles",
         sales: "$6,540",
         rating: 4.6,

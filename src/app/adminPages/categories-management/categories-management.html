@@ -1,16 +1,30 @@
-<!-- <div class="space-y-6"> -->
-  <!-- Page Header -->
-  <!-- <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        {{ languageService.currentLanguage() === 'en' ? 'Categories Management' : 'إدارة الفئات' }}
-      </h1>
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ languageService.currentLanguage() === 'en' 
-          ? 'Manage product categories and subcategories'
-          : 'إدارة فئات المنتجات والفئات الفرعية' }}
-      </p>
-    </div>
+<!-- Toast Notifications -->
+<app-toast></app-toast>
+
+<!-- Loading Overlay -->
+<app-loading [isLoading]="isLoading" [overlay]="true" text="Loading categories..."></app-loading>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      {{ languageService.currentLanguage() === 'en' ? 'Categories Management' : 'إدارة الفئات' }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ languageService.currentLanguage() === 'en' 
+        ? 'Manage product categories and subcategories'
+        : 'إدارة فئات المنتجات والفئات الفرعية' }}
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <button
+      *ngIf="selectedCategories.size > 0"
+      (click)="openBulkDeleteModal()"
+      class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 gap-2"
+    >
+      <i class="fa-solid fa-trash w-4 h-4"></i>
+      Delete Selected ({{ selectedCategories.size }})
+    </button>
     <button
       (click)="openCreateModal()"
       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 gap-2"
@@ -18,272 +32,474 @@
       <i class="fa-solid fa-plus w-4 h-4"></i>
       {{ languageService.currentLanguage() === 'en' ? 'Add Category' : 'إضافة فئة' }}
     </button>
-  </div> -->
+  </div>
+</div>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-5">
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Total Categories</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalCategories() }}</p>
-        </div>
-        <div class="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-          <i class="fa-solid fa-tags w-6 h-6 text-blue-600 dark:text-blue-400"></i>
-        </div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-5">
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Total Categories</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalCategories() }}</p>
       </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Active Categories</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getActiveCategories() }}</p>
-        </div>
-        <div class="p-3 bg-green-100 dark:bg-green-900/50 rounded-lg">
-          <i class="fa-solid fa-folder w-6 h-6 text-green-600 dark:text-green-400"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Parent Categories</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getParentCategories() }}</p>
-        </div>
-        <div class="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
-          <i class="fa-solid fa-folder-open w-6 h-6 text-purple-600 dark:text-purple-400"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Total Products</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalProducts() }}</p>
-        </div>
-        <div class="p-3 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
-          <i class="fa-solid fa-chart-line w-6 h-6 text-orange-600 dark:text-orange-400"></i>
-        </div>
+      <div class="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+        <i class="fa-solid fa-tags w-6 h-6 text-blue-600 dark:text-blue-400"></i>
       </div>
     </div>
   </div>
 
-  <!-- Categories Table -->
-  <app-data-table
-    [title]="languageService.currentLanguage() === 'en' ? 'Categories List' : 'قائمة الفئات'"
-    [subtitle]="languageService.currentLanguage() === 'en' ? 'Manage and organize your product categories' : 'إدارة وتنظيم فئات المنتجات'"
-    [data]="categories"
-    [columns]="tableColumns"
-    [actions]="tableActions"
-    [searchPlaceholder]="languageService.currentLanguage() === 'en' ? 'Search categories...' : 'البحث في الفئات...'"
-    (actionClicked)="onTableAction($event)"
-    (exportClicked)="exportCategories()"
-  ></app-data-table>
-
-  <!-- Create/Edit Modal -->
-  <app-modal
-    [isOpen]="showModal"
-    [title]="modalTitle"
-    [confirmText]="languageService.currentLanguage() === 'en' ? 'Save Category' : 'حفظ الفئة'"
-    [cancelText]="languageService.currentLanguage() === 'en' ? 'Cancel' : 'إلغاء'"
-    confirmButtonType="primary"
-    (closed)="closeModal()"
-    (confirmed)="saveCategory()"
-  >
-    <form [formGroup]="categoryForm" class="space-y-6">
-      <!-- Category Name -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {{ languageService.currentLanguage() === 'en' ? 'Category Name' : 'اسم الفئة' }}
-        </label>
-        <input
-          type="text"
-          formControlName="name"
-          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          [placeholder]="languageService.currentLanguage() === 'en' ? 'Enter category name' : 'أدخل اسم الفئة'"
-        />
-        <div *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="mt-1 text-sm text-red-600 dark:text-red-400">
-          Category name is required
+        <p class="text-sm text-gray-600 dark:text-gray-400">Active Categories</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getActiveCategories() }}</p>
+      </div>
+      <div class="p-3 bg-green-100 dark:bg-green-900/50 rounded-lg">
+        <i class="fa-solid fa-folder w-6 h-6 text-green-600 dark:text-green-400"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Parent Categories</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getParentCategories() }}</p>
+      </div>
+      <div class="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+        <i class="fa-solid fa-folder-open w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Total Products</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTotalProducts() }}</p>
+      </div>
+      <div class="p-3 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
+        <i class="fa-solid fa-chart-line w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Actions and Items Per Page -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+  <div class="flex items-center gap-4">
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        [checked]="isAllSelected"
+        [indeterminate]="isIndeterminate"
+        (change)="toggleAllCategories()"
+        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+      />
+      <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Select All</span>
+    </label>
+    <span class="text-sm text-gray-500 dark:text-gray-400">
+      {{ selectedCategories.size }} of {{ categories.length }} selected
+    </span>
+  </div>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-700 dark:text-gray-300">Items per page:</label>
+    <select
+      [value]="itemsPerPage"
+      (change)="changeItemsPerPage(+$any($event.target).value)"
+      class="rounded border-gray-300 dark:border-gray-600 text-sm"
+    >
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select>
+  </div>
+</div>
+
+<!-- Categories Table -->
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead class="bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            <input
+              type="checkbox"
+              [checked]="isAllSelected"
+              [indeterminate]="isIndeterminate"
+              (change)="toggleAllCategories()"
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Image</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tr *ngFor="let category of categories" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <input
+              type="checkbox"
+              [checked]="selectedCategories.has(category.id)"
+              (change)="toggleCategorySelection(category.id)"
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <img [src]="category.image || '/assets/placeholder.svg'" [alt]="category.name" class="w-10 h-10 rounded object-cover">
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+            {{ category.name }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="getBadgeClass(category.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+              {{ category.status }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <div class="flex space-x-2">
+              <button 
+                (click)="viewCategory(category)" 
+                class="inline-flex items-center px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-800 rounded-lg transition-colors duration-200 text-xs font-medium"
+                title="View Details"
+              >
+                <i class="fas fa-eye w-3 h-3 mr-1"></i>
+                View
+              </button>
+              <button 
+                (click)="openEditModal(category)" 
+                class="inline-flex items-center px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800 rounded-lg transition-colors duration-200 text-xs font-medium"
+                title="Edit Category"
+              >
+                <i class="fas fa-edit w-3 h-3 mr-1"></i>
+                Edit
+              </button>
+              <button 
+                (click)="openDeleteModal(category)" 
+                class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 rounded-lg transition-colors duration-200 text-xs font-medium"
+                title="Delete Category"
+              >
+                <i class="fas fa-trash w-3 h-3 mr-1"></i>
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="categories.length === 0 && !isLoading">
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+            No categories found
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Pagination -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
+  <div class="text-sm text-gray-700 dark:text-gray-300">
+    Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ getEndIndex() }} of {{ totalItems }} results
+  </div>
+  <div class="flex items-center space-x-2">
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Previous
+    </button>
+    <button
+      *ngFor="let page of paginationPages"
+      (click)="changePage(page)"
+      [class.bg-blue-600]="page === currentPage"
+      [class.text-white]="page === currentPage"
+      [class.bg-white]="page !== currentPage"
+      [class.text-gray-700]="page !== currentPage"
+      class="px-3 py-2 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50"
+    >
+      {{ page }}
+    </button>
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Next
+    </button>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<app-modal
+  [isOpen]="showModal"
+  [title]="modalTitle"
+  [confirmText]="isSaving ? 'Saving...' : (languageService.currentLanguage() === 'en' ? 'Save Category' : 'حفظ الفئة')"
+  [cancelText]="languageService.currentLanguage() === 'en' ? 'Cancel' : 'إلغاء'"
+  confirmButtonType="primary"
+  [confirmDisabled]="isSaving"
+  (closed)="closeModal()"
+  (confirmed)="saveCategory()"
+>
+  <form [formGroup]="categoryForm" class="space-y-6">
+    <!-- Category Name -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ languageService.currentLanguage() === 'en' ? 'Category Name' : 'اسم الفئة' }}
+        <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        formControlName="name"
+        [class.border-red-500]="isFieldInvalid('name')"
+        [class.border-gray-300]="!isFieldInvalid('name')"
+        class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        [placeholder]="languageService.currentLanguage() === 'en' ? 'Enter category name (2-50 characters)' : 'أدخل اسم الفئة (2-50 حرف)'"
+      />
+      <div *ngIf="isFieldInvalid('name')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ getFieldError('name') }}
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ languageService.currentLanguage() === 'en' ? 'Description' : 'الوصف' }}
+        <span class="text-gray-400 text-xs">({{ languageService.currentLanguage() === 'en' ? 'Optional, max 500 characters' : 'اختياري، 500 حرف كحد أقصى' }})</span>
+      </label>
+      <textarea
+        formControlName="description"
+        rows="3"
+        [class.border-red-500]="isFieldInvalid('description')"
+        [class.border-gray-300]="!isFieldInvalid('description')"
+        class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        [placeholder]="languageService.currentLanguage() === 'en' ? 'Enter category description (optional)' : 'أدخل وصف الفئة (اختياري)'"
+      ></textarea>
+      <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ getFieldError('description') }}
+      </div>
+      <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {{ categoryForm.get('description')?.value?.length || 0 }}/500 characters
+      </div>
+    </div>
+
+    <!-- Parent Category -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ languageService.currentLanguage() === 'en' ? 'Parent Category' : 'الفئة الأساسية' }}
+      </label>
+      <select
+        formControlName="parent_id"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      >
+        <option value="">{{ languageService.currentLanguage() === 'en' ? 'No Parent (Main Category)' : 'بدون أساسية (فئة رئيسية)' }}</option>
+        <option *ngFor="let category of getParentCategoryOptions()" [value]="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Image URL -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ languageService.currentLanguage() === 'en' ? 'Category Image' : 'صورة الفئة' }}
+        <span *ngIf="!isEditMode" class="text-red-500">*</span>
+      </label>
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/*"
+        [class.border-red-500]="!isEditMode && !selectedFile && categoryForm.touched"
+        [class.border-gray-300]="isEditMode || selectedFile || !categoryForm.touched"
+        class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      />
+      
+      <!-- File validation error -->
+      <div *ngIf="!isEditMode && !selectedFile && categoryForm.touched" class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
+        <i class="fas fa-exclamation-circle mr-1"></i>
+        {{ languageService.currentLanguage() === 'en' ? 'Please select an image for the category' : 'يرجى اختيار صورة للفئة' }}
+      </div>
+      
+      <!-- File preview -->
+      <div *ngIf="selectedFile" class="mt-3">
+        <div class="flex items-center space-x-3">
+          <img [src]="selectedFile ? previewImageUrl : ''" alt="Preview" class="w-20 h-20 object-cover rounded-lg border-2 border-green-200" />
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedFile.name }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
+            <div class="flex items-center mt-1">
+              <i class="fas fa-check-circle text-green-500 mr-1"></i>
+              <span class="text-xs text-green-600 dark:text-green-400">{{ languageService.currentLanguage() === 'en' ? 'Image selected' : 'تم اختيار الصورة' }}</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Description -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {{ languageService.currentLanguage() === 'en' ? 'Description' : 'الوصف' }}
-        </label>
-        <textarea
-          formControlName="description"
-          rows="3"
-          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          [placeholder]="languageService.currentLanguage() === 'en' ? 'Enter category description' : 'أدخل وصف الفئة'"
-        ></textarea>
+      
+      <!-- Current image (edit mode) -->
+      <div *ngIf="!selectedFile && isEditMode && categoryForm.get('image')?.value" class="mt-3">
+        <div class="flex items-center space-x-3">
+          <img [src]="categoryForm.get('image')?.value" alt="Current" class="w-20 h-20 object-cover rounded-lg border-2 border-blue-200" />
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ languageService.currentLanguage() === 'en' ? 'Current Image' : 'الصورة الحالية' }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ languageService.currentLanguage() === 'en' ? 'Select a new file to replace' : 'اختر ملف جديد للاستبدال' }}</p>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <!-- Parent Category -->
+    <!-- Status and Featured -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {{ languageService.currentLanguage() === 'en' ? 'Parent Category' : 'الفئة الأساسية' }}
+          {{ languageService.currentLanguage() === 'en' ? 'Status' : 'الحالة' }}
         </label>
         <select
-          formControlName="parent_id"
+          formControlName="status"
           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         >
-          <option value="">{{ languageService.currentLanguage() === 'en' ? 'No Parent (Main Category)' : 'بدون أساسية (فئة رئيسية)' }}</option>
-          <option *ngFor="let category of getParentCategoryOptions()" [value]="category.id">
-            {{ category.name }}
-          </option>
+          <option value="active">{{ languageService.currentLanguage() === 'en' ? 'Active' : 'نشط' }}</option>
+          <option value="inactive">{{ languageService.currentLanguage() === 'en' ? 'Inactive' : 'غير نشط' }}</option>
         </select>
       </div>
 
-      <!-- Image URL -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {{ languageService.currentLanguage() === 'en' ? 'Category Image' : 'صورة الفئة' }}
+          {{ languageService.currentLanguage() === 'en' ? 'Sort Order' : 'ترتيب العرض' }}
+          <span class="text-gray-400 text-xs">(0-999)</span>
         </label>
         <input
-          type="url"
-          formControlName="image"
-          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          [placeholder]="languageService.currentLanguage() === 'en' ? 'Enter image URL' : 'أدخل رابط الصورة'"
+          type="number"
+          formControlName="sort_order"
+          min="0"
+          max="999"
+          [class.border-red-500]="isFieldInvalid('sort_order')"
+          [class.border-gray-300]="!isFieldInvalid('sort_order')"
+          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          [placeholder]="languageService.currentLanguage() === 'en' ? 'Sort order (0-999)' : 'ترتيب العرض (0-999)'"
         />
-      </div>
-
-      <!-- Status and Featured -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ languageService.currentLanguage() === 'en' ? 'Status' : 'الحالة' }}
-          </label>
-          <select
-            formControlName="status"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="active">{{ languageService.currentLanguage() === 'en' ? 'Active' : 'نشط' }}</option>
-            <option value="inactive">{{ languageService.currentLanguage() === 'en' ? 'Inactive' : 'غير نشط' }}</option>
-          </select>
+        <div *ngIf="isFieldInvalid('sort_order')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError('sort_order') }}
         </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ languageService.currentLanguage() === 'en' ? 'Sort Order' : 'ترتيب العرض' }}
-          </label>
-          <input
-            type="number"
-            formControlName="sort_order"
-            min="0"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            [placeholder]="languageService.currentLanguage() === 'en' ? 'Sort order' : 'ترتيب العرض'"
-          />
-        </div>
-      </div>
-
-      <!-- Featured Toggle -->
-      <div class="flex items-center">
-        <input
-          type="checkbox"
-          formControlName="is_featured"
-          id="is_featured"
-          class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-        />
-        <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          {{ languageService.currentLanguage() === 'en' ? 'Featured Category' : 'فئة مميزة' }}
-        </label>
-      </div>
-    </form>
-  </app-modal>
-
-  <!-- Delete Confirmation Modal -->
-  <app-modal
-    [isOpen]="showDeleteModal"
-    [title]="languageService.currentLanguage() === 'en' ? 'Delete Category' : 'حذف الفئة'"
-    [confirmText]="languageService.currentLanguage() === 'en' ? 'Delete' : 'حذف'"
-    [cancelText]="languageService.currentLanguage() === 'en' ? 'Cancel' : 'إلغاء'"
-    confirmButtonType="danger"
-    (closed)="closeDeleteModal()"
-    (confirmed)="confirmDelete()"
-  >
-    <div class="text-center">
-      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
-        <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        {{ languageService.currentLanguage() === 'en' ? 'Are you sure?' : 'هل أنت متأكد؟' }}
-      </h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        {{ languageService.currentLanguage() === 'en' 
-          ? 'This action cannot be undone. This will permanently delete the category and all its subcategories.'
-          : 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفئة وجميع الفئات الفرعية نهائياً.' }}
-      </p>
-      <div *ngIf="categoryToDelete" class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <p class="font-medium text-gray-900 dark:text-white">{{ categoryToDelete.name }}</p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ categoryToDelete.product_count }} products will be affected</p>
       </div>
     </div>
-  </app-modal>
 
-  <!-- View Details Modal -->
-  <app-modal
-    [isOpen]="showViewModal"
-    [title]="languageService.currentLanguage() === 'en' ? 'Category Details' : 'تفاصيل الفئة'"
-    [showConfirmButton]="false"
-    [cancelText]="languageService.currentLanguage() === 'en' ? 'Close' : 'إغلاق'"
-    (closed)="closeViewModal()"
-  >
-    <div *ngIf="selectedCategory" class="space-y-6">
-      <!-- Category Image -->
-      <div *ngIf="selectedCategory.image" class="text-center">
-        <img [src]="selectedCategory.image" [alt]="selectedCategory.name" class="w-32 h-32 object-cover rounded-lg mx-auto">
+    <!-- Featured Toggle -->
+    <div class="flex items-center">
+      <input
+        type="checkbox"
+        formControlName="is_featured"
+        id="is_featured"
+        class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+      />
+      <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        {{ languageService.currentLanguage() === 'en' ? 'Featured Category' : 'فئة مميزة' }}
+      </label>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-modal
+  [isOpen]="showDeleteModal"
+  [title]="languageService.currentLanguage() === 'en' ? 'Delete Category' : 'حذف الفئة'"
+  [confirmText]="isDeleting ? 'Deleting...' : (languageService.currentLanguage() === 'en' ? 'Delete' : 'حذف')"
+  [cancelText]="languageService.currentLanguage() === 'en' ? 'Cancel' : 'إلغاء'"
+  confirmButtonType="danger"
+  [confirmDisabled]="isDeleting"
+  (closed)="closeDeleteModal()"
+  (confirmed)="confirmDelete()"
+>
+  <div class="text-center">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
+      <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      {{ languageService.currentLanguage() === 'en' ? 'Are you sure?' : 'هل أنت متأكد؟' }}
+    </h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+      {{ languageService.currentLanguage() === 'en' 
+        ? 'This action cannot be undone. This will permanently delete the category and all its subcategories.'
+        : 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفئة وجميع الفئات الفرعية نهائياً.' }}
+    </p>
+    <div *ngIf="categoryToDelete" class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <p class="font-medium text-gray-900 dark:text-white">{{ categoryToDelete.name }}</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">{{ categoryToDelete.product_count }} products will be affected</p>
+    </div>
+  </div>
+</app-modal>
+
+<!-- Bulk Delete Modal -->
+<app-modal
+  [isOpen]="showBulkDeleteModal"
+  title="Delete Selected Categories"
+  [confirmText]="isDeleting ? 'Deleting...' : 'Delete All'"
+  cancelText="Cancel"
+  confirmButtonType="danger"
+  [confirmDisabled]="isDeleting"
+  (closed)="closeBulkDeleteModal()"
+  (confirmed)="confirmBulkDelete()"
+>
+  <div class="text-center">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
+      <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+      This action cannot be undone. This will permanently delete {{ selectedCategories.size }} selected categories.
+    </p>
+  </div>
+</app-modal>
+
+<!-- View Details Modal -->
+<app-modal
+  [isOpen]="showViewModal"
+  [title]="languageService.currentLanguage() === 'en' ? 'Category Details' : 'تفاصيل الفئة'"
+  [showConfirmButton]="false"
+  [cancelText]="languageService.currentLanguage() === 'en' ? 'Close' : 'إغلاق'"
+  (closed)="closeViewModal()"
+>
+  <div *ngIf="selectedCategory" class="space-y-6">
+    <!-- Category Image -->
+    <div *ngIf="selectedCategory.image" class="text-center">
+      <img [src]="selectedCategory.image" [alt]="selectedCategory.name" class="w-32 h-32 object-cover rounded-lg mx-auto">
+    </div>
+
+    <!-- Category Info -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Category ID</label>
+        <p class="text-lg font-bold text-blue-600 dark:text-blue-400">#{{ selectedCategory.id }}</p>
       </div>
-
-      <!-- Category Info -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Name</label>
-          <p class="text-gray-900 dark:text-white font-medium">{{ selectedCategory.name }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
-          <span [class]="getBadgeClass(selectedCategory.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-            {{ selectedCategory.status }}
-          </span>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Parent Category</label>
-          <p class="text-gray-900 dark:text-white">{{ selectedCategory.parent_name || 'Main Category' }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Products Count</label>
-          <p class="text-gray-900 dark:text-white font-medium">{{ selectedCategory.product_count }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Subcategories</label>
-          <p class="text-gray-900 dark:text-white font-medium">{{ selectedCategory.subcategories_count }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Sort Order</label>
-          <p class="text-gray-900 dark:text-white">{{ selectedCategory.sort_order }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Created Date</label>
-          <p class="text-gray-900 dark:text-white">{{ formatDate(selectedCategory.created_at) }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Featured</label>
-          <span [class]="selectedCategory.is_featured ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'">
-            {{ selectedCategory.is_featured ? 'Yes' : 'No' }}
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Status</label>
+        <span [class]="getBadgeClass(selectedCategory.status)" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full">
+          {{ selectedCategory.status | titlecase }}
+        </span>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Category Name</label>
+        <p class="text-gray-900 dark:text-white font-semibold text-lg">{{ selectedCategory.name }}</p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Featured</label>
+        <div class="flex items-center">
+          <i [class]="selectedCategory.is_featured ? 'fas fa-star text-yellow-500' : 'far fa-star text-gray-400'" class="w-4 h-4 mr-2"></i>
+          <span [class]="selectedCategory.is_featured ? 'text-yellow-600 dark:text-yellow-400 font-semibold' : 'text-gray-500 dark:text-gray-400'">
+            {{ selectedCategory.is_featured ? 'Featured Category' : 'Regular Category' }}
           </span>
         </div>
       </div>
+    </div>
 
-      <!-- Description -->
-      <div *ngIf="selectedCategory.description">
-        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</label>
-        <p class="text-gray-900 dark:text-white">{{ selectedCategory.description }}</p>
+    <!-- Description -->
+    <div *ngIf="selectedCategory.description" class="mt-6">
+      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Description</label>
+        <p class="text-gray-900 dark:text-white leading-relaxed">{{ selectedCategory.description }}</p>
       </div>
     </div>
-  </app-modal>
-<!-- </div> -->
+  </div>
+</app-modal>

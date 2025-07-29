@@ -6,6 +6,10 @@ import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { RouterModule } from '@angular/router';
+import { CategoryService, CategoryDto } from './../../services/category';
+import { ToastService } from './../../services/toast.service';
+import { LoadingComponent } from './../../components/loading/loading.component';
+import { ToastComponent } from './../../components/toast/toast.component';
 
 interface Category {
   id: number;
@@ -24,35 +28,83 @@ interface Category {
   sort_order: number;
 }
 
+// Add a mapping function to convert CategoryDto to Category
+function mapCategoryDtoToCategory(dto: CategoryDto): Category {
+  return {
+    id: dto.id,
+    name: dto.name,
+    description: '',
+    slug: '',
+    parent_id: null,
+    parent_name: '',
+    image: dto.imageUrl || '',
+    status: 'active',
+    created_at: '',
+    updated_at: '',
+    product_count: 0,
+    subcategories_count: 0,
+    is_featured: false,
+    sort_order: 0,
+  };
+}
+
 @Component({
   selector: "app-categories-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal,RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal, RouterModule, LoadingComponent, ToastComponent],
   templateUrl: "./categories-management.html",
 })
 export class CategoriesManagement implements OnInit {
   categories: Category[] = [];
+  allCategories: Category[] = []; // For pagination
   showModal = false;
   showDeleteModal = false;
   showViewModal = false;
   selectedCategory: Category | null = null;
   categoryToDelete: Category | null = null;
   isEditMode = false;
+  isLoading = false;
+  isDeleting = false;
+  isSaving = false;
+
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+
+  // Bulk actions
+  selectedCategories: Set<number> = new Set();
+  showBulkDeleteModal = false;
 
   categoryForm: FormGroup;
+  selectedFile: File | null = null;
+  previewImageUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     public themeService: ThemeService,
     public languageService: LanguageService,
+    private categoryService: CategoryService,
+    private toastService: ToastService
   ) {
     this.categoryForm = this.fb.group({
-      name: ["", Validators.required],
-      description: [""],
+      name: ["", [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-Z0-9\s\u0600-\u06FF]+$/) // Allow English, Arabic, numbers, and spaces
+      ]],
+      description: ["", [
+        Validators.maxLength(500)
+      ]],
       parent_id: [""],
-      image: [""],
+      image: [null],
       status: ["active", Validators.required],
-      sort_order: [0],
+      sort_order: [0, [
+        Validators.min(0),
+        Validators.max(999)
+      ]],
       is_featured: [false],
     });
   }
@@ -91,130 +143,40 @@ export class CategoriesManagement implements OnInit {
   }
 
   loadCategories(): void {
-    this.categories = [
-      {
-        id: 1,
-        name: "Handmade Jewelry",
-        description: "Beautiful handcrafted jewelry pieces including necklaces, bracelets, and earrings",
-        slug: "handmade-jewelry",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-15T10:00:00Z",
-        updated_at: "2024-01-20T14:30:00Z",
-        product_count: 156,
-        subcategories_count: 4,
-        is_featured: true,
-        sort_order: 1,
+    this.isLoading = true;
+    this.categoryService.getCategories().subscribe({
+      next: (categoriesDto) => {
+        this.allCategories = categoriesDto.map(mapCategoryDtoToCategory);
+        this.updatePagination();
+        this.isLoading = false;
+        this.selectedCategories.clear();
       },
-      {
-        id: 2,
-        name: "Necklaces",
-        description: "Handcrafted necklaces in various styles and materials",
-        slug: "necklaces",
-        parent_id: 1,
-        parent_name: "Handmade Jewelry",
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-16T09:00:00Z",
-        updated_at: "2024-01-21T11:15:00Z",
-        product_count: 45,
-        subcategories_count: 0,
-        is_featured: false,
-        sort_order: 1,
-      },
-      {
-        id: 3,
-        name: "Home Decor",
-        description: "Unique handmade items to beautify your living space",
-        slug: "home-decor",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-25T16:45:00Z",
-        product_count: 203,
-        subcategories_count: 6,
-        is_featured: true,
-        sort_order: 2,
-      },
-      {
-        id: 4,
-        name: "Wall Art",
-        description: "Handcrafted paintings, prints, and wall decorations",
-        slug: "wall-art",
-        parent_id: 3,
-        parent_name: "Home Decor",
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-12T12:00:00Z",
-        updated_at: "2024-01-22T09:30:00Z",
-        product_count: 78,
-        subcategories_count: 0,
-        is_featured: true,
-        sort_order: 1,
-      },
-      {
-        id: 5,
-        name: "Handmade Bags",
-        description: "Stylish and functional handcrafted bags and purses",
-        slug: "handmade-bags",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-08T14:00:00Z",
-        updated_at: "2024-01-18T13:20:00Z",
-        product_count: 89,
-        subcategories_count: 3,
-        is_featured: false,
-        sort_order: 3,
-      },
-      {
-        id: 6,
-        name: "Pottery & Ceramics",
-        description: "Handcrafted pottery, ceramics, and clay items",
-        slug: "pottery-ceramics",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-05T11:00:00Z",
-        updated_at: "2024-01-19T15:10:00Z",
-        product_count: 134,
-        subcategories_count: 5,
-        is_featured: true,
-        sort_order: 4,
-      },
-      {
-        id: 7,
-        name: "Textiles & Fabrics",
-        description: "Handwoven textiles, fabrics, and fiber arts",
-        slug: "textiles-fabrics",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "inactive",
-        created_at: "2024-01-03T16:00:00Z",
-        updated_at: "2024-01-17T10:45:00Z",
-        product_count: 67,
-        subcategories_count: 2,
-        is_featured: false,
-        sort_order: 5,
-      },
-      {
-        id: 8,
-        name: "Wooden Crafts",
-        description: "Beautiful handcrafted wooden items and furniture",
-        slug: "wooden-crafts",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-01T10:00:00Z",
-        updated_at: "2024-01-23T12:00:00Z",
-        product_count: 112,
-        subcategories_count: 4,
-        is_featured: false,
-        sort_order: 6,
-      },
-    ];
+      error: (error) => {
+        this.toastService.error('Error', 'Failed to load categories');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  updatePagination(): void {
+    this.totalItems = this.allCategories.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.categories = this.allCategories.slice(startIndex, endIndex);
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  changeItemsPerPage(items: number): void {
+    this.itemsPerPage = items;
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   getTotalCategories(): number {
@@ -240,25 +202,20 @@ export class CategoriesManagement implements OnInit {
   openCreateModal(): void {
     this.isEditMode = false;
     this.selectedCategory = null;
-    this.categoryForm.reset({
-      status: "active",
-      sort_order: 0,
-      is_featured: false,
-    });
+    this.selectedFile = null;
+    this.previewImageUrl = null;
+    this.categoryForm.reset();
     this.showModal = true;
   }
 
   openEditModal(category: Category): void {
     this.isEditMode = true;
     this.selectedCategory = category;
+    this.selectedFile = null;
+    this.previewImageUrl = category.image || null;
     this.categoryForm.patchValue({
       name: category.name,
-      description: category.description,
-      parent_id: category.parent_id || "",
-      image: category.image,
-      status: category.status,
-      sort_order: category.sort_order,
-      is_featured: category.is_featured,
+      image: null
     });
     this.showModal = true;
   }
@@ -269,35 +226,51 @@ export class CategoriesManagement implements OnInit {
     this.categoryForm.reset();
   }
 
-  saveCategory(): void {
-    if (this.categoryForm.valid) {
-      const formData = this.categoryForm.value;
-      
-      if (this.isEditMode && this.selectedCategory) {
-        const index = this.categories.findIndex((cat) => cat.id === this.selectedCategory!.id);
-        if (index !== -1) {
-          this.categories[index] = {
-            ...this.categories[index],
-            ...formData,
-            updated_at: new Date().toISOString(),
-            parent_name: formData.parent_id ? this.categories.find(c => c.id == formData.parent_id)?.name : undefined,
-          };
-        }
-      } else {
-        const newCategory: Category = {
-          id: Math.max(...this.categories.map((cat) => cat.id)) + 1,
-          ...formData,
-          slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          product_count: 0,
-          subcategories_count: 0,
-          parent_name: formData.parent_id ? this.categories.find(c => c.id == formData.parent_id)?.name : undefined,
-        };
-        this.categories.push(newCategory);
-      }
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.previewImageUrl = URL.createObjectURL(file);
+    } else {
+      this.selectedFile = null;
+      this.previewImageUrl = null;
+    }
+  }
 
-      this.closeModal();
+  saveCategory(): void {
+    if (!this.validateForm()) {
+      return;
+    }
+
+    this.isSaving = true;
+    const name = this.categoryForm.value.name;
+    
+    if (this.isEditMode && this.selectedCategory) {
+      this.categoryService.updateCategory(this.selectedCategory.id, name, this.selectedFile!).subscribe({
+        next: () => {
+          this.toastService.success('Success', 'Category updated successfully');
+          this.loadCategories();
+          this.closeModal();
+          this.isSaving = false;
+        },
+        error: () => {
+          this.toastService.error('Error', 'Failed to update category');
+          this.isSaving = false;
+        }
+      });
+    } else {
+      this.categoryService.createCategory(name, this.selectedFile!).subscribe({
+        next: () => {
+          this.toastService.success('Success', 'Category created successfully');
+          this.loadCategories();
+          this.closeModal();
+          this.isSaving = false;
+        },
+        error: () => {
+          this.toastService.error('Error', 'Failed to create category');
+          this.isSaving = false;
+        }
+      });
     }
   }
 
@@ -337,10 +310,19 @@ export class CategoriesManagement implements OnInit {
 
   confirmDelete(): void {
     if (this.categoryToDelete) {
-      this.categories = this.categories.filter(
-        (cat) => cat.id !== this.categoryToDelete!.id && cat.parent_id !== this.categoryToDelete!.id
-      );
-      this.closeDeleteModal();
+      this.isDeleting = true;
+      this.categoryService.deleteCategory(this.categoryToDelete.id).subscribe({
+        next: () => {
+          this.toastService.success('Success', 'Category deleted successfully');
+          this.loadCategories();
+          this.closeDeleteModal();
+          this.isDeleting = false;
+        },
+        error: () => {
+          this.toastService.error('Error', 'Failed to delete category');
+          this.isDeleting = false;
+        }
+      });
     }
   }
 
@@ -365,5 +347,130 @@ export class CategoriesManagement implements OnInit {
 
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString();
+  }
+
+  getEndIndex(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  }
+
+  // Form validation helpers
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.categoryForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.categoryForm.get(fieldName);
+    if (field && field.errors && (field.dirty || field.touched)) {
+      if (field.errors['required']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+      }
+      if (field.errors['minlength']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${field.errors['minlength'].requiredLength} characters`;
+      }
+      if (field.errors['maxlength']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
+      }
+      if (field.errors['pattern']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} contains invalid characters`;
+      }
+      if (field.errors['min']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${field.errors['min'].min}`;
+      }
+      if (field.errors['max']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must not exceed ${field.errors['max'].max}`;
+      }
+    }
+    return '';
+  }
+
+  validateForm(): boolean {
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.categoryForm.controls).forEach(key => {
+      this.categoryForm.get(key)?.markAsTouched();
+    });
+
+    // Check if form is valid - don't show toast, let the form show validation errors
+    if (!this.categoryForm.valid) {
+      return false;
+    }
+
+    // Additional validation for file upload in create mode - don't show toast, let UI handle it
+    if (!this.isEditMode && !this.selectedFile) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Bulk actions
+  toggleCategorySelection(categoryId: number): void {
+    if (this.selectedCategories.has(categoryId)) {
+      this.selectedCategories.delete(categoryId);
+    } else {
+      this.selectedCategories.add(categoryId);
+    }
+  }
+
+  toggleAllCategories(): void {
+    if (this.selectedCategories.size === this.categories.length) {
+      this.selectedCategories.clear();
+    } else {
+      this.categories.forEach(cat => this.selectedCategories.add(cat.id));
+    }
+  }
+
+  get isAllSelected(): boolean {
+    return this.categories.length > 0 && this.selectedCategories.size === this.categories.length;
+  }
+
+  get isIndeterminate(): boolean {
+    return this.selectedCategories.size > 0 && this.selectedCategories.size < this.categories.length;
+  }
+
+  openBulkDeleteModal(): void {
+    if (this.selectedCategories.size > 0) {
+      this.showBulkDeleteModal = true;
+    }
+  }
+
+  closeBulkDeleteModal(): void {
+    this.showBulkDeleteModal = false;
+  }
+
+  confirmBulkDelete(): void {
+    if (this.selectedCategories.size > 0) {
+      this.isDeleting = true;
+      const deletePromises = Array.from(this.selectedCategories).map(id =>
+        this.categoryService.deleteCategory(id).toPromise()
+      );
+
+      Promise.all(deletePromises).then(() => {
+        this.toastService.success('Success', `${this.selectedCategories.size} categories deleted successfully`);
+        this.loadCategories();
+        this.closeBulkDeleteModal();
+        this.isDeleting = false;
+      }).catch(() => {
+        this.toastService.error('Error', 'Failed to delete some categories');
+        this.loadCategories();
+        this.isDeleting = false;
+      });
+    }
+  }
+
+  get paginationPages(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 }

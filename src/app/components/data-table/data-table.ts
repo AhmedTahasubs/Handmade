@@ -158,6 +158,23 @@ export class DataTable {
     }
   }
 
+  getEnhancedActionButtonClass(color: string): string {
+    switch (color) {
+      case "primary":
+        return "bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-800";
+      case "success":
+        return "bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800";
+      case "warning":
+        return "bg-yellow-100 hover:bg-yellow-200 text-yellow-700 hover:text-yellow-800";
+      case "danger":
+        return "bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800";
+      case "secondary":
+        return "bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800";
+      default:
+        return "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-800";
+    }
+  }
+
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString();
   }

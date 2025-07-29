@@ -1,6 +1,12 @@
+<!-- Toast Notifications -->
+<app-toast></app-toast>
+
+<!-- Loading Overlay -->
+<app-loading [isLoading]="isLoading" [overlay]="true" text="Loading services..."></app-loading>
+
 <div class="space-y-6">
  <!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
   <div>
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
       {{ languageService.currentLanguage() === 'en' ? 'Services Management' : 'إدارة الخدمات' }}
@@ -11,25 +17,42 @@
         : 'مراجعة وإدارة خدمات الحرفيين' }}
     </p>
   </div>
-  
-  <!-- Status Filter -->
   <div class="flex gap-2">
     <button
-      *ngFor="let status of statusFilters"
-      (click)="setStatusFilter(status.value)"
-      [class]="getFilterButtonClass(status.value)"
-      class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+      *ngIf="selectedServices.size > 0"
+      (click)="openBulkDeleteModal()"
+      class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 gap-2"
     >
-      <i [class]="status.icon" class="w-4 h-4"></i>
-      {{ languageService.currentLanguage() === 'en' ? status.label : 
-         status.value === 'all' ? 'الكل' :
-         status.value === 'awaiting' ? 'بانتظار المراجعة' :
-         status.value === 'approved' ? 'مقبول' : 'مرفوض' }}
-      <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
-        {{ getStatusCount(status.value) }}
-      </span>
+      <i class="fa-solid fa-trash w-4 h-4"></i>
+      Delete Selected ({{ selectedServices.size }})
+    </button>
+    <button
+      (click)="openCreateModal()"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 gap-2"
+    >
+      <i class="fa-solid fa-plus w-4 h-4"></i>
+      {{ languageService.currentLanguage() === 'en' ? 'Add Service' : 'إضافة خدمة' }}
     </button>
   </div>
+</div>
+
+<!-- Status Filter -->
+<div class="flex gap-2 pb-6">
+  <button
+    *ngFor="let status of statusFilters"
+    (click)="setStatusFilter(status.value)"
+    [class]="getFilterButtonClass(status.value)"
+    class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+  >
+    <i [class]="status.icon" class="w-4 h-4"></i>
+    {{ languageService.currentLanguage() === 'en' ? status.label : 
+       status.value === 'all' ? 'الكل' :
+       status.value === 'awaiting' ? 'بانتظار المراجعة' :
+       status.value === 'approved' ? 'مقبول' : 'مرفوض' }}
+    <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+      {{ getStatusCount(status.value) }}
+    </span>
+  </button>
 </div>
 
   <!-- Data Table -->
@@ -43,6 +66,177 @@
     (actionClicked)="onAction($event)"
     (exportClicked)="onExport()"
   ></app-data-table>
+
+  <!-- Add/Edit Service Modal -->
+  <app-modal
+    [isOpen]="showModal"
+    [title]="isEditMode ? 'Edit Service' : 'Add Service'"
+    [confirmText]="isSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Service')"
+    [cancelText]="'Cancel'"
+    confirmButtonType="primary"
+    [confirmDisabled]="isSaving"
+    (closed)="closeModal()"
+    (confirmed)="saveService()"
+  >
+    <form [formGroup]="serviceForm" class="space-y-6">
+      <!-- Service Title -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Service Title <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          formControlName="title" 
+          [class.border-red-500]="isFieldInvalid('title')"
+          [class.border-gray-300]="!isFieldInvalid('title')"
+          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          placeholder="Enter service title (2-100 characters)" 
+        />
+        <div *ngIf="isFieldInvalid('title')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError('title') }}
+        </div>
+      </div>
+
+      <!-- Service Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Description <span class="text-red-500">*</span>
+        </label>
+        <textarea 
+          formControlName="description" 
+          rows="3" 
+          [class.border-red-500]="isFieldInvalid('description')"
+          [class.border-gray-300]="!isFieldInvalid('description')"
+          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          placeholder="Enter detailed service description (10-1000 characters)"
+        ></textarea>
+        <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError('description') }}
+        </div>
+        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {{ serviceForm.get('description')?.value?.length || 0 }}/1000 characters
+        </div>
+      </div>
+
+      <!-- Price and Delivery Time -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Base Price <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="number" 
+            formControlName="basePrice" 
+            min="0" 
+            step="0.01"
+            [class.border-red-500]="isFieldInvalid('basePrice')"
+            [class.border-gray-300]="!isFieldInvalid('basePrice')"
+            class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+            placeholder="0.00" 
+          />
+          <div *ngIf="isFieldInvalid('basePrice')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError('basePrice') }}
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Delivery Time <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="number" 
+            formControlName="deliveryTime" 
+            min="1" 
+            [class.border-red-500]="isFieldInvalid('deliveryTime')"
+            [class.border-gray-300]="!isFieldInvalid('deliveryTime')"
+            class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+            placeholder="Days" 
+          />
+          <div *ngIf="isFieldInvalid('deliveryTime')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError('deliveryTime') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Category <span class="text-red-500">*</span>
+        </label>
+        <select 
+          formControlName="categoryId" 
+          [class.border-red-500]="isFieldInvalid('categoryId')"
+          [class.border-gray-300]="!isFieldInvalid('categoryId')"
+          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+          <option value="">Select a category</option>
+          <option value="1">Web Development</option>
+          <option value="2">Graphic Design</option>
+          <option value="3">Digital Marketing</option>
+          <option value="4">Writing & Translation</option>
+          <option value="5">Video & Animation</option>
+        </select>
+        <div *ngIf="isFieldInvalid('categoryId')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError('categoryId') }}
+        </div>
+      </div>
+
+      <!-- Status (Edit Mode Only) -->
+      <div *ngIf="isEditMode">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+        <select 
+          formControlName="status" 
+          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+          <option value="approved">Approved</option>
+          <option value="awaiting">Awaiting</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <!-- Image ID (Optional) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Image ID 
+          <span class="text-gray-400 text-xs">(Optional)</span>
+        </label>
+        <input 
+          type="number" 
+          formControlName="imageId" 
+          min="0" 
+          [class.border-red-500]="isFieldInvalid('imageId')"
+          [class.border-gray-300]="!isFieldInvalid('imageId')"
+          class="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white" 
+          placeholder="Enter image ID (optional)" 
+        />
+        <div *ngIf="isFieldInvalid('imageId')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError('imageId') }}
+        </div>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Delete Confirmation Modal -->
+  <app-modal
+    [isOpen]="showDeleteModal"
+    [title]="'Delete Service'"
+    [confirmText]="isDeleting ? 'Deleting...' : 'Delete'"
+    [cancelText]="'Cancel'"
+    confirmButtonType="danger"
+    [confirmDisabled]="isDeleting"
+    (closed)="closeDeleteModal()"
+    (confirmed)="confirmDelete()"
+  >
+    <div class="text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
+        <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone. This will permanently delete the service.</p>
+      <div *ngIf="serviceToDelete" class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <p class="font-medium text-gray-900 dark:text-white">{{ serviceToDelete.title }}</p>
+      </div>
+    </div>
+  </app-modal>
 
   <!-- Service Details Modal -->
   <app-modal
@@ -184,6 +378,33 @@
         rows="4"
         class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
       ></textarea>
+    </div>
+  </app-modal>
+
+  <!-- Bulk Delete Confirmation Modal -->
+  <app-modal
+    [isOpen]="showBulkDeleteModal"
+    [title]="'Delete Selected Services'"
+    [confirmText]="isDeleting ? 'Deleting...' : 'Delete Selected'"
+    [cancelText]="'Cancel'"
+    confirmButtonType="danger"
+    [confirmDisabled]="isDeleting"
+    (closed)="closeBulkDeleteModal()"
+    (confirmed)="confirmBulkDelete()"
+  >
+    <div class="text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
+        <i class="fa-solid fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Multiple Services?</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        This action cannot be undone. This will permanently delete {{ selectedServices.size }} selected service(s).
+      </p>
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+        <p class="text-sm text-red-800 dark:text-red-200 font-medium">
+          {{ selectedServices.size }} service(s) will be permanently deleted
+        </p>
+      </div>
     </div>
   </app-modal>
 </div>
