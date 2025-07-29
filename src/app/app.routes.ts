@@ -28,9 +28,7 @@ export const routes: Routes = [
         path: 'categories', 
         loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
-
-
-      
+ 
       {
         path: 'category/services/:id', // el id da bta3 el category ya hammad
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
