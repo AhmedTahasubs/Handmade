@@ -164,42 +164,42 @@ export class Login {
     }
   }
 
-  // validateForm(): boolean {
-  //   let isValid = true
+  validateForm(): boolean {
+    let isValid = true
 
-  //   if (!this.email) {
-  //     this.emailError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
-  //     isValid = false
-  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-  //     this.emailError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
-  //     isValid = false
-  //   } else {
-  //     this.emailError = ""
-  //   }
+    if (!this.email) {
+      this.emailError =
+        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
+      isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+      this.emailError =
+        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
+      isValid = false
+    } else {
+      this.emailError = ""
+    }
 
-  //   if (!this.password) {
-  //     this.passwordError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
-  //     isValid = false
-  //   } else if (this.password.length < 6) {
-  //     this.passwordError =
-  //       this.LanguageService.currentLanguage() === "ar"
-  //         ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
-  //         : "Password must be at least 6 characters"
-  //     isValid = false
-  //   } else {
-  //     this.passwordError = ""
-  //   }
+    if (!this.password) {
+      this.passwordError =
+        this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
+      isValid = false
+    } else if (this.password.length < 6) {
+      this.passwordError =
+        this.LanguageService.currentLanguage() === "ar"
+          ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+          : "Password must be at least 6 characters"
+      isValid = false
+    } else {
+      this.passwordError = ""
+    }
 
-  //   return isValid
-  // }
+    return isValid
+  }
 
   onSubmit(): void {
-    // if (!this.validateForm()) {
-    //   return
-    // }
+    if (!this.validateForm()) {
+      return
+    }
 
     this.isLoading = true
     this.emailError = ""
