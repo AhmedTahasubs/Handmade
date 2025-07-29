@@ -247,7 +247,7 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
     });
   }
   navigateToCategoryServices(categoryId: number): void {
-  this.router.navigate(['/category/services', categoryId]);
+  this.router.navigate(['category/services', categoryId]);
 }
 
   // دالة مساعدة للعثور على معرف الفئة بالاسم، وهي حاسمة لتصفية المنتجات
