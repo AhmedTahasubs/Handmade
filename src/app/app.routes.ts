@@ -63,7 +63,7 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'sellerprofile/:id',
+        path: 'sellerProfile/:id',
         loadComponent: () =>
           import('./pages/seller-profile/seller-profile').then(
             (m) => m.SellerProfilePage
