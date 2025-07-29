@@ -1,46 +1,36 @@
 <div class="pb-6 border-b border-gray-200 review-card dark:border-gray-600 last:border-0">
   <div class="flex items-start gap-4">
-    <img [src]="review.user.avatar" [alt]="review.user.name" class="flex-shrink-0 w-12 h-12 border-2 border-gray-200 rounded-full dark:border-gray-600">
+    <!-- مفيش صورة -->
+    
     <div class="flex-1 min-w-0">
+      <!-- اسم المراجع وتاريخ الريفيو -->
       <div class="flex flex-wrap items-center gap-3 mb-2">
-        <h4 class="font-medium text-gray-900 truncate dark:text-white">{{ review.user.name }}</h4>
-        <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-          <i class="text-xs fas fa-map-marker-alt"></i>
-          {{ review.user.country }}
-        </span>
-        <span *ngIf="review.isVerified" class="flex items-center gap-1 px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-200">
-          <i class="fas fa-check-circle"></i>
-          {{ labels.verified_purchase }}
+        <h4 class="font-medium text-gray-900 truncate dark:text-white">
+          {{ review.reviewerName }}
+        </h4>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          {{ review.createdAt | date:'mediumDate' }}
         </span>
       </div>
-      
+
+      <!-- التقييم -->
       <div class="flex items-center gap-2 mb-3">
         <div class="flex items-center star-rating">
-          <ng-container *ngFor="let star of getStarArray(); let i = index">
-            <i class="text-sm text-yellow-400 fas fa-star star" 
-               *ngIf="isStarFilled(i)"></i>
-            <i class="text-sm text-gray-300 far fa-star dark:text-gray-600 star" 
-               *ngIf="!isStarFilled(i)"></i>
+          <ng-container *ngFor="let star of [1,2,3,4,5]">
+            <i class="text-sm"
+               [ngClass]="star <= review.rating ? 'text-yellow-400 fas fa-star' : 'text-gray-300 far fa-star dark:text-gray-600'">
+            </i>
           </ng-container>
         </div>
-        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ review.rating }}</span>
-        <span class="text-sm text-gray-500 dark:text-gray-400">•</span>
-        <span class="text-sm text-gray-600 dark:text-gray-400">{{ review.date | date:'mediumDate' }}</span>
+        <span class="text-sm font-medium text-gray-900 dark:text-white">
+          {{ review.rating }}
+        </span>
       </div>
-      
-      <p class="mb-4 leading-relaxed text-gray-700 dark:text-gray-300">
-        {{ review.comment[language] }}
+
+      <!-- التعليق -->
+      <p class="mb-2 leading-relaxed text-gray-700 dark:text-gray-300">
+        {{ review.comment }}
       </p>
-      
-      <div class="flex items-center gap-4">
-        <button class="flex items-center gap-2 text-sm text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 group">
-          <i class="transition-transform fas fa-thumbs-up group-hover:scale-110"></i>
-          {{ labels.helpful }}
-        </button>
-        <button class="text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-          Reply
-        </button>
-      </div>
     </div>
   </div>
 </div>

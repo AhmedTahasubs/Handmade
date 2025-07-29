@@ -16,13 +16,13 @@
         </li>
         <li class="flex items-center">
           <i class="mx-2 text-gray-400 fas fa-chevron-right"></i>
-          <span class="text-gray-900 dark:text-white">{{ product?.name?.[language] }}</span>
+          <span class="text-gray-900 dark:text-white">{{ product?.title }}</span>
         </li>
       </ol>
     </nav>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading -->
   <div *ngIf="loading" class="flex items-center justify-center min-h-96">
     <div class="text-center">
       <div class="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <!-- Error State -->
+  <!-- Error -->
   <div *ngIf="error && !loading" class="flex items-center justify-center min-h-96">
     <div class="text-center">
       <div class="w-16 h-16 mx-auto mb-4 text-red-500">
@@ -45,20 +45,17 @@
     </div>
   </div>
 
-  <!-- Product Details -->
+  <!-- Product -->
   <div *ngIf="!loading && !error && product" class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="grid gap-8 lg:grid-cols-2">
-      <!-- Product Images -->
+      <!-- Images -->
       <div class="space-y-4">
-        <!-- Main Image -->
         <div class="relative overflow-hidden bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
           <img
-            [src]="selectedImage || product.image"
-            [alt]="product.name[language]"
+            [src]="selectedImage || product.imageUrl"
+            [alt]="product.title"
             class="object-cover w-full h-96 transition-transform duration-300 hover:scale-105"
           />
-
-          <!-- Image Overlay Actions -->
           <div class="absolute top-4 right-4 flex flex-col space-y-2">
             <button
               (click)="onAddToWishlist()"
@@ -74,7 +71,7 @@
             </button>
           </div>
 
-          <!-- Stock Status Badge -->
+          <!-- Stock Badge -->
           <div class="absolute top-4 left-4">
             <span
               class="flex items-center gap-1 px-3 py-1 text-sm text-white rounded-full"
@@ -88,7 +85,7 @@
           </div>
         </div>
 
-        <!-- Thumbnail Images (if multiple images available) -->
+        <!-- Thumbnails -->
         <div *ngIf="productImages.length > 1" class="grid grid-cols-4 gap-2">
           <button
             *ngFor="let image of productImages; let i = index"
@@ -98,7 +95,7 @@
             class="overflow-hidden transition-all border border-gray-200 rounded-lg dark:border-gray-700 hover:border-blue-500">
             <img
               [src]="image"
-              [alt]="product.name[language] + ' - ' + (i + 1)"
+              [alt]="product.title + ' - ' + (i + 1)"
               class="object-cover w-full h-20 transition-transform hover:scale-110"
             />
           </button>
@@ -107,26 +104,13 @@
 
       <!-- Product Info -->
       <div class="space-y-6">
-        <!-- Title and Rating -->
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.name[language] }}</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.title }}</h1>
           <div class="flex items-center gap-4 mt-2">
-            <div class="flex items-center gap-2">
-              <div class="flex items-center star-rating">
-                <ng-container *ngFor="let star of getStarArray(); let i = index">
-                  <i class="text-lg text-yellow-400 fas fa-star star"
-                     *ngIf="isStarFilled(i)"></i>
-                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star"
-                     *ngIf="!isStarFilled(i)"></i>
-                </ng-container>
-              </div>
-              <span class="font-medium text-gray-900 dark:text-white">{{ product.rating }}</span>
-            </div>
-            <span class="text-gray-500 dark:text-gray-400">•</span>
             <button
               (click)="onSellerClick()"
               class="text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-              {{ product.seller }}
+              {{ product.sellerId }}
             </button>
             <span class="text-gray-500 dark:text-gray-400">•</span>
             <span class="text-sm font-medium"
@@ -137,20 +121,18 @@
           </div>
         </div>
 
-        <!-- Price -->
         <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
           <div class="flex items-baseline gap-2">
             <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ product.price }}</span>
           </div>
         </div>
 
-        <!-- Description -->
         <div>
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{{ labels.description }}</h3>
-          <p class="text-gray-700 leading-relaxed dark:text-gray-300">{{ product?.description?.[language] }}</p>
+          <p class="text-gray-700 leading-relaxed dark:text-gray-300">{{ product.description }}</p>
         </div>
 
-        <!-- Product Details -->
+        <!-- Details -->
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
             <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.status }}</h4>
@@ -170,7 +152,7 @@
           </div>
         </div>
 
-        <!-- Quantity and Add to Cart -->
+        <!-- Quantity & Cart -->
         <div class="space-y-4" *ngIf="isProductInStock()">
           <div class="flex items-center gap-4">
             <label class="font-medium text-gray-900 dark:text-white">{{ labels.quantity }}:</label>
@@ -178,7 +160,7 @@
               <button
                 (click)="decreaseQuantity()"
                 [disabled]="quantity <= 1"
-                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-3 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50">
                 <i class="fas fa-minus"></i>
               </button>
               <input
@@ -191,7 +173,7 @@
               <button
                 (click)="increaseQuantity()"
                 [disabled]="quantity >= product.stock"
-                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-3 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -219,7 +201,6 @@
           </div>
         </div>
 
-        <!-- Out of Stock Message -->
         <div *ngIf="!isProductInStock()" class="p-4 bg-red-50 rounded-lg dark:bg-red-900/20">
           <div class="flex items-start gap-3">
             <i class="text-red-600 fas fa-exclamation-triangle mt-1"></i>
@@ -230,7 +211,6 @@
           </div>
         </div>
 
-        <!-- Shipping Info -->
         <div class="p-4 bg-blue-50 rounded-lg dark:bg-blue-900/20">
           <div class="flex items-start gap-3">
             <i class="text-blue-600 fas fa-shipping-fast mt-1"></i>
