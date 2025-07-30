@@ -24,6 +24,7 @@ export interface IProduct {
   imageUrl: string;
   category: string;
   description: string;
+  sellerName: string;
 }
 
 @Injectable({

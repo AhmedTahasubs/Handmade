@@ -1,17 +1,20 @@
 /* chat.component.css */
 
-.chat-container {
-  background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 1600px;
-  height: 95vh;
+.chat-container, .full-chat-screen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  background: #fff;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  margin: 0 auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .status-indicator {
@@ -100,9 +103,10 @@
 }
 
 .bubble {
-  max-width: 55%;
-  padding: 20px 24px;
-  border-radius: 24px;
+  max-width: 45%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 15px;
   position: relative;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
@@ -127,15 +131,15 @@
 
 .content {
   display: block;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.6;
   word-wrap: break-word;
 }
 
 .meta {
   display: block;
-  font-size: 14px;
-  margin-top: 10px;
+  font-size: 12px;
+  margin-top: 6px;
   opacity: 0.7;
   font-weight: 500;
 }
@@ -145,21 +149,21 @@
 }
 
 .input-row {
-  padding: 32px 48px;
+  padding: 12px 18px;
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 20px;
+  gap: 10px;
   align-items: center;
-  border-radius: 0 0 24px 24px;
+  border-radius: 0 0 16px 16px;
 }
 
 .input-row input {
   flex: 1;
-  padding: 20px 24px;
+  padding: 10px 14px;
   border: 2px solid #e5e7eb;
   border-radius: 50px;
-  font-size: 18px;
+  font-size: 15px;
   outline: none;
   transition: all 0.3s ease;
   background: #f8fafc;
@@ -178,16 +182,16 @@
 }
 
 .input-row button {
-  padding: 20px 40px;
+  padding: 10px 18px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border: none;
   border-radius: 50px;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px;
+  min-width: 60px;
 }
 
 .input-row button:hover:not(:disabled) {
@@ -232,10 +236,10 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .chat-container {
-    height: 95vh;
-    border-radius: 16px;
-    max-width: 100%;
+  .chat-container, .full-chat-screen {
+    height: 100vh;
+    border-radius: 0;
+    max-width: 100vw;
   }
 
   .status-indicator {
@@ -250,29 +254,35 @@
   }
 
   .bubble {
-    max-width: 85%;
-    padding: 12px 16px;
-    border-radius: 16px;
+    max-width: 75%;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 13px;
   }
 
   .content {
-    font-size: 15px;
+    font-size: 13px;
+  }
+
+  .meta {
+    font-size: 11px;
+    margin-top: 4px;
   }
 
   .input-row {
-    padding: 16px;
-    gap: 8px;
-    border-radius: 0 0 16px 16px;
+    padding: 8px 10px;
+    gap: 6px;
+    border-radius: 0 0 10px 10px;
   }
 
   .input-row input {
-    padding: 12px 16px;
-    font-size: 15px;
+    padding: 8px 10px;
+    font-size: 13px;
   }
 
   .input-row button {
-    padding: 12px 20px;
-    font-size: 15px;
-    min-width: 70px;
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 40px;
   }
 }

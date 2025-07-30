@@ -14,6 +14,7 @@ export interface Product {
   imageUrl: string;
   category: string;
   description: string;
+  sellerName: string;
 }
 
 @Component({
