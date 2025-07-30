@@ -8,85 +8,66 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./pages/home/home').then((m) => m.HomeComponent),
+      { 
+        path: '', 
+        loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent)
       },
-      {
-        path: 'login',
-        loadComponent: () =>
-          import('./authPages/login/login').then((m) => m.Login),
+      { 
+        path: 'login', 
+        loadComponent: () => import('./authPages/login/login').then(m => m.Login)
       },
-      {
-        path: 'register',
-        loadComponent: () =>
-          import('./authPages/register/register').then((m) => m.Register),
+      { 
+        path: 'register', 
+        loadComponent: () => import('./authPages/register/register').then(m => m.Register)
       },
-      {
-        path: 'forgot-password',
-        loadComponent: () =>
-          import('./authPages/forgot-password/forgot-password').then(
-            (m) => m.ForgotPassword
-          ),
+      { 
+        path: 'forgot-password', 
+        loadComponent: () => import('./authPages/forgot-password/forgot-password').then(m => m.ForgotPassword)
       },
-      {
-        path: 'categories',
-        loadComponent: () =>
-          import('./pages/categories/categories').then(
-            (m) => m.CategoriesComponent
-          ),
+      { 
+        path: 'categories', 
+        loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
 
+
+      
       {
         path: 'category/services/:id', // el id da bta3 el category ya hammad
-        loadComponent: () =>
-          import('./pages/services/services').then((m) => m.ServicesPage),
+        loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
       },
       {
         path: 'services/:id',
-        loadComponent: () =>
-          import('./pages/service-detail/service-detail').then(
-            (m) => m.ServiceDetailPage
-          ),
+        loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
       },
       {
         path: 'products',
-        loadComponent: () =>
-          import('./pages/products/products').then((m) => m.ProductsPage),
+        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
       },
       {
         path: 'products/:id',
-        loadComponent: () =>
-          import('./pages/product-detail/product-detail').then(
-            (m) => m.ProductDetailComponent
-          ),
+        loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
       },
       {
         path: 'sellerProfile/:id',
-        loadComponent: () =>
-          import('./pages/seller-profile/seller-profile').then(
-            (m) => m.SellerProfilePage
-          ),
+        loadComponent: () => import('./pages/seller-profile/seller-profile').then(m => m.SellerProfilePage)
       },
       {
         path: 'cart',
-        loadComponent: () =>
-          import('./pages/cart/cart').then((m) => m.CartComponent),
+        loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent)
       },
       {
         path: 'orders',
-        loadComponent: () =>
-          import('./pages/orders/orders').then(
-            (m) => m.CustomerOrdersComponent
-          ),
+        loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
       },
       {
         path: 'chat/:userId',
-        loadComponent: () =>
-          import('./pages/chat/chat-page').then((m) => m.ChatPageComponent),
+        loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
       },
-    ],
+      {
+        path: 'contacts',
+        loadComponent: () => import('./pages/contacts/contacts').then(m => m.ContactsPageComponent)
+      },
+    ]
   },
   //dashboard layout
   {
@@ -98,92 +79,65 @@ export const routes: Routes = [
     children: [
       {
         path: 'admin',
-        loadComponent: () => import('./pages/admin/admin').then((m) => m.Admin),
+        loadComponent: () => import('./pages/admin/admin').then(m => m.Admin),
         children: [
-          {
-            path: '',
-            loadComponent: () =>
-              import('./adminPages/users-management/users-management').then(
-                (m) => m.UsersManagement
-              ),
+          { 
+            path: '', 
+            loadComponent: () => import('./adminPages/users-management/users-management').then(m => m.UsersManagement)
           },
-          {
-            path: 'products-management',
-            loadComponent: () =>
-              import(
-                './adminPages/products-management/products-management'
-              ).then((m) => m.ProductsManagement),
+          { 
+            path: 'products-management', 
+            loadComponent: () => import('./adminPages/products-management/products-management').then(m => m.ProductsManagement)
           },
-          {
-            path: 'orders-management',
-            loadComponent: () =>
-              import('./adminPages/orders-management/orders-management').then(
-                (m) => m.OrdersManagement
-              ),
+          { 
+            path: 'orders-management', 
+            loadComponent: () => import('./adminPages/orders-management/orders-management').then(m => m.OrdersManagement)
           },
-          {
-            path: 'services-management',
-            loadComponent: () =>
-              import(
-                './adminPages/services-management/services-management'
-              ).then((m) => m.ServicesManagement),
+          { 
+            path: 'services-management', 
+            loadComponent: () => import('./adminPages/services-management/services-management').then(m => m.ServicesManagement)
           },
-          {
-            path: 'users-management',
-            loadComponent: () =>
-              import('./adminPages/users-management/users-management').then(
-                (m) => m.UsersManagement
-              ),
+          { 
+            path: 'users-management', 
+            loadComponent: () => import('./adminPages/users-management/users-management').then(m => m.UsersManagement)
           },
-          {
-            path: 'categories-management',
-            loadComponent: () =>
-              import(
-                './adminPages/categories-management/categories-management'
-              ).then((m) => m.CategoriesManagement),
+          { 
+            path: 'categories-management', 
+            loadComponent: () => import('./adminPages/categories-management/categories-management').then(m => m.CategoriesManagement)
           },
-        ],
+        ]
       },
       {
         path: 'seller',
         canActivate: [authGuard],
         data: { roles: ['seller'] },
-        loadComponent: () =>
-          import('./pages/seller/seller').then((m) => m.Seller),
-        children: [
-          {
-            path: '',
+        loadComponent: () => import('./pages/seller/seller').then(m => m.Seller),
+        children:[
+          { 
+            path: '', 
             redirectTo: 'services-management',
-            pathMatch: 'full',
+            pathMatch: 'full'
           },
-          {
-            path: 'services-management',
-            loadComponent: () =>
-              import(
-                './sellerPages/services-management/services-management'
-              ).then((m) => m.SellerServicesManagement),
+          { 
+            path: 'services-management', 
+            loadComponent: () => import('./sellerPages/services-management/services-management').then(m => m.SellerServicesManagement)
           },
-          {
-            path: 'products-management',
-            loadComponent: () =>
-              import(
-                './sellerPages/products-management/products-management'
-              ).then((m) => m.SellerProductsManagement),
+          { 
+            path: 'products-management', 
+            loadComponent: () => import('./sellerPages/products-management/products-management').then(m => m.SellerProductsManagement)
           },
-          {
-            path: 'orders-management',
-            loadComponent: () =>
-              import('./sellerPages/orders-management/orders-management').then(
-                (m) => m.SellerOrdersManagement
-              ),
+          { 
+            path: 'orders-management', 
+            loadComponent: () => import('./sellerPages/orders-management/orders-management').then(m => m.SellerOrdersManagement)
           },
-        ],
-      },
-    ],
+        ]
+      }
+    ]
   },
   // wildcard for unknown routes
-  {
-    path: '**',
-    loadComponent: () => import('./pages/error/error').then((m) => m.ErrorPage),
-  },
+  { 
+    path: '**', 
+    loadComponent: () => import('./pages/error/error').then(m => m.ErrorPage)
+  }
 ];
+

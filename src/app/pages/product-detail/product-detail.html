@@ -58,20 +58,12 @@
               <i class="text-lg fas fa-share-alt"></i>
             </button>
           </div>
-
-          <!-- Custom Badge -->
-          <!-- <div *ngIf="product.customizable" class="absolute top-4 left-4">
-            <span class="flex items-center gap-1 px-3 py-1 text-sm text-white bg-blue-600 rounded-full animate-pulse">
-              <i class="text-sm fas fa-pencil-alt"></i>
-              <span>{{ labels.customizable }}</span>
-            </span>
-          </div>
-        </div> -->
+        </div>
 
         <!-- Thumbnail Images -->
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-4 gap-2" *ngIf="productImages.length > 1">
           <button
-            *ngFor="let image of productImages; let i = index"
+            *ngFor="let image of productImages; let i = index; trackBy: trackByIndex"
             (click)="selectImage(image)"
             [class.ring-2]="selectedImage === image"
             [class.ring-blue-500]="selectedImage === image"
@@ -87,29 +79,21 @@
 
       <!-- Product Info -->
       <div class="space-y-6">
-        <!-- Title and Rating -->
+        <!-- Title and Seller -->
         <div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.title }}</h1>
           <div class="flex items-center gap-4 mt-2">
-            <div class="flex items-center gap-2">
-              <!-- <div class="flex items-center star-rating">
-                <ng-container *ngFor="let star of getStarArray(); let i = index">
-                  <i class="text-lg text-yellow-400 fas fa-star star"
-                     *ngIf="isStarFilled(i)"></i>
-                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star"
-                     *ngIf="!isStarFilled(i)"></i>
-                </ng-container>
-              </div> -->
-              <!-- <span class="font-medium text-gray-900 dark:text-white">{{ product.rating }}</span> -->
-            </div>
-            <span class="text-gray-500 dark:text-gray-400">•</span>
             <button
               (click)="onSellerClick()"
               class="text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-              {{ product.sellerId }}
+              {{ product.sellerName || product.sellerId }}
             </button>
             <span class="text-gray-500 dark:text-gray-400">•</span>
-            <span class="text-sm text-gray-600 dark:text-gray-400">{{ labels.in_stock }}</span>
+            <span class="text-sm text-gray-600 dark:text-gray-400"
+                  [class.text-green-600]="product.quantity > 0"
+                  [class.text-red-600]="product.quantity === 0">
+              {{ product.quantity > 0 ? labels.in_stock : 'Out of Stock' }}
+            </span>
           </div>
         </div>
 
@@ -117,16 +101,7 @@
         <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
           <div class="flex items-baseline gap-2">
             <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ product.price }}</span>
-            <span *ngIf="product.originalPrice" class="text-lg text-gray-500 line-through dark:text-gray-400">
-              ${{ product.originalPrice }}
-            </span>
-            <span *ngIf="product.originalPrice" class="px-2 py-1 text-sm text-white bg-red-500 rounded-full">
-              {{ getDiscountPercentage() }}% {{ labels.off }}
-            </span>
           </div>
-          <!-- <p *ngIf="product.customizable" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {{ labels.starting_price }}
-          </p> -->
         </div>
 
         <!-- Description -->
@@ -135,67 +110,75 @@
           <p class="text-gray-700 leading-relaxed dark:text-gray-300">{{ product.description }}</p>
         </div>
 
-        <!-- Product Details -->
+        <!-- Product Status -->
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.category }}</h4>
-            <p class="text-gray-600 dark:text-gray-400">{{ product.category }}</p>
+            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.status }}</h4>
+            <p class="text-gray-600 dark:text-gray-400">{{ product.status }}</p>
           </div>
           <div>
-            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.material }}</h4>
-            <p class="text-gray-600 dark:text-gray-400">{{ product.material || labels.not_specified }}</p>
-          </div>
-          <div>
-            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.dimensions }}</h4>
-            <p class="text-gray-600 dark:text-gray-400">{{ product.dimensions || labels.not_specified }}</p>
-          </div>
-          <div>
-            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.weight }}</h4>
-            <p class="text-gray-600 dark:text-gray-400">{{ product.weight || labels.not_specified }}</p>
+            <h4 class="mb-2 font-medium text-gray-900 dark:text-white">{{ labels.available_quantity }}</h4>
+            <p class="text-gray-600 dark:text-gray-400">{{ product.quantity }} {{ labels.units }}</p>
           </div>
         </div>
 
         <!-- Quantity and Add to Cart -->
-        <div class="space-y-4">
+        <div class="space-y-4" *ngIf="product.quantity > 0">
           <div class="flex items-center gap-4">
             <label class="font-medium text-gray-900 dark:text-white">{{ labels.quantity }}:</label>
             <div class="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
               <button
                 (click)="decreaseQuantity()"
-                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                [disabled]="quantity <= 1"
+                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-minus"></i>
               </button>
               <input
                 type="number"
                 [(ngModel)]="quantity"
-                min="1"
+                [min]="1"
+                [max]="product.quantity"
+                (input)="validateQuantity()"
                 class="w-16 px-2 py-2 text-center border-0 focus:ring-0 dark:bg-gray-800 dark:text-white"
               />
               <button
                 (click)="increaseQuantity()"
-                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                [disabled]="quantity >= product.quantity"
+                class="px-3 py-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
           </div>
 
           <div class="flex gap-4">
-            <app-form-button
+            <button
               (click)="onAddToCart()"
-              [loading]="addingToCart"
-              class="flex-1"
-              [text]="labels.add_to_cart"
-              [icon]="'fas fa-cart-plus'">
-            </app-form-button>
+              [disabled]="addingToCart || quantity > product.quantity"
+              class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <i class="fas fa-cart-plus" *ngIf="!addingToCart"></i>
+              <i class="fas fa-spinner fa-spin" *ngIf="addingToCart"></i>
+              <span>{{ addingToCart ? labels.adding : labels.add_to_cart }}</span>
+            </button>
 
-            <app-form-button
+            <button
               (click)="onBuyNow()"
-              [loading]="buyingNow"
-              class="flex-1"
-              [text]="labels.buy_now"
-              [icon]="'fas fa-bolt'"
-              [variant]="'secondary'">
-            </app-form-button>
+              [disabled]="buyingNow || quantity > product.quantity"
+              class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-blue-600 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <i class="fas fa-bolt" *ngIf="!buyingNow"></i>
+              <i class="fas fa-spinner fa-spin" *ngIf="buyingNow"></i>
+              <span>{{ buyingNow ? labels.processing : labels.buy_now }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Out of Stock Message -->
+        <div *ngIf="product.quantity === 0" class="p-4 bg-red-50 rounded-lg dark:bg-red-900/20">
+          <div class="flex items-center gap-3">
+            <i class="text-red-600 fas fa-exclamation-triangle"></i>
+            <div>
+              <h4 class="font-medium text-red-900 dark:text-red-100">{{ labels.out_of_stock }}</h4>
+              <p class="text-sm text-red-700 dark:text-red-200">{{ labels.out_of_stock_message }}</p>
+            </div>
           </div>
         </div>
 
@@ -212,158 +195,73 @@
       </div>
     </div>
 
-    <!-- Reviews Section -->
-    <div class="mt-16">
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ labels.reviews }}</h2>
-        <button
-          (click)="showReviewForm = true"
-          class="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
-          {{ labels.write_review }}
-        </button>
-      </div>
-
-      <!-- Review Stats -->
-      <div class="grid gap-6 mb-8 lg:grid-cols-3">
-        <div class="p-6 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-          <div class="text-center">
-            <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ averageRating }}</div>
-            <div class="flex justify-center mt-2">
-              <!-- <div class="flex items-center star-rating">
-                <ng-container *ngFor="let star of getStarArray(); let i = index">
-                  <i class="text-lg text-yellow-400 fas fa-star star"
-                     *ngIf="isStarFilled(i, averageRating)"></i>
-                  <i class="text-lg text-gray-300 far fa-star dark:text-gray-600 star"
-                     *ngIf="!isStarFilled(i, averageRating)"></i>
-                </ng-container>
-              </div> -->
-            </div>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ totalReviews }} {{ labels.reviews }}</p>
-          </div>
-        </div>
-
-        <div class="p-6 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-          <h4 class="mb-4 font-medium text-gray-900 dark:text-white">{{ labels.rating_distribution }}</h4>
-          <div class="space-y-2">
-            <div *ngFor="let rating of ratingDistribution; let i = index" class="flex items-center gap-2">
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ 5 - i }} {{ labels.stars }}</span>
-              <div class="flex-1 h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                <div
-                  class="h-2 bg-yellow-400 rounded-full transition-all duration-300"
-                  [style.width.%]="rating.percentage">
-                </div>
-              </div>
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ rating.count }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="p-6 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-          <h4 class="mb-4 font-medium text-gray-900 dark:text-white">{{ labels.review_filters }}</h4>
-          <div class="space-y-2">
-            <button
-              *ngFor="let filter of reviewFilters"
-              (click)="filterReviews(filter.value)"
-              [class.bg-blue-100]="selectedFilter === filter.value"
-              [class.text-blue-800]="selectedFilter === filter.value"
-              class="w-full px-3 py-2 text-left text-sm transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-              {{ filter.label }} ({{ filter.count }})
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reviews List -->
-      <!-- <div class="space-y-6">
-        <app-review-item 
-          *ngFor="let review of filteredReviews"
-          [review]="review"
-          [language]="language">
-        </app-review-item>
-      </div> -->
-
-      <!-- Load More Reviews -->
-      <div *ngIf="hasMoreReviews" class="mt-8 text-center">
-        <app-form-button
-          (click)="loadMoreReviews()"
-          [loading]="loadingReviews"
-          [text]="labels.load_more_reviews"
-          [icon]="'fas fa-chevron-down'">
-        </app-form-button>
-      </div>
-    </div>
-
     <!-- Related Products -->
-    <div class="mt-16">
-      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">{{ labels.related_products }}</h2>
+    <div class="mt-16" *ngIf="relatedProducts.length > 0">
+      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
+        {{ labels.related_products }}
+      </h2>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <app-product-card
-          *ngFor="let relatedProduct of relatedProducts"
-          [product]="relatedProduct"
-          [language]="language"
-          (addToCart)="onAddToCart()"
-          (addToWishlist)="onAddToWishlist()">
-        </app-product-card>
+        <div
+          *ngFor="let relatedProduct of relatedProducts; trackBy: trackByProductId"
+          class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <!-- Wrap the product info inside a routerLink -->
+          <a
+            [routerLink]="['/products', relatedProduct.id]"
+            class="block relative"
+          >
+            <img
+              [src]="relatedProduct.imageUrl"
+              [alt]="relatedProduct.title"
+              class="object-cover w-full h-48 rounded-t-lg"
+            />
+          </a>
+          <!-- Wishlist button stays outside the link -->
+          <button
+            (click)="onRelatedProductAddToWishlist(relatedProduct)"
+            class="absolute top-3 right-3 p-2 text-gray-600 bg-white rounded-full shadow-sm hover:text-red-500 transition-colors"
+          >
+            <i class="fas fa-heart"></i>
+          </button>
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+              {{ relatedProduct.title }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              {{ relatedProduct.sellerName || relatedProduct.sellerId }}
+            </p>
+            <div class="flex items-center justify-between">
+          <span class="text-xl font-bold text-gray-900 dark:text-white">
+            ${{ relatedProduct.price }}
+          </span>
+              <button
+                (click)="onRelatedProductAddToCart(relatedProduct)"
+                [disabled]="relatedProduct.quantity === 0"
+                class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <i class="fas fa-cart-plus mr-1"></i>
+                {{ labels.add }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Review Form Modal -->
-  <div *ngIf="showReviewForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-    <div class="w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl dark:bg-gray-800">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ labels.write_review }}</h3>
-        <button
-          (click)="showReviewForm = false"
-          class="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <form (ngSubmit)="submitReview()" class="space-y-4">
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ labels.rating }}</label>
-          <div class="flex items-center gap-2">
-            <ng-container *ngFor="let star of getStarArray(); let i = index">
-              <button
-                type="button"
-                (click)="setReviewRating(i + 1)"
-                class="text-2xl transition-colors"
-                [class.text-yellow-400]="reviewRating > i"
-                [class.text-gray-300]="reviewRating <= i">
-                <i class="fas fa-star"></i>
-              </button>
-            </ng-container>
-          </div>
-        </div>
-
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ labels.comment }}</label>
-          <textarea
-            [(ngModel)]="reviewComment"
-            name="comment"
-            rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            [placeholder]="labels.review_placeholder">
-          </textarea>
-        </div>
-
-        <div class="flex gap-3">
-          <app-form-button
-            type="button"
-            (click)="showReviewForm = false"
-            [text]="labels.cancel"
-            [variant]="'secondary'">
-          </app-form-button>
-
-          <app-form-button
-            type="submit"
-            [loading]="submittingReview"
-            [text]="labels.submit_review"
-            [icon]="'fas fa-paper-plane'">
-          </app-form-button>
-        </div>
-      </form>
+  <!-- Error State -->
+  <div *ngIf="!loading && !product" class="flex items-center justify-center min-h-96">
+    <div class="text-center">
+      <i class="fas fa-exclamation-triangle text-6xl text-gray-400 mb-4"></i>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ labels.product_not_found }}</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">{{ labels.product_not_found_message }}</p>
+      <button
+        (click)="goBack()"
+        class="px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+        <i class="fas fa-arrow-left mr-2"></i>
+        {{ labels.go_back }}
+      </button>
     </div>
   </div>
 </div>
