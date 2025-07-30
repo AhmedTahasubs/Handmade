@@ -1,45 +1,56 @@
-<div class="product-card overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm group dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 cursor-pointer" (click)="onProductClick()">
+<div
+  class="product-card overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm group dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+  (click)="onProductClick()"
+>
   <!-- Image -->
   <div class="product-image-container relative overflow-hidden">
     <img
-      [src]="product.image"
-      [alt]="product.name[language]"
+      [src]="product.imageUrl"
+      [alt]="product.title"
       class="object-cover w-full h-48 transition-transform duration-500 group-hover:scale-105"
     />
 
     <!-- Hover Overlay -->
-    <div class="absolute inset-0 flex items-center justify-center gap-4 transition-opacity duration-300 opacity-0 bg-black/40 group-hover:opacity-100">
+    <div
+      class="absolute inset-0 flex items-center justify-center gap-4 transition-opacity duration-300 opacity-0 bg-black/40 group-hover:opacity-100"
+    >
       <!-- Wishlist -->
-      <button 
+      <button
         (click)="onAddToWishlist(); $event.stopPropagation()"
         class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white"
-        [attr.aria-label]="language === 'en' ? 'Add to wishlist' : 'أضف للمفضلة'">
+        [attr.aria-label]="
+          language === 'en' ? 'Add to wishlist' : 'أضف للمفضلة'
+        "
+      >
         <i class="text-lg fas fa-heart"></i>
       </button>
       <!-- Add to Cart -->
-      <button 
+      <button
         (click)="onAddToCart(); $event.stopPropagation()"
         class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white"
-        [attr.aria-label]="language === 'en' ? 'Add to cart' : 'أضف للسلة'">
+        [attr.aria-label]="language === 'en' ? 'Add to cart' : 'أضف للسلة'"
+      >
         <i class="text-lg fas fa-cart-plus"></i>
       </button>
     </div>
 
     <!-- Badge -->
     <div class="absolute space-y-1 top-2 left-2">
-      <span 
-        *ngIf="product.customizable" 
-        class="flex items-center gap-1 px-2 py-1 text-xs text-white bg-blue-600 rounded-full animate-pulse">
+      <span
+        *ngIf=""
+        class="flex items-center gap-1 px-2 py-1 text-xs text-white bg-blue-600 rounded-full animate-pulse"
+      >
         <i class="text-xs fas fa-pencil-alt"></i>
-        <span>{{ language === 'en' ? 'Custom' : 'مخصص' }}</span>
+        <span>{{ language === "en" ? "Custom" : "مخصص" }}</span>
       </span>
     </div>
 
     <!-- Favorite -->
-    <button 
+    <button
       (click)="onAddToWishlist(); $event.stopPropagation()"
       class="absolute p-2 transition rounded-full top-2 right-2 bg-white/80 hover:bg-white"
-      [attr.aria-label]="language === 'en' ? 'Add to favorites' : 'أضف للمفضلة'">
+      [attr.aria-label]="language === 'en' ? 'Add to favorites' : 'أضف للمفضلة'"
+    >
       <i class="text-sm text-gray-600 fa-solid fa-heart"></i>
     </button>
   </div>
@@ -48,43 +59,53 @@
   <div class="product-content p-4 space-y-3">
     <!-- Title & Rating -->
     <div>
-      <h3 class="product-title font-semibold text-gray-900 truncate transition dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-        {{ product.name[language] }}
+      <h3
+        class="product-title font-semibold text-gray-900 truncate transition dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400"
+      >
+        {{ product.title }}
       </h3>
-      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+      <div
+        class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+      >
         <div class="flex items-center gap-1">
           <ng-container *ngFor="let star of getStarArray(); let i = index">
-            <i 
-              class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
           </ng-container>
         </div>
-        <span>{{ product.rating }}</span>
         <span>•</span>
-        <button 
-          (click)="onSellerClick(); $event.stopPropagation()" 
+        <!-- <button
+          (click)="onSellerClick(); $event.stopPropagation()"
           class="text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-          {{ product.seller }}
-        </button>
+          {{ product.sellerId }}
+        </button> -->
       </div>
     </div>
 
     <!-- Description -->
-    <p class="product-description text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ product.description[language] }}</p>
+    <p
+      class="product-description text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
+    >
+      {{ product.description }}
+    </p>
 
     <!-- Price & Add to Cart -->
     <div class="product-actions flex items-center justify-between pt-2">
       <div>
-        <p class="product-price text-lg font-bold text-gray-900 dark:text-white">${{ product.price }}</p>
-        <p *ngIf="product.customizable" class="text-xs text-gray-500 dark:text-gray-400">
-          {{ language === 'en' ? 'Starting price' : 'السعر الأساسي' }}
+        <p
+          class="product-price text-lg font-bold text-gray-900 dark:text-white"
+        >
+          ${{ product.price }}
+        </p>
+        <p *ngIf="" class="text-xs text-gray-500 dark:text-gray-400">
+          {{ language === "en" ? "Starting price" : "السعر الأساسي" }}
         </p>
       </div>
-      <button 
+      <button
         (click)="onAddToCart(); $event.stopPropagation()"
         class="product-button flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-blue-600 rounded-md hover:bg-blue-700 animate-bounce-once"
       >
         <i class="fas fa-cart-plus"></i>
-        <span>{{ language === 'en' ? 'Add to Cart' : 'أضف للسلة' }}</span>
+        <span>{{ language === "en" ? "Add to Cart" : "أضف للسلة" }}</span>
       </button>
     </div>
   </div>

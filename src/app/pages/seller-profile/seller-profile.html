@@ -1,89 +1,124 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900" [attr.dir]="languageService.currentLanguage()">
+<div
+  class="min-h-screen bg-gray-50 dark:bg-gray-900"
+  [attr.dir]="languageService.currentLanguage()"
+>
   <!-- Loading State -->
   <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
-    <div class="w-12 h-12 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+    <div
+      class="w-12 h-12 border-b-2 border-blue-600 rounded-full animate-spin"
+    ></div>
   </div>
 
   <!-- Main Content -->
   <div *ngIf="!loading && seller" class="pb-8">
     <!-- Cover Image -->
-    <div class="relative h-64 overflow-hidden md:h-80 bg-gradient-to-r from-blue-600 to-purple-600">
-      <img 
-        [src]="seller.coverImage" 
-        [alt]="seller.name"
+    <div
+      class="relative h-64 overflow-hidden md:h-80 bg-gradient-to-r from-blue-600 to-purple-600"
+    >
+      <img
+        [src]=""
+        [alt]="seller.fullName"
         class="object-cover w-full h-full opacity-80"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"
+      ></div>
     </div>
 
     <!-- Seller Profile Section -->
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="relative mb-8 -mt-32">
         <div class="p-6 bg-white rounded-lg shadow-lg dark:bg-gray-800 md:p-8">
-          <div class="flex flex-col items-start gap-6 md:flex-row md:items-center">
+          <div
+            class="flex flex-col items-start gap-6 md:flex-row md:items-center"
+          >
             <!-- Avatar -->
             <div class="relative">
-              <img 
-                [src]="seller.avatar" 
-                [alt]="seller.name"
+              <img
+                [src]=""
+                [alt]="seller.fullName"
                 class="w-24 h-24 border-4 border-white rounded-full shadow-lg md:w-32 md:h-32 dark:border-gray-700"
               />
               <!-- Online Status -->
-              <div class="absolute w-6 h-6 border-2 border-white rounded-full bottom-2 right-2 dark:border-gray-700" 
-                   [class.bg-green-500]="seller.isOnline" 
-                   [class.bg-gray-400]="!seller.isOnline">
-              </div>
+              <div
+                class="absolute w-6 h-6 border-2 border-white rounded-full bottom-2 right-2 dark:border-gray-700"
+                [class.bg-green-500]=""
+                [class.bg-gray-400]=""
+              ></div>
             </div>
 
             <!-- Seller Info -->
             <div class="flex-1">
-              <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div
+                class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+              >
                 <div>
                   <div class="flex items-center gap-3 mb-2">
-                    <h1 class="text-2xl font-bold text-gray-900 md:text-3xl dark:text-white">{{ seller.name }}</h1>
-                    <span *ngIf="seller.isVerified" class="inline-flex items-center px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200">
+                    <h1
+                      class="text-2xl font-bold text-gray-900 md:text-3xl dark:text-white"
+                    >
+                      {{ seller.fullName }}
+                    </h1>
+                    <span
+                      *ngIf=""
+                      class="inline-flex items-center px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200"
+                    >
                       <i class="mr-1 fas fa-check-circle"></i>
                       {{ labels.verified }}
                     </span>
                   </div>
-                  <p class="mb-2 text-lg text-gray-600 dark:text-gray-300">{{ seller.username }}</p>
-                  
+                  <p class="mb-2 text-lg text-gray-600 dark:text-gray-300">
+                    {{ seller.userName }}
+                  </p>
+
                   <!-- Rating -->
                   <div class="flex items-center gap-2 mb-3">
                     <div class="flex items-center">
-                      <ng-container *ngFor="let star of getStarArray(); let i = index">
-                        <i class="text-sm text-yellow-400 fas fa-star" 
-                           *ngIf="isStarFilled(i)"></i>
-                        <i class="text-sm text-yellow-400 fas fa-star-half-alt" 
-                           *ngIf="isStarHalf(i)"></i>
-                        <i class="text-sm text-gray-300 far fa-star" 
-                           *ngIf="!isStarFilled(i) && !isStarHalf(i)"></i>
+                      <ng-container
+                        *ngFor="let star of getStarArray(); let i = index"
+                      >
+                        <i
+                          class="text-sm text-yellow-400 fas fa-star"
+                          *ngIf=""
+                        ></i>
+                        <i
+                          class="text-sm text-yellow-400 fas fa-star-half-alt"
+                          *ngIf=""
+                        ></i>
+                        <i
+                          class="text-sm text-gray-300 far fa-star"
+                          *ngIf=""
+                        ></i>
                       </ng-container>
                     </div>
-                    <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ seller.rating }}</span>
-                    <span class="text-gray-600 dark:text-gray-400">({{ seller.reviewCount }} {{ labels.reviews.toLowerCase() }})</span>
+                    <span
+                      class="text-lg font-semibold text-gray-900 dark:text-white"
+                    ></span>
+                    <span class="text-gray-600 dark:text-gray-400"></span>
                   </div>
 
                   <!-- Status -->
                   <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 text-sm rounded-full" 
-                          [class.bg-green-100]="seller.isOnline"
-                          [class.text-green-800]="seller.isOnline"
-                          [class.bg-gray-100]="!seller.isOnline"
-                          [class.text-gray-800]="!seller.isOnline"
-                          [class.dark:bg-green-900]="seller.isOnline"
-                          [class.dark:text-green-200]="seller.isOnline"
-                          [class.dark:bg-gray-700]="!seller.isOnline"
-                          [class.dark:text-gray-300]="!seller.isOnline">
-                      {{ seller.isOnline ? labels.online : labels.offline }}
+                    <span
+                      class="px-3 py-1 text-sm rounded-full"
+                      [class.bg-green-100]=""
+                      [class.text-green-800]=""
+                      [class.bg-gray-100]=""
+                      [class.text-gray-800]=""
+                      [class.dark:bg-green-900]=""
+                      [class.dark:text-green-200]=""
+                      [class.dark:bg-gray-700]=""
+                      [class.dark:text-gray-300]=""
+                    >
                     </span>
                   </div>
                 </div>
 
                 <!-- Contact Button -->
-                <button 
-                  (click)="sendMessage()" 
-                  class="flex items-center gap-2 px-6 py-3 font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
+                <button
+                  (click)="sendMessage()"
+                  class="flex items-center gap-2 px-6 py-3 font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+                >
                   <i class="fas fa-comment-alt"></i>
                   {{ labels.contact_seller }}
                 </button>
@@ -92,22 +127,40 @@
           </div>
 
           <!-- Seller Stats -->
-          <div class="grid grid-cols-2 gap-6 pt-6 mt-8 border-t border-gray-200 md:grid-cols-4 dark:border-gray-600">
+          <div
+            class="grid grid-cols-2 gap-6 pt-6 mt-8 border-t border-gray-200 md:grid-cols-4 dark:border-gray-600"
+          >
             <div class="text-center">
-              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ seller.completedOrders }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">{{ labels.completed_orders }}</div>
+              <div
+                class="text-2xl font-bold text-gray-900 dark:text-white"
+              ></div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">
+                {{ labels.completed_orders }}
+              </div>
             </div>
             <div class="text-center">
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ seller.responseTime }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">{{ labels.response_time }}</div>
+              <div
+                class="text-lg font-semibold text-gray-900 dark:text-white"
+              ></div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">
+                {{ labels.response_time }}
+              </div>
             </div>
             <div class="text-center">
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ seller.location }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">{{ labels.from }}</div>
+              <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ seller.address }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">
+                {{ labels.from }}
+              </div>
             </div>
             <div class="text-center">
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ seller.joinDate | date:'MMM yyyy' }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">{{ labels.member_since }}</div>
+              <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ seller.createdOn | date : "MMM yyyy" }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">
+                {{ labels.member_since }}
+              </div>
             </div>
           </div>
         </div>
@@ -119,31 +172,47 @@
         <div class="space-y-6 lg:col-span-1">
           <!-- About -->
           <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{{ labels.about }}</h3>
+            <h3
+              class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              {{ labels.about }}
+            </h3>
             <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-              {{ seller.description[currentLanguage] }}
+              {{ seller.bio }}
             </p>
           </div>
 
           <!-- Skills -->
           <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{{ labels.skills }}</h3>
+            <h3
+              class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              {{ labels.skills }}
+            </h3>
             <div class="flex flex-wrap gap-2">
-              <span *ngFor="let skill of seller.skills" 
-                    class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200">
-                {{ skill }}
+              <span
+                *ngFor=""
+                class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200"
+              >
+                <!-- {{ skill }} -->
               </span>
             </div>
           </div>
 
           <!-- Languages -->
           <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{{ labels.languages }}</h3>
+            <h3
+              class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              {{ labels.languages }}
+            </h3>
             <div class="space-y-2">
-              <div *ngFor="let language of seller.languages" 
-                   class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+              <div
+                *ngFor=""
+                class="flex items-center gap-2 text-gray-600 dark:text-gray-300"
+              >
                 <i class="text-sm text-green-500 fas fa-check-circle"></i>
-                <span>{{ language }}</span>
+                <span></span>
               </div>
             </div>
           </div>
@@ -155,37 +224,43 @@
           <div class="bg-white rounded-lg shadow dark:bg-gray-800">
             <!-- Header -->
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-              <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
+              <div
+                class="flex flex-col items-center justify-between gap-4 md:flex-row"
+              >
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                  {{ labels.products }} ({{ filteredProducts.length }})
+                  {{ labels.products }}
                 </h2>
-                
+
                 <div class="flex items-center gap-4">
                   <!-- Category Filter -->
 
-
-
-
-
-                  
-                   <!-- hna ya abdel karimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm -->
-                  <select 
+                  <!-- hna ya abdel karimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm -->
+                  <select
                     [(ngModel)]="selectedCategory"
                     (ngModelChange)="onCategoryChange($event)"
-                    class="px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500">
+                    class="px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  >
                     <option value="all">{{ labels.all_categories }}</option>
-                    <option *ngFor="let category of categories.slice(1)" [value]="category">
+                    <option
+                      *ngFor="let category of categories.slice(1)"
+                      [value]="category"
+                    >
                       {{ category | titlecase }}
                     </option>
                   </select>
 
                   <!-- Sort -->
-                  <select 
+                  <select
                     (change)="onSortChange($event)"
-                    class="px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500">
+                    class="px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  >
                     <option value="rating">{{ labels.highest_rated }}</option>
-                    <option value="price-low">{{ labels.price_low_high }}</option>
-                    <option value="price-high">{{ labels.price_high_low }}</option>
+                    <option value="price-low">
+                      {{ labels.price_low_high }}
+                    </option>
+                    <option value="price-high">
+                      {{ labels.price_high_low }}
+                    </option>
                     <option value="newest">{{ labels.newest }}</option>
                   </select>
                 </div>
@@ -194,14 +269,17 @@
 
             <!-- Products Grid -->
             <div class="p-6">
-              <div *ngIf="filteredProducts.length > 0; else noProducts" 
-                   class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <div
+                *ngIf="filteredProducts.length > 0; else noProducts"
+                class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+              >
                 <app-product-card
                   *ngFor="let product of filteredProducts"
                   [product]="product"
                   [language]="currentLanguage"
                   (addToCart)="onAddToCart($event)"
-                  (addToWishlist)="onAddToWishlist($event)">
+                  (addToWishlist)="onAddToWishlist($event)"
+                >
                 </app-product-card>
               </div>
 
@@ -209,11 +287,21 @@
               <ng-template #noProducts>
                 <div class="py-12 text-center">
                   <i class="mb-4 text-4xl text-gray-400 fas fa-box-open"></i>
-                  <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                    {{ currentLanguage === 'en' ? 'No products found' : 'لم يتم العثور على منتجات' }}
+                  <h3
+                    class="mb-2 text-lg font-medium text-gray-900 dark:text-white"
+                  >
+                    {{
+                      currentLanguage === "en"
+                        ? "No products found"
+                        : "لم يتم العثور على منتجات"
+                    }}
                   </h3>
                   <p class="text-gray-600 dark:text-gray-400">
-                    {{ currentLanguage === 'en' ? 'Try adjusting your filters' : 'حاول تعديل المرشحات' }}
+                    {{
+                      currentLanguage === "en"
+                        ? "Try adjusting your filters"
+                        : "حاول تعديل المرشحات"
+                    }}
                   </p>
                 </div>
               </ng-template>
