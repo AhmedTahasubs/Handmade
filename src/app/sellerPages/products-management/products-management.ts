@@ -8,7 +8,7 @@ import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from '@angular/router';
 import { ProductService, Product, ProductRequest } from '../../services/products.service';
 import { ServiceSellerService, ServiceDto } from '../../services/services.service';
-
+import { jwtDecode } from "jwt-decode";
 @Component({
   selector: "app-seller-products-management",
   standalone: true,
@@ -125,7 +125,12 @@ export class SellerProductsManagement implements OnInit {
   }
 
   loadProducts(): void {
-    this.productService.getAll().subscribe({
+    let token = localStorage.getItem('token');
+    if (!token) return;
+    let decodedToken: any = jwtDecode(token);
+    let sellerId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    
+    this.productService.getBySellerId(sellerId).subscribe({
       next: (products) => {
         this.products = products;
       },
@@ -181,7 +186,6 @@ export class SellerProductsManagement implements OnInit {
       price: 0,
       quantity: 0,
       serviceId: this.services[0]?.id || 0,
-      status: "active"
     };
     this.showModal = true;
   }
@@ -244,11 +248,10 @@ export class SellerProductsManagement implements OnInit {
       description: product.description,
       price: product.price,
       quantity: product.quantity,
-      serviceId: product.serviceId,
-      status: product.status
     };
     this.imagePreview = product.imageUrl || null;
     this.showModal = true;
+    console.log(this.currentProduct)
   }
 
   deleteProduct(product: Product): void {
@@ -271,12 +274,18 @@ export class SellerProductsManagement implements OnInit {
   if (!this.currentProduct) return;
 
   const formData = new FormData();
+  if (this.isEditing && this.currentProduct.id !== undefined) {
+      formData.append('id', this.currentProduct.id.toString());
+  }
   formData.append('title', this.currentProduct.title || '');
   formData.append('description', this.currentProduct.description || '');
   formData.append('price', (this.currentProduct.price || 0).toString());
   formData.append('quantity', (this.currentProduct.quantity || 0).toString());
   formData.append('serviceId', (this.currentProduct.serviceId || 0).toString());
-  formData.append('status', this.currentProduct.status || 'active');
+  if(!this.isEditing)
+  {
+    formData.append('status', this.currentProduct.status || 'active');
+  }
   
   if (this.selectedFile) {
     formData.append('file', this.selectedFile);

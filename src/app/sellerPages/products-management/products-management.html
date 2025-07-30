@@ -82,7 +82,6 @@
     <form class="space-y-4" *ngIf="currentProduct">
       <fieldset class="space-y-4">
         <legend class="sr-only">Product Information</legend>
-        
         <!-- Product Name -->
         <div>
           <label for="productTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -146,42 +145,25 @@
             />
           </div>
         </div>
-
-        <!-- Service Selection -->
-        <div>
-          <label for="productService" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ getTranslation('service') }}
-          </label>
-          <select
-            id="productService"
-            [(ngModel)]="currentProduct.serviceId"
-            name="serviceId"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option *ngFor="let service of services" [value]="service.id">
-              {{ service.title }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Status -->
-        <div>
-          <label for="productStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ getTranslation('status') }}
-          </label>
-          <select
-            id="productStatus"
-            [(ngModel)]="currentProduct.status"
-            name="status"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="active">{{ getTranslation('active') }}</option>
-            <option value="inactive">{{ getTranslation('inactive') }}</option>
-            <option value="out_of_stock">{{ getTranslation('out_of_stock') }}</option>
-          </select>
-        </div>
+        @if(!isEditing){
+          <!-- Service Selection -->
+          <div>
+            <label for="productService" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ getTranslation('service') }}
+            </label>
+            <select
+              id="productService"
+              [(ngModel)]="currentProduct.serviceId"
+              name="serviceId"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option *ngFor="let service of services" [value]="service.id">   
+                {{ service.title }}
+              </option>
+            </select>
+          </div>
+        }
 
         <!-- Image Upload -->
         <div>
