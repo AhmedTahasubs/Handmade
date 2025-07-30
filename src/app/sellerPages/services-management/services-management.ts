@@ -33,6 +33,8 @@ export class SellerServicesManagement implements OnInit {
   imagePreview: string | ArrayBuffer | null = null;
   isLoading = false;
   formErrors: Record<string, string> = {};
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
@@ -81,6 +83,11 @@ export class SellerServicesManagement implements OnInit {
       loading: "Loading...",
       noServices: "No services found",
       noServicesMessage: "You haven't added any services yet. Start by creating one.",
+      addServiceSuccess: "Service added successfully!",
+    editServiceSuccess: "Service updated successfully!",
+    deleteServiceSuccess: "Service deleted successfully!",
+    saveServiceError: "Failed to save service. Please try again.",
+    deleteServiceError: "Failed to delete service. Please try again.",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $1",
@@ -116,6 +123,11 @@ export class SellerServicesManagement implements OnInit {
       loading: "جاري التحميل...",
       noServices: "لا توجد خدمات",
       noServicesMessage: "لم تقم بإضافة أي خدمات بعد. ابدأ بإنشاء واحدة.",
+      addServiceSuccess: "تمت إضافة الخدمة بنجاح!",
+    editServiceSuccess: "تم تحديث الخدمة بنجاح!",
+    deleteServiceSuccess: "تم حذف الخدمة بنجاح!",
+    saveServiceError: "فشل حفظ الخدمة. يرجى المحاولة مرة أخرى.",
+    deleteServiceError: "فشل حذف الخدمة. يرجى المحاولة مرة أخرى.",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ١ دولار",
@@ -357,9 +369,12 @@ export class SellerServicesManagement implements OnInit {
         this.loadServices();
         this.closeModal();
         this.isLoading = false;
+        this.successMessage = this.getTranslation(this.isEditing ? 'editServiceSuccess' : 'addServiceSuccess');
+        setTimeout(() => this.successMessage = null, 5000); // Auto-dismiss after 5 seconds
       },
       error: (error) => {
         console.error('Error saving service:', error);
+        this.errorMessage = this.getTranslation('saveServiceError');
         this.isLoading = false;
         if (form) {
           form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
@@ -400,21 +415,24 @@ export class SellerServicesManagement implements OnInit {
       });
     }
     this.serviceSellerService.delete(this.serviceToDelete.id).subscribe({
-      next: () => {
-        this.loadServices();
-        this.closeDeleteModal();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error deleting service:', error);
-        this.isLoading = false;
-        if (modal) {
-          modal.querySelectorAll('button').forEach((button: any) => {
-            button.disabled = false;
-          });
-        }
-      }
-    });
+  next: () => {
+    this.loadServices();
+    this.closeDeleteModal();
+    this.isLoading = false;
+    this.successMessage = this.getTranslation('deleteServiceSuccess');
+    setTimeout(() => this.successMessage = null, 5000);
+  },
+  error: (error) => {
+    console.error('Error deleting service:', error);
+    this.errorMessage = this.getTranslation('deleteServiceError');
+    this.isLoading = false;
+    if (modal) {
+      modal.querySelectorAll('button').forEach((button: any) => {
+        button.disabled = false;
+      });
+    }
+  }
+});
   }
 
   onExport(): void {
