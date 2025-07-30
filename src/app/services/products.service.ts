@@ -13,6 +13,7 @@ export interface Product {
   sellerId: string;
   serviceId: number;
   imageUrl: string;
+  sellerName: string;
 }
 
 export interface ProductRequest {

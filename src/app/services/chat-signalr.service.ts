@@ -30,10 +30,19 @@ export class ChatSignalrService implements OnDestroy {
     return this.connectionStatusSubject.asObservable();
   }
 
+  /**
+   * Fetches the user's chat contacts.
+   */
+  getChatContacts(): Observable<{ userId: string; fullName: string; profileImage?: string | null }[]> {
+    const jwt = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${jwt}` });
+    return this.http.get<{ userId: string; fullName: string; profileImage?: string | null }[]>(`${this.apiUrl}/contacts`, { headers });
+  }
+
   connect(): void {
     if (this.hubConnection) return;
     this.connectionStatusSubject.next('connecting');
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem('token');
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.hubUrl, {
         accessTokenFactory: () => jwt || ''
@@ -79,7 +88,7 @@ export class ChatSignalrService implements OnDestroy {
   }
 
   fetchMessages(otherUserId: string, page: number, pageSize: number): Observable<Message[]> {
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${jwt}` });
     const params = new HttpParams()
       .set('userId', otherUserId)
@@ -90,7 +99,7 @@ export class ChatSignalrService implements OnDestroy {
 
   markDelivered(messageIds: number[]): Observable<any> {
     if (!messageIds.length) return of(null);
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${jwt}` });
     return this.http.post(`${this.apiUrl}/mark-delivered`, messageIds, { headers });
   }
@@ -100,4 +109,4 @@ export class ChatSignalrService implements OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-} 
+}
