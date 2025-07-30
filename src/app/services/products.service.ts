@@ -45,14 +45,17 @@ export class ProductService {
   }
 
    createWithImage(formData: FormData): Observable<Product> {
-    return this.http.post<Product>(`${this.baseUrl}/with-image`, formData);
+    return this.http.post<Product>(`${this.baseUrl}`, formData);
   }
 
   updateWithImage(id: number, formData: FormData): Observable<Product> {
-    return this.http.put<Product>(`${this.baseUrl}/with-image/${id}`, formData);
+    return this.http.put<Product>(`${this.baseUrl}/${id}`, formData);
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+  getBySellerId(sellerId: string): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.baseUrl}/get-by-sellerid/${sellerId}`);
   }
 }

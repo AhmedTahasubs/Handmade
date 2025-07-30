@@ -19,8 +19,13 @@
     </button>
   </header>
 
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading && products.length === 0" class="flex justify-center items-center py-16">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+  </div>
+
   <!-- Stats Cards -->
-  <section class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4">
+  <section *ngIf="!isLoading || products.length > 0" class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4">
     <article class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div class="flex items-center">
         <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
@@ -59,7 +64,7 @@
   </section>
 
   <!-- Data Table -->
-  <main>
+  <main *ngIf="!isLoading || products.length > 0">
     <app-data-table
       [data]="products"
       [columns]="columns"
@@ -74,15 +79,19 @@
   <app-modal
     [isOpen]="showModal"
     [title]="modalTitle"
-    [confirmText]="isEditing ? getTranslation('update') : getTranslation('create')"
+    [confirmText]="isLoading ? '' : (isEditing ? getTranslation('update') : getTranslation('create'))"
     (closed)="closeModal()"
     (confirmed)="saveProduct()"
     aria-labelledby="product-form-title"
   >
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+
     <form class="space-y-4" *ngIf="currentProduct">
       <fieldset class="space-y-4">
         <legend class="sr-only">Product Information</legend>
-        
         <!-- Product Name -->
         <div>
           <label for="productTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -94,8 +103,12 @@
             [(ngModel)]="currentProduct.title"
             name="title"
             required
+            [class.border-red-500]="formErrors['title']"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
+          <p *ngIf="formErrors['title']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ formErrors['title'] }}
+          </p>
         </div>
 
         <!-- Description -->
@@ -109,8 +122,12 @@
             name="description"
             rows="3"
             required
+            [class.border-red-500]="formErrors['description']"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           ></textarea>
+          <p *ngIf="formErrors['description']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ formErrors['description'] }}
+          </p>
         </div>
 
         <!-- Price and Quantity -->
@@ -127,8 +144,12 @@
               min="0"
               step="0.01"
               required
+              [class.border-red-500]="formErrors['price']"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
+            <p *ngIf="formErrors['price']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ formErrors['price'] }}
+            </p>
           </div>
 
           <div>
@@ -142,93 +163,88 @@
               name="quantity"
               min="0"
               required
+              [class.border-red-500]="formErrors['quantity']"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
+            <p *ngIf="formErrors['quantity']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ formErrors['quantity'] }}
+            </p>
           </div>
         </div>
 
-        <!-- Service Selection -->
-        <div>
-          <label for="productService" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ getTranslation('service') }}
-          </label>
-          <select
-            id="productService"
-            [(ngModel)]="currentProduct.serviceId"
-            name="serviceId"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option *ngFor="let service of services" [value]="service.id">
-              {{ service.title }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Status -->
-        <div>
-          <label for="productStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ getTranslation('status') }}
-          </label>
-          <select
-            id="productStatus"
-            [(ngModel)]="currentProduct.status"
-            name="status"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="active">{{ getTranslation('active') }}</option>
-            <option value="inactive">{{ getTranslation('inactive') }}</option>
-            <option value="out_of_stock">{{ getTranslation('out_of_stock') }}</option>
-          </select>
-        </div>
+        @if(!isEditing){
+          <!-- Service Selection -->
+          <div>
+            <label for="productService" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ getTranslation('service') }}
+            </label>
+            <select
+              id="productService"
+              [(ngModel)]="currentProduct.serviceId"
+              name="serviceId"
+              required
+              [class.border-red-500]="formErrors['serviceId']"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option *ngFor="let service of services" [value]="service.id">   
+                {{ service.title }}
+              </option>
+            </select>
+            <p *ngIf="formErrors['serviceId']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ formErrors['serviceId'] }}
+            </p>
+          </div>
+        }
 
         <!-- Image Upload -->
         <div>
-  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-    {{ getTranslation('imageUpload') }}
-  </label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ getTranslation('imageUpload') }}
+          </label>
 
-  <!-- Image Preview -->
-  <div class="mb-4" *ngIf="currentImage">
-    <img 
-      [src]="currentImage" 
-      alt="Product preview"
-      class="h-32 w-32 object-cover rounded-lg"
-    >
-  </div>
+          <!-- Image Preview -->
+          <div class="mb-4" *ngIf="currentImage">
+            <img 
+              [src]="currentImage" 
+              alt="Product preview"
+              class="h-32 w-32 object-cover rounded-lg"
+            >
+          </div>
 
-  <!-- File Input -->
-  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-    <label for="fileInput" class="cursor-pointer">
-      <span class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
-        <i class="fas fa-upload w-4 h-4" aria-hidden="true"></i>
-        {{ currentImage ? 'Change Image' : 'Upload Image' }}
-      </span>
-      <input 
-        type="file" 
-        id="fileInput"
-        (change)="onFileSelected($event)"
-        accept="image/*"
-        class="hidden"
-      >
-    </label>
+          <!-- File Input -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <label for="fileInput" class="cursor-pointer">
+              <span class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+                <i class="fas fa-upload w-4 h-4" aria-hidden="true"></i>
+                {{ currentImage ? 'Change Image' : 'Upload Image' }}
+              </span>
+              <input 
+                type="file" 
+                id="fileInput"
+                (change)="onFileSelected($event)"
+                accept="image/*"
+                class="hidden"
+              >
+            </label>
 
-    <button 
-      type="button" 
-      *ngIf="currentImage"
-      (click)="resetFileInput()"
-      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
-    >
-      <i class="fas fa-trash w-4 h-4" aria-hidden="true"></i>
-      Remove
-    </button>
-  </div>
+            <button 
+              type="button" 
+              *ngIf="currentImage"
+              (click)="resetFileInput()"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="fas fa-trash w-4 h-4" aria-hidden="true"></i>
+              Remove
+            </button>
+          </div>
 
-  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    Upload a high-quality image (JPEG, PNG) under 5MB
-  </p>
-</div>
+          <p *ngIf="formErrors['image']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ formErrors['image'] }}
+          </p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ getTranslation('validation.maxFileSize') }}. {{ getTranslation('validation.invalidFileType') }}
+          </p>
+        </div>
       </fieldset>
     </form>
   </app-modal>
@@ -237,12 +253,17 @@
   <app-modal
     [isOpen]="showDeleteModal"
     [title]="getTranslation('deleteProduct')"
-    [confirmText]="getTranslation('delete')"
+    [confirmText]="isLoading ? '' : getTranslation('delete')"
     confirmButtonType="danger"
     (closed)="closeDeleteModal()"
     (confirmed)="confirmDelete()"
     aria-labelledby="delete-confirmation-title"
   >
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
+    </div>
+
     <div class="text-center">
       <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fas fa-trash w-6 h-6 text-red-600 dark:text-red-400" aria-hidden="true"></i>
@@ -262,7 +283,7 @@
     [title]="getTranslation('noServicesTitle')"
     [confirmText]="getTranslation('createService')"
     [cancelText]="getTranslation('cancel')"
-    (closed)="navigateToServices()"
+    (closed)="closeNoServicesModal()"
     (confirmed)="navigateToServices()"
     aria-labelledby="no-services-title"
   >

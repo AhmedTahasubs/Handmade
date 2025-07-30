@@ -113,8 +113,8 @@ export class Login {
           continueWithGoogle: "المتابعة مع Google",
           facebook: "Facebook",
           github: "GitHub",
-          email: "البريد الإلكتروني",
-          emailPlaceholder: "أدخل بريدك الإلكتروني",
+          email: "البريد الإلكتروني أو اسم المستخدم",
+          emailPlaceholder: "  أدخل بريدك الإلكتروني أو اسم المستخدم",
           password: "كلمة المرور",
           passwordPlaceholder: "أدخل كلمة المرور",
           rememberMe: "تذكرني",
@@ -130,8 +130,8 @@ export class Login {
           continueWithGoogle: "Continue with Google",
           facebook: "Facebook",
           github: "GitHub",
-          email: "Email Address",
-          emailPlaceholder: "Enter your email",
+          email: "Email Address or Username",
+          emailPlaceholder: "Enter your email or username",
           password: "Password",
           passwordPlaceholder: "Enter your password",
           rememberMe: "Remember me",
@@ -151,55 +151,32 @@ export class Login {
     this.LanguageService.toggleLanguage()
   }
 
-  async onSocialLogin(provider: "google" | "facebook" | "github" | "apple"): Promise<void> {
-    this.socialLoading[provider] = true
+  validateForm(): boolean {
+    let isValid = true
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log(`${provider} login successful`)
-    } catch (error) {
-      console.error(`${provider} login failed:`, error)
-    } finally {
-      this.socialLoading[provider] = false
+    if (!this.email) {
+      this.emailError =
+        this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
+      isValid = false
+    } else {
+      this.emailError = ""
     }
+
+    if (!this.password) {
+      this.passwordError =
+        this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
+      isValid = false
+    } else {
+      this.passwordError = ""
+    }
+
+    return isValid
   }
-
-  // validateForm(): boolean {
-  //   let isValid = true
-
-  //   if (!this.email) {
-  //     this.emailError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
-  //     isValid = false
-  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-  //     this.emailError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني غير صحيح" : "Invalid email format"
-  //     isValid = false
-  //   } else {
-  //     this.emailError = ""
-  //   }
-
-  //   if (!this.password) {
-  //     this.passwordError =
-  //       this.LanguageService.currentLanguage() === "ar" ? "كلمة المرور مطلوبة" : "Password is required"
-  //     isValid = false
-  //   } else if (this.password.length < 6) {
-  //     this.passwordError =
-  //       this.LanguageService.currentLanguage() === "ar"
-  //         ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
-  //         : "Password must be at least 6 characters"
-  //     isValid = false
-  //   } else {
-  //     this.passwordError = ""
-  //   }
-
-  //   return isValid
-  // }
-
+//  ana hna aho
   onSubmit(): void {
-    // if (!this.validateForm()) {
-    //   return
-    // }
+    if (!this.validateForm()) {
+      return
+    }
 
     this.isLoading = true
     this.emailError = ""
@@ -213,7 +190,13 @@ export class Login {
     this.authService.login(credentials).subscribe({
       next: (e) => {
         this.isLoading = false;
-        console.log(e);
+        if (!e.user || e.token ==null)
+        {
+          this.passwordError = this.LanguageService.currentLanguage() === "ar" ? " بريدك الإلكتروني أو كلمة المرور خاطئة " : " Email or password incorrect";
+          
+          return;
+        }
+
         // Success - AuthService handles the redirect
       },
       error: (error) => {
