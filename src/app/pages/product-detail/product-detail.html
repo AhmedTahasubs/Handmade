@@ -197,32 +197,48 @@
 
     <!-- Related Products -->
     <div class="mt-16" *ngIf="relatedProducts.length > 0">
-      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">{{ labels.related_products }}</h2>
+      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
+        {{ labels.related_products }}
+      </h2>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div
           *ngFor="let relatedProduct of relatedProducts; trackBy: trackByProductId"
-          class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow">
-          <div class="relative">
+          class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <!-- Wrap the product info inside a routerLink -->
+          <a
+            [routerLink]="['/products', relatedProduct.id]"
+            class="block relative"
+          >
             <img
               [src]="relatedProduct.imageUrl"
               [alt]="relatedProduct.title"
               class="object-cover w-full h-48 rounded-t-lg"
             />
-            <button
-              (click)="onRelatedProductAddToWishlist(relatedProduct)"
-              class="absolute top-3 right-3 p-2 text-gray-600 bg-white rounded-full shadow-sm hover:text-red-500 transition-colors">
-              <i class="fas fa-heart"></i>
-            </button>
-          </div>
+          </a>
+          <!-- Wishlist button stays outside the link -->
+          <button
+            (click)="onRelatedProductAddToWishlist(relatedProduct)"
+            class="absolute top-3 right-3 p-2 text-gray-600 bg-white rounded-full shadow-sm hover:text-red-500 transition-colors"
+          >
+            <i class="fas fa-heart"></i>
+          </button>
           <div class="p-4">
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{{ relatedProduct.title }}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ relatedProduct.sellerName || relatedProduct.sellerId }}</p>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+              {{ relatedProduct.title }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              {{ relatedProduct.sellerName || relatedProduct.sellerId }}
+            </p>
             <div class="flex items-center justify-between">
-              <span class="text-xl font-bold text-gray-900 dark:text-white">${{ relatedProduct.price }}</span>
+          <span class="text-xl font-bold text-gray-900 dark:text-white">
+            ${{ relatedProduct.price }}
+          </span>
               <button
                 (click)="onRelatedProductAddToCart(relatedProduct)"
                 [disabled]="relatedProduct.quantity === 0"
-                class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
                 <i class="fas fa-cart-plus mr-1"></i>
                 {{ labels.add }}
               </button>
@@ -231,6 +247,7 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- Error State -->
