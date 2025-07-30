@@ -2,6 +2,7 @@ import { LanguageService } from './../../../services/language.service';
 import { Component, Input, Output, EventEmitter, computed, effect, signal, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../services/authService.service';
 
 @Component({
   selector: "app-admin-sidebar",
@@ -13,6 +14,8 @@ export class AdminSidebar {
   @Input() isOpen = false;
   @Output() onClose = new EventEmitter<void>();
   public router = inject(Router);
+  private authService = inject(AuthService);
+  user = this.authService.getUser();
   
   currentLanguage = computed(() => this.LanguageService.currentLanguage());
   navigation = signal<{ name: string; icon: string; href: string; exact: boolean }[]>([]);

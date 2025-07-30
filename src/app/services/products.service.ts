@@ -14,6 +14,7 @@ export interface Product {
   serviceId: number;
   imageUrl: string;
   sellerName: string;
+  category:string
 }
 
 export interface ProductRequest {
@@ -58,4 +59,9 @@ export class ProductService {
   getBySellerId(sellerId: string): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.baseUrl}/get-by-sellerid/${sellerId}`);
   }
+  updateStatus(id: number, status: string): Observable<Product> {
+  const formData = new FormData();
+  formData.append('status', status);
+  return this.http.patch<Product>(`${this.baseUrl}/${id}`, formData);
+}
 }
