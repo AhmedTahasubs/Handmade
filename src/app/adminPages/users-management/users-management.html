@@ -1,123 +1,240 @@
 <div class="space-y-6">
-<!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-      {{ languageService.currentLanguage() === 'en' ? 'Users Management' : 'إدارة المستخدمين' }}
-    </h1>
-    <p class="text-gray-600 dark:text-gray-400">
-      {{ languageService.currentLanguage() === 'en' 
-        ? 'Manage system users and their permissions' 
-        : 'إدارة مستخدمي النظام وصلاحياتهم' }}
-    </p>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ languageService.currentLanguage() === 'en' ? 'Users Management' : 'إدارة المستخدمين' }}
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'Manage system users and administrators' 
+          : 'إدارة مستخدمي النظام والمسؤولين' }}
+      </p>
+    </div>
+    <button
+      (click)="openCreateModal()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+    >
+      <i class="fas fa-user-plus w-4 h-4"></i>
+      {{ languageService.currentLanguage() === 'en' ? 'Add Admin' : 'إضافة مسؤول' }}
+    </button>
   </div>
-  <button
-    (click)="openCreateModal()"
-    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
-  >
-    <i class="fa-solid fa-plus w-4 h-4"></i>
-    {{ languageService.currentLanguage() === 'en' ? 'Add User' : 'إضافة مستخدم' }}
-  </button>
-</div>
 
-  <!-- Data Table -->
-  <app-data-table
-    title="Users"
-    subtitle="Manage all system users"
-    [data]="users"
-    [columns]="columns"
-    [actions]="actions"
-    searchPlaceholder="Search users..."
-    (actionClicked)="onAction($event)"
-    (exportClicked)="onExport()"
-  ></app-data-table>
-
-  <!-- Create/Edit Modal -->
-  <app-modal
-    [isOpen]="showModal"
-    [title]="modalTitle"
-    (closed)="closeModal()"
-    (confirmed)="saveUser()"
-  >
-    <form class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <app-form-input
-          label="Full Name"
-          placeholder="Enter full name"
-          icon="user"
-          [(ngModel)]="currentUser.name"
-          name="name"
-          required
-        ></app-form-input>
-
-        <app-form-input
-          label="Email"
-          placeholder="Enter email address"
-          type="email"
-          icon="envelope"
-          [(ngModel)]="currentUser.email"
-          name="email"
-          required
-        ></app-form-input>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <app-form-input
-          label="Phone"
-          placeholder="Enter phone number"
-          type="tel"
-          icon="phone"
-          [(ngModel)]="currentUser.phone"
-          name="phone"
-        ></app-form-input>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
-          <select
-            [(ngModel)]="currentUser.role"
-            name="role"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-          >
-            <option value="admin">Admin</option>
-            <option value="artisan">Artisan</option>
-            <option value="customer">Customer</option>
-            <option value="moderator">Moderator</option>
-          </select>
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 dark:bg-red-900/50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-circle h-5 w-5 text-red-500 dark:text-red-300"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700 dark:text-red-300">
+            {{ errorMessage }}
+          </p>
         </div>
       </div>
+      <button type="button" (click)="dismissError()" class="text-red-500 dark:text-red-300">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-        <select
-          [(ngModel)]="currentUser.status"
-          name="status"
-          class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="suspended">Suspended</option>
-        </select>
+  <div *ngIf="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 dark:bg-green-900/50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <i class="fas fa-check-circle h-5 w-5 text-green-500 dark:text-green-300"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-green-700 dark:text-green-300">
+            {{ successMessage }}
+          </p>
+        </div>
+      </div>
+      <button type="button" (click)="dismissSuccess()" class="text-green-500 dark:text-green-300">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="isLoading" class="flex justify-center items-center p-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+  </div>
+
+  <!-- Data Table -->
+  <div *ngIf="!isLoading && users.length > 0">
+    <app-data-table
+      [title]="languageService.currentLanguage() === 'en' ? 'Users' : 'المستخدمين'"
+      [subtitle]="languageService.currentLanguage() === 'en' ? 'All system users' : 'جميع مستخدمي النظام'"
+      [data]="users"
+      [columns]="columns"
+      [actions]="actions"
+      [searchPlaceholder]="languageService.currentLanguage() === 'en' ? 'Search users...' : 'بحث المستخدمين...'"
+      (actionClicked)="onAction($event)"
+      (exportClicked)="onExport()"
+    ></app-data-table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && users.length === 0" class="text-center py-12">
+    <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+      <i class="fas fa-users text-gray-400 dark:text-gray-500 text-3xl"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      {{ languageService.currentLanguage() === 'en' ? 'No users found' : 'لا يوجد مستخدمون' }}
+    </h3>
+    <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+      {{ languageService.currentLanguage() === 'en' 
+        ? 'There are currently no users in the system.' 
+        : 'لا يوجد مستخدمون في النظام حالياً' }}
+    </p>
+  </div>
+
+  <!-- Add Admin Modal -->
+  <app-modal
+    [isOpen]="showModal"
+    [title]="languageService.currentLanguage() === 'en' ? 'Register New Admin' : 'تسجيل مسؤول جديد'"
+    [confirmText]="languageService.currentLanguage() === 'en' ? 'Register' : 'تسجيل'"
+    (closed)="closeModal()"
+    (confirmed)="registerAdmin()"
+  >
+    <form class="space-y-4">
+      <div *ngIf="isLoading" class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-10 rounded-lg">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      </div>
+      
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Username Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ languageService.currentLanguage() === 'en' ? 'Username' : 'اسم المستخدم' }} *
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="currentUser.userName"
+            name="userName"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            required
+          />
+          <div *ngIf="validationErrors.userName" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ validationErrors.userName }}
+          </div>
+        </div>
+
+        <!-- Full Name Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ languageService.currentLanguage() === 'en' ? 'Full Name' : 'الاسم الكامل' }} *
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="currentUser.name"
+            name="name"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            required
+          />
+          <div *ngIf="validationErrors.name" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ validationErrors.name }}
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ languageService.currentLanguage() === 'en' ? 'Email' : 'البريد الإلكتروني' }} *
+          </label>
+          <input
+            type="email"
+            [(ngModel)]="currentUser.email"
+            name="email"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            required
+          />
+          <div *ngIf="validationErrors.email" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ validationErrors.email }}
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ languageService.currentLanguage() === 'en' ? 'Password' : 'كلمة المرور' }} *
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="currentUser.password"
+            name="password"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            required
+          />
+          <div *ngIf="validationErrors.password" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ validationErrors.password }}
+          </div>
+        </div>
       </div>
     </form>
   </app-modal>
 
-  <!-- Delete Confirmation Modal -->
+  <!-- User Details Modal -->
   <app-modal
-    [isOpen]="showDeleteModal"
-    title="Delete User"
-    confirmText="Delete"
-    confirmButtonType="danger"
-    (closed)="closeDeleteModal()"
-    (confirmed)="confirmDelete()"
+    [isOpen]="showDetailsModal"
+    [title]="languageService.currentLanguage() === 'en' ? 'User Details' : 'تفاصيل المستخدم'"
+    [showConfirmButton]="false"
+    [cancelText]="languageService.currentLanguage() === 'en' ? 'Close' : 'إغلاق'"
+    (closed)="closeDetailsModal()"
   >
-    <div class="text-center">
-      <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <i class="fas fa-trash w-6 h-6 text-red-600 dark:text-red-400"></i>
+    <div *ngIf="selectedUser" class="space-y-6">
+      <div class="flex flex-col items-center">
+        <div class="w-24 h-24 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mb-4">
+          <img *ngIf="selectedUser.imageurl" [src]="selectedUser.imageurl" alt="User Avatar" class="w-full h-full rounded-full object-cover">
+          <i *ngIf="!selectedUser.imageurl" class="fas fa-user text-gray-500 dark:text-gray-300 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedUser.fullName }}</h3>
+        <p class="text-gray-500 dark:text-gray-400">{{ selectedUser.userName }}</p>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Are you sure?</h3>
-      <p class="text-gray-500 dark:text-gray-400">
-        This action cannot be undone. This will permanently delete the user account and remove all associated data.
-      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            {{ languageService.currentLanguage() === 'en' ? 'Basic Information' : 'المعلومات الأساسية' }}
+          </h4>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'User ID' : 'معرف المستخدم' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedUser.id }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            {{ languageService.currentLanguage() === 'en' ? 'Additional Information' : 'معلومات إضافية' }}
+          </h4>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Address' : 'العنوان' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedUser.address || 'N/A' }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Bio' : 'السيرة الذاتية' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedUser.bio || 'N/A' }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Created On' : 'تاريخ الإنشاء' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedUser.createdOn | date }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </app-modal>
 </div>
