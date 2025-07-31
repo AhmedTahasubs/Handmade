@@ -43,7 +43,7 @@ export class ServicesPage implements OnInit {
 
   searchTerm: string = '';
   selectedCategory: string = 'all';
-  priceRange: number[] = [0, 200];
+  priceRange: number[] = [0, 1000];
   showCustomizable: boolean = false;
   
   sortOption: 'price-low' | 'price-high' | 'rating' | 'newest' = 'rating';
