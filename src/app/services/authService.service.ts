@@ -81,7 +81,7 @@ export class AuthService {
       customerData
     ).pipe(
       tap(response => {
-        this.handleSignupSuccess(response.token, response.user);
+        this.handleSignupSuccess();
       }),
       catchError(this.handleError)
     );
@@ -93,20 +93,23 @@ export class AuthService {
       sellerData
     ).pipe(
       tap(response => {
-        this.handleSignupSuccess(response.token, response.user);
+        this.handleSignupSuccess();
+        console.log(response)
       }),
       catchError(this.handleError)
     );
   }
 
   private handleLoginSuccess(token: string, user: User): void {
+    if (!token || !user)
+      return;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     this.loggedIn.next(true);
     this.currentUser.next(user);
     this.router.navigate(['/']); // Redirect to home after login/registration
   }
-  private handleSignupSuccess(token: string, user: User): void {
+  private handleSignupSuccess(): void {
     this.router.navigate(['/login']); // Redirect to login after successful registration
   }
 

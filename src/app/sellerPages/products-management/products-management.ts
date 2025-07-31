@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from '@angular/router';
 import { ProductService, Product, ProductRequest } from '../../services/products.service';
 import { ServiceSellerService, ServiceDto } from '../../services/services.service';
+import { jwtDecode } from "jwt-decode";
 
 @Component({
   selector: "app-seller-products-management",
@@ -26,13 +27,16 @@ export class SellerProductsManagement implements OnInit {
   showDeleteModal = false;
   showNoServicesModal = false;
   isEditing = false;
+  isLoading = false;
   productToDelete: Product | null = null;
   currentProduct: Partial<Product> = {};
   products: Product[] = [];
   services: ServiceDto[] = [];
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
-
+  formErrors: Record<string, string> = {};
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
     { key: "title", label: "Product", sortable: true, type: "text" },
@@ -43,7 +47,6 @@ export class SellerProductsManagement implements OnInit {
       label: "Status", 
       sortable: true, 
       type: "badge",
-
     },
     { key: "createdAt", label: "Created", sortable: true, type: "date" },
   ];
@@ -81,7 +84,22 @@ export class SellerProductsManagement implements OnInit {
       createService: "Create Service",
       cancel: "Cancel",
       imageUpload: "Product Image",
-      searchPlaceholder: "Search products..."
+      searchPlaceholder: "Search products...",
+          addProductSuccess: "Product added successfully!",
+    editProductSuccess: "Product updated successfully!",
+    deleteProductSuccess: "Product deleted successfully!",
+    saveProductError: "Failed to save product. Please try again.",
+    deleteProductError: "Failed to delete product. Please try again.",
+      loadProductsError: "Failed to load products. Please try again.",
+  loadServicesError: "Failed to load services. Please try again.",
+      validation: {
+        required: "This field is required",
+        minPrice: "Price must be at least $0.01",
+        minStock: "Stock must be at least 0",
+        maxStock: "Stock cannot exceed 10000",
+        maxFileSize: "Image size must be less than 5MB",
+        invalidFileType: "Only JPEG and PNG images are allowed"
+      }
     },
     ar: {
       title: "إدارة المنتجات",
@@ -110,7 +128,22 @@ export class SellerProductsManagement implements OnInit {
       createService: "إنشاء خدمة",
       cancel: "إلغاء",
       imageUpload: "صورة المنتج",
-      searchPlaceholder: "ابحث عن منتجات..."
+      searchPlaceholder: "ابحث عن منتجات...",
+      addProductSuccess: "تمت إضافة المنتج بنجاح!",
+    editProductSuccess: "تم تحديث المنتج بنجاح!",
+    deleteProductSuccess: "تم حذف المنتج بنجاح!",
+    saveProductError: "فشل حفظ المنتج. يرجى المحاولة مرة أخرى.",
+    deleteProductError: "فشل حذف المنتج. يرجى المحاولة مرة أخرى.",
+      loadProductsError: "فشل تحميل المنتجات. يرجى المحاولة مرة أخرى.",
+  loadServicesError: "فشل تحميل الخدمات. يرجى المحاولة مرة أخرى.",
+      validation: {
+        required: "هذا الحقل مطلوب",
+        minPrice: "يجب أن يكون السعر على الأقل ٠٫٠١ دولار",
+        minStock: "يجب أن يكون المخزون ٠ على الأقل",
+        maxStock: "لا يمكن أن يتجاوز المخزون ١٠٠٠٠",
+        maxFileSize: "يجب أن يكون حجم الصورة أقل من ٥ ميجابايت",
+        invalidFileType: "يُسمح فقط بصور JPEG و PNG"
+      }
     },
   };
 
@@ -125,20 +158,31 @@ export class SellerProductsManagement implements OnInit {
   }
 
   loadProducts(): void {
-    this.productService.getAll().subscribe({
-      next: (products) => {
-        this.products = products;
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-      }
-    });
-  }
+  this.isLoading = true;
+  let token = localStorage.getItem('token');
+  if (!token) return;
+  let decodedToken: any = jwtDecode(token);
+  let sellerId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+  
+  this.productService.getBySellerId(sellerId).subscribe({
+    next: (products) => {
+      this.products = products;
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error loading products:', error);
+      this.errorMessage = this.getTranslation('loadProductsError');
+      this.isLoading = false;
+    }
+  });
+}
 
   loadServicesAndThenProducts(): void {
+  this.isLoading = true;
   this.serviceService.getBySeller().subscribe({
     next: (services) => {
       this.services = services;
+      this.isLoading = false;
 
       if (this.services.length === 0) {
         this.showNoServicesModal = true;
@@ -148,12 +192,22 @@ export class SellerProductsManagement implements OnInit {
     },
     error: (error) => {
       console.error('Error loading services:', error);
+      this.errorMessage = this.getTranslation('loadServicesError');
+      this.isLoading = false;
     }
   });
 }
 
   getTranslation(key: string): string {
-    return this.translations[this.currentLanguage][key as keyof typeof this.translations.en] || key;
+    const keys = key.split('.');
+    let result: any = this.translations[this.currentLanguage];
+    
+    for (const k of keys) {
+      result = result[k];
+      if (result === undefined) return key;
+    }
+    
+    return result || key;
   }
 
   get modalTitle(): string {
@@ -166,6 +220,75 @@ export class SellerProductsManagement implements OnInit {
 
   getOutOfStockCount(): number {
     return this.products.filter(p => p.status.toLowerCase() === 'out_of_stock').length;
+  }
+
+  validateForm(): boolean {
+    this.formErrors = {};
+    let isValid = true;
+
+    if (!this.currentProduct.title?.trim()) {
+      this.formErrors['title'] = this.getTranslation('validation.required');
+      isValid = false;
+    }
+
+    if (!this.currentProduct.description?.trim()) {
+      this.formErrors['description'] = this.getTranslation('validation.required');
+      isValid = false;
+    }
+
+    if (!this.currentProduct.price || this.currentProduct.price < 0.01) {
+      this.formErrors['price'] = this.getTranslation('validation.minPrice');
+      isValid = false;
+    }
+
+    if (this.currentProduct.quantity === undefined || this.currentProduct.quantity < 0) {
+      this.formErrors['quantity'] = this.getTranslation('validation.minStock');
+      isValid = false;
+    } else if (this.currentProduct.quantity > 10000) {
+      this.formErrors['quantity'] = this.getTranslation('validation.maxStock');
+      isValid = false;
+    }
+
+    if (!this.isEditing && !this.currentProduct.serviceId) {
+      this.formErrors['serviceId'] = this.getTranslation('validation.required');
+      isValid = false;
+    }
+
+    // Only require image for new products
+    if (!this.isEditing && !this.selectedFile) {
+      this.formErrors['image'] = this.getTranslation('validation.required');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      
+      // Validate file type
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        this.formErrors['image'] = this.getTranslation('validation.invalidFileType');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        this.formErrors['image'] = this.getTranslation('validation.maxFileSize');
+        return;
+      }
+      
+      this.selectedFile = file;
+      this.formErrors['image'] = '';
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
   }
 
   openCreateModal(): void {
@@ -181,14 +304,15 @@ export class SellerProductsManagement implements OnInit {
       price: 0,
       quantity: 0,
       serviceId: this.services[0]?.id || 0,
-      status: "active"
     };
+    this.resetFileInput();
     this.showModal = true;
   }
 
   closeModal(): void {
     this.showModal = false;
     this.currentProduct = {};
+    this.formErrors = {};
     this.resetFileInput();
   }
 
@@ -214,28 +338,6 @@ export class SellerProductsManagement implements OnInit {
     }
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.selectedFile = input.files[0];
-      
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result;
-      };
-      reader.readAsDataURL(this.selectedFile);
-    }
-  }
-
-  resetFileInput(): void {
-    this.selectedFile = null;
-    this.imagePreview = null;
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
-
   editProduct(product: Product): void {
     this.isEditing = true;
     this.currentProduct = { 
@@ -244,8 +346,7 @@ export class SellerProductsManagement implements OnInit {
       description: product.description,
       price: product.price,
       quantity: product.quantity,
-      serviceId: product.serviceId,
-      status: product.status
+      serviceId: product.serviceId
     };
     this.imagePreview = product.imageUrl || null;
     this.showModal = true;
@@ -255,73 +356,125 @@ export class SellerProductsManagement implements OnInit {
     this.productToDelete = product;
     this.showDeleteModal = true;
   }
+
   get currentImage(): string | null {
-  if (this.imagePreview) {
-    return this.imagePreview as string;
+    if (this.imagePreview) {
+      return this.imagePreview as string;
+    }
+
+    if (this.isEditing && this.currentProduct.id) {
+      const product = this.products.find(p => p.id === this.currentProduct.id);
+      return product?.imageUrl || null;
+    }
+
+    return null;
   }
 
-  if (this.isEditing && this.currentProduct.id) {
-    const product = this.products.find(p => p.id === this.currentProduct.id);
-    return product?.imageUrl || null;
-  }
-
-  return null;
-}
-  saveProduct(): void {
-  if (!this.currentProduct) return;
-
-  const formData = new FormData();
-  formData.append('title', this.currentProduct.title || '');
-  formData.append('description', this.currentProduct.description || '');
-  formData.append('price', (this.currentProduct.price || 0).toString());
-  formData.append('quantity', (this.currentProduct.quantity || 0).toString());
-  formData.append('serviceId', (this.currentProduct.serviceId || 0).toString());
-  formData.append('status', this.currentProduct.status || 'active');
-  
-  if (this.selectedFile) {
-    formData.append('file', this.selectedFile);
-  } else if (this.currentProduct.id && !this.selectedFile) {
-    const existingProduct = this.products.find(p => p.id === this.currentProduct.id);
-    if (existingProduct?.imageUrl) {
-      formData.append('imageUrl', existingProduct.imageUrl);
+  resetFileInput(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.formErrors['image'] = '';
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
   }
 
-  if (this.isEditing && this.currentProduct.id) {
-    this.productService.updateWithImage(this.currentProduct.id, formData).subscribe({
-      next: () => {
-        this.loadProducts();
-        this.closeModal();
-      },
-      error: (error) => {
-        console.error('Error updating product:', error);
-      }
-    });
-  } else {
-    this.productService.createWithImage(formData).subscribe({
-      next: () => {
-        this.loadProducts();
-        this.closeModal();
-      },
-      error: (error) => {
-        console.error('Error creating product:', error);
-      }
-    });
-  }
-}
+  saveProduct(): void {
+    if (!this.validateForm()) {
+      return;
+    }
 
-  confirmDelete(): void {
-    if (this.productToDelete?.id) {
-      this.productService.delete(this.productToDelete.id).subscribe({
-        next: () => {
-          this.loadProducts();
-          this.closeDeleteModal();
-        },
-        error: (error) => {
-          console.error('Error deleting product:', error);
-        }
+    this.isLoading = true;
+    // Disable form during submission
+    const form = document.querySelector('form');
+    if (form) {
+      form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
+        element.disabled = true;
       });
     }
+
+    const formData = new FormData();
+    if (this.isEditing && this.currentProduct.id !== undefined) {
+      formData.append('id', this.currentProduct.id.toString());
+    }
+    formData.append('title', this.currentProduct.title || '');
+    formData.append('description', this.currentProduct.description || '');
+    formData.append('price', (this.currentProduct.price || 0).toString());
+    formData.append('quantity', (this.currentProduct.quantity || 0).toString());
+    formData.append('serviceId', (this.currentProduct.serviceId || 0).toString());
+    
+    if (!this.isEditing) {
+      formData.append('status', this.currentProduct.status || 'active');
+    }
+    
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    } else if (this.currentProduct.id && !this.selectedFile) {
+      const existingProduct = this.products.find(p => p.id === this.currentProduct.id);
+      if (existingProduct?.imageUrl) {
+        formData.append('imageUrl', existingProduct.imageUrl);
+      }
+    }
+
+    const saveObservable = this.isEditing && this.currentProduct.id 
+      ? this.productService.updateWithImage(this.currentProduct.id, formData)
+      : this.productService.createWithImage(formData);
+
+    saveObservable.subscribe({
+  next: () => {
+    this.loadProducts();
+    this.closeModal();
+    this.isLoading = false;
+    this.successMessage = this.getTranslation(this.isEditing ? 'editProductSuccess' : 'addProductSuccess');
+    setTimeout(() => this.successMessage = null, 5000); // Auto-dismiss after 5 seconds
+  },
+  error: (error) => {
+    console.error('Error saving product:', error);
+    this.errorMessage = this.getTranslation('saveProductError');
+    this.isLoading = false;
+    // Re-enable form on error
+    if (form) {
+      form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
+        element.disabled = false;
+      });
+    }
+  }
+});
+  }
+
+  confirmDelete(): void {
+    if (!this.productToDelete?.id) return;
+
+    this.isLoading = true;
+    // Disable delete modal buttons during loading
+    const modal = document.querySelector('app-modal[aria-labelledby="delete-confirmation-title"]');
+    if (modal) {
+      modal.querySelectorAll('button').forEach((button: any) => {
+        button.disabled = true;
+      });
+    }
+
+    this.productService.delete(this.productToDelete.id).subscribe({
+  next: () => {
+    this.loadProducts();
+    this.closeDeleteModal();
+    this.isLoading = false;
+    this.successMessage = this.getTranslation('deleteProductSuccess');
+    setTimeout(() => this.successMessage = null, 5000);
+  },
+  error: (error) => {
+    console.error('Error deleting product:', error);
+    this.errorMessage = this.getTranslation('deleteProductError');
+    this.isLoading = false;
+    // Re-enable buttons on error
+    if (modal) {
+      modal.querySelectorAll('button').forEach((button: any) => {
+        button.disabled = false;
+      });
+    }
+  }
+});
   }
 
   onExport(): void {
@@ -331,6 +484,5 @@ export class SellerProductsManagement implements OnInit {
   navigateToServices(): void {
     this.router.navigate(['/seller/services-management']);
     this.closeNoServicesModal();
-    console.log("Navigate to services creation page");
   }
 }

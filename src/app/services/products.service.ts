@@ -14,6 +14,7 @@ export interface Product {
   serviceId: number;
   imageUrl: string;
   sellerName: string;
+  category:string
 }
 
 export interface ProductRequest {
@@ -45,14 +46,22 @@ export class ProductService {
   }
 
    createWithImage(formData: FormData): Observable<Product> {
-    return this.http.post<Product>(`${this.baseUrl}/with-image`, formData);
+    return this.http.post<Product>(`${this.baseUrl}`, formData);
   }
 
   updateWithImage(id: number, formData: FormData): Observable<Product> {
-    return this.http.put<Product>(`${this.baseUrl}/with-image/${id}`, formData);
+    return this.http.put<Product>(`${this.baseUrl}/${id}`, formData);
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+  getBySellerId(sellerId: string): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.baseUrl}/get-by-sellerid/${sellerId}`);
+  }
+  updateStatus(id: number, status: string): Observable<Product> {
+  const formData = new FormData();
+  formData.append('status', status);
+  return this.http.patch<Product>(`${this.baseUrl}/${id}`, formData);
+}
 }

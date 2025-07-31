@@ -1,36 +1,26 @@
-import { type TableAction , DataTable, type TableColumn } from './../../components/data-table/data-table';
+import { TableAction, TableColumn, DataTable } from './../../components/data-table/data-table';
 import { LanguageService } from './../../services/language.service';
 import { Modal } from './../../components/modal/modal';
 import { ThemeService } from './../../services/theme.service';
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { RouterModule } from '@angular/router';
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  slug: string;
-  parent_id: number | null;
-  parent_name?: string;
-  image: string;
-  status: "active" | "inactive";
-  created_at: string;
-  updated_at: string;
-  product_count: number;
-  subcategories_count: number;
-  is_featured: boolean;
-  sort_order: number;
-}
+import { Category, CategoryRequest, CategorySellerService } from '../../services/categories.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: "app-categories-management",
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal,RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DataTable, Modal, RouterModule],
   templateUrl: "./categories-management.html",
 })
 export class CategoriesManagement implements OnInit {
+  private fb = inject(FormBuilder);
+  private categoryService = inject(CategorySellerService);
+  themeService = inject(ThemeService);
+  languageService = inject(LanguageService);
+
   categories: Category[] = [];
   showModal = false;
   showDeleteModal = false;
@@ -38,22 +28,19 @@ export class CategoriesManagement implements OnInit {
   selectedCategory: Category | null = null;
   categoryToDelete: Category | null = null;
   isEditMode = false;
+  isLoading = false;
+  isProcessing = false;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   categoryForm: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    public themeService: ThemeService,
-    public languageService: LanguageService,
-  ) {
+  constructor() {
     this.categoryForm = this.fb.group({
-      name: ["", Validators.required],
-      description: [""],
-      parent_id: [""],
-      image: [""],
-      status: ["active", Validators.required],
-      sort_order: [0],
-      is_featured: [false],
+      name: ["", [Validators.required, Validators.minLength(3)]],
+      file: [null]
     });
   }
 
@@ -63,188 +50,148 @@ export class CategoriesManagement implements OnInit {
 
   get tableColumns(): TableColumn[] {
     return [
-      { key: "image", label: "Image", type: "image", width: "80px" },
-      { key: "name", label: "Name", sortable: true, type: "text" },
-      { key: "parent_name", label: "Parent", type: "text" },
-      { key: "status", label: "Status", type: "badge" },
-      { key: "product_count", label: "Products", sortable: true, type: "text" },
-      { key: "subcategories_count", label: "Subcategories", sortable: true, type: "text" },
-      { key: "is_featured", label: "Featured", type: "badge" },
-      { key: "created_at", label: "Created", sortable: true, type: "date" },
+      { key: "imageUrl", label: this.getTranslation('image'), type: "image", width: "80px" },
+      { key: "name", label: this.getTranslation('name'), sortable: true, type: "text" },
     ];
   }
 
   get tableActions(): TableAction[] {
     return [
-      { label: "View", icon: "fa-solid fa-eye", color: "primary", action: "view" },
-      { label: "Edit", icon: "fa-solid fa-edit", color: "secondary", action: "edit" },
-      { label: "Delete", icon: "fa-solid fa-trash", color: "danger", action: "delete" },
+      { label: this.getTranslation('edit'), icon: "edit", color: "secondary", action: "edit" },
+      { label: this.getTranslation('delete'), icon: "trash", color: "danger", action: "delete" },
     ];
+  }
+
+  private translations = {
+    en: {
+      title: "Categories Management",
+      subtitle: "Manage product categories",
+      
+      addCategory: "Add Category",
+      editCategory: "Edit Category",
+      deleteCategory: "Delete Category",
+      categoryName: "Category Name",
+
+      image: "Image",
+      name: "Name",
+      view: "View",
+      edit: "Edit",
+      delete: "Delete",
+      save: "Save",
+      cancel: "Cancel",
+      close: "Close",
+      deleteConfirm: "Are you sure?",
+      deleteMessage: "This action cannot be undone. This will permanently delete the category.",
+      totalCategories: "Total Categories",
+      categoryDetails: "Category Details",
+      validation: {
+        required: "This field is required",
+        minLength: "Must be at least 3 characters",
+        imageRequired: "Image is required"
+      }
+    },
+    ar: {
+      title: "إدارة الفئات",
+      subtitle: "إدارة فئات المنتجات",
+      addCategory: "إضافة فئة",
+      editCategory: "تعديل الفئة",
+      deleteCategory: "حذف الفئة",
+      categoryName: "اسم الفئة",
+      image: "صورة",
+      name: "الاسم",
+      view: "عرض",
+      edit: "تعديل",
+      delete: "حذف",
+      save: "حفظ",
+      cancel: "إلغاء",
+      close: "إغلاق",
+      deleteConfirm: "هل أنت متأكد؟",
+      deleteMessage: "لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفئة نهائياً.",
+      totalCategories: "إجمالي الفئات",
+      categoryDetails: "تفاصيل الفئة",
+      validation: {
+        required: "هذا الحقل مطلوب",
+        minLength: "يجب أن يكون على الأقل 3 أحرف",
+        imageRequired: "الصورة مطلوبة"
+      }
+    }
+  };
+
+  getTranslation(key: string): string {
+    const keys = key.split('.');
+    let result: any = this.translations[this.languageService.currentLanguage()];
+    
+    for (const k of keys) {
+      result = result[k];
+      if (result === undefined) return key;
+    }
+    
+    return result || key;
   }
 
   get modalTitle(): string {
-    const isArabic = this.languageService.currentLanguage() === "ar";
-    if (this.isEditMode) {
-      return isArabic ? "تعديل الفئة" : "Edit Category";
-    }
-    return isArabic ? "إضافة فئة جديدة" : "Add New Category";
+    return this.isEditMode ? this.getTranslation('editCategory') : this.getTranslation('addCategory');
   }
 
   loadCategories(): void {
-    this.categories = [
-      {
-        id: 1,
-        name: "Handmade Jewelry",
-        description: "Beautiful handcrafted jewelry pieces including necklaces, bracelets, and earrings",
-        slug: "handmade-jewelry",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-15T10:00:00Z",
-        updated_at: "2024-01-20T14:30:00Z",
-        product_count: 156,
-        subcategories_count: 4,
-        is_featured: true,
-        sort_order: 1,
+    this.isLoading = true;
+    this.errorMessage = null;
+    
+    this.categoryService.getAll().pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: (categories) => {
+        this.categories = categories;
       },
-      {
-        id: 2,
-        name: "Necklaces",
-        description: "Handcrafted necklaces in various styles and materials",
-        slug: "necklaces",
-        parent_id: 1,
-        parent_name: "Handmade Jewelry",
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-16T09:00:00Z",
-        updated_at: "2024-01-21T11:15:00Z",
-        product_count: 45,
-        subcategories_count: 0,
-        is_featured: false,
-        sort_order: 1,
-      },
-      {
-        id: 3,
-        name: "Home Decor",
-        description: "Unique handmade items to beautify your living space",
-        slug: "home-decor",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-25T16:45:00Z",
-        product_count: 203,
-        subcategories_count: 6,
-        is_featured: true,
-        sort_order: 2,
-      },
-      {
-        id: 4,
-        name: "Wall Art",
-        description: "Handcrafted paintings, prints, and wall decorations",
-        slug: "wall-art",
-        parent_id: 3,
-        parent_name: "Home Decor",
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-12T12:00:00Z",
-        updated_at: "2024-01-22T09:30:00Z",
-        product_count: 78,
-        subcategories_count: 0,
-        is_featured: true,
-        sort_order: 1,
-      },
-      {
-        id: 5,
-        name: "Handmade Bags",
-        description: "Stylish and functional handcrafted bags and purses",
-        slug: "handmade-bags",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-08T14:00:00Z",
-        updated_at: "2024-01-18T13:20:00Z",
-        product_count: 89,
-        subcategories_count: 3,
-        is_featured: false,
-        sort_order: 3,
-      },
-      {
-        id: 6,
-        name: "Pottery & Ceramics",
-        description: "Handcrafted pottery, ceramics, and clay items",
-        slug: "pottery-ceramics",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-05T11:00:00Z",
-        updated_at: "2024-01-19T15:10:00Z",
-        product_count: 134,
-        subcategories_count: 5,
-        is_featured: true,
-        sort_order: 4,
-      },
-      {
-        id: 7,
-        name: "Textiles & Fabrics",
-        description: "Handwoven textiles, fabrics, and fiber arts",
-        slug: "textiles-fabrics",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "inactive",
-        created_at: "2024-01-03T16:00:00Z",
-        updated_at: "2024-01-17T10:45:00Z",
-        product_count: 67,
-        subcategories_count: 2,
-        is_featured: false,
-        sort_order: 5,
-      },
-      {
-        id: 8,
-        name: "Wooden Crafts",
-        description: "Beautiful handcrafted wooden items and furniture",
-        slug: "wooden-crafts",
-        parent_id: null,
-        image: "/placeholder.svg?height=100&width=100",
-        status: "active",
-        created_at: "2024-01-01T10:00:00Z",
-        updated_at: "2024-01-23T12:00:00Z",
-        product_count: 112,
-        subcategories_count: 4,
-        is_featured: false,
-        sort_order: 6,
-      },
-    ];
+      error: (err) => {
+        this.errorMessage = 'Failed to load categories. Please try again later.';
+        console.error('Error loading categories:', err);
+      }
+    });
   }
 
   getTotalCategories(): number {
     return this.categories.length;
   }
 
-  getActiveCategories(): number {
-    return this.categories.filter((cat) => cat.status === "active").length;
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.selectedFile = file;
+      this.categoryForm.patchValue({ file: file });
+      this.categoryForm.get('file')?.updateValueAndValidity();
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
-  getParentCategories(): number {
-    return this.categories.filter((cat) => cat.parent_id === null).length;
+  resetFileInput(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.categoryForm.patchValue({ file: null });
+    this.categoryForm.get('file')?.updateValueAndValidity();
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
   }
 
-  getTotalProducts(): number {
-    return this.categories.reduce((total, cat) => total + cat.product_count, 0);
-  }
-
-  getParentCategoryOptions(): Category[] {
-    return this.categories.filter((cat) => cat.parent_id === null && (!this.selectedCategory || cat.id !== this.selectedCategory.id));
+  get currentImage(): string | null {
+    if (this.imagePreview) return this.imagePreview as string;
+    if (this.selectedCategory?.imageUrl) return this.selectedCategory.imageUrl;
+    return null;
   }
 
   openCreateModal(): void {
     this.isEditMode = false;
     this.selectedCategory = null;
-    this.categoryForm.reset({
-      status: "active",
-      sort_order: 0,
-      is_featured: false,
-    });
+    this.categoryForm.reset();
+    this.resetFileInput();
+    this.categoryForm.get('file')?.setValidators([Validators.required]);
+    this.categoryForm.get('file')?.updateValueAndValidity();
     this.showModal = true;
   }
 
@@ -252,14 +199,10 @@ export class CategoriesManagement implements OnInit {
     this.isEditMode = true;
     this.selectedCategory = category;
     this.categoryForm.patchValue({
-      name: category.name,
-      description: category.description,
-      parent_id: category.parent_id || "",
-      image: category.image,
-      status: category.status,
-      sort_order: category.sort_order,
-      is_featured: category.is_featured,
+      name: category.name
     });
+    this.categoryForm.get('file')?.clearValidators();
+    this.categoryForm.get('file')?.updateValueAndValidity();
     this.showModal = true;
   }
 
@@ -267,38 +210,58 @@ export class CategoriesManagement implements OnInit {
     this.showModal = false;
     this.selectedCategory = null;
     this.categoryForm.reset();
+    this.resetFileInput();
+    this.successMessage = null;
+    this.errorMessage = null;
   }
 
   saveCategory(): void {
-    if (this.categoryForm.valid) {
-      const formData = this.categoryForm.value;
-      
-      if (this.isEditMode && this.selectedCategory) {
-        const index = this.categories.findIndex((cat) => cat.id === this.selectedCategory!.id);
-        if (index !== -1) {
-          this.categories[index] = {
-            ...this.categories[index],
-            ...formData,
-            updated_at: new Date().toISOString(),
-            parent_name: formData.parent_id ? this.categories.find(c => c.id == formData.parent_id)?.name : undefined,
-          };
-        }
-      } else {
-        const newCategory: Category = {
-          id: Math.max(...this.categories.map((cat) => cat.id)) + 1,
-          ...formData,
-          slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          product_count: 0,
-          subcategories_count: 0,
-          parent_name: formData.parent_id ? this.categories.find(c => c.id == formData.parent_id)?.name : undefined,
-        };
-        this.categories.push(newCategory);
-      }
+     if (this.categoryForm.invalid || this.isProcessing || (!this.isEditMode && !this.selectedFile)) {
+    return;
+  }
+    this.categoryForm.markAllAsTouched();
 
-      this.closeModal();
+    if (this.categoryForm.invalid || this.isProcessing) {
+      return;
     }
+
+    if (!this.isEditMode && !this.selectedFile) {
+      this.errorMessage = this.getTranslation('validation.imageRequired');
+      return;
+    }
+
+    this.isProcessing = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    const formData = new FormData();
+    formData.append('name', this.categoryForm.value.name);
+    
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    } else if (this.isEditMode && this.selectedCategory?.imageUrl) {
+      formData.append('imageUrl', this.selectedCategory.imageUrl);
+    }
+
+    const operation = this.isEditMode && this.selectedCategory
+      ? this.categoryService.update(this.selectedCategory.id, formData as any)
+      : this.categoryService.create(formData as any);
+
+    operation.pipe(
+      finalize(() => this.isProcessing = false)
+    ).subscribe({
+      next: () => {
+        this.successMessage = this.isEditMode 
+          ? 'Category updated successfully!' 
+          : 'Category created successfully!';
+        this.loadCategories();
+        this.closeModal();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to save category. Please try again.';
+        console.error('Error saving category:', err);
+      }
+    });
   }
 
   onTableAction(event: { action: string; item: Category }): void {
@@ -336,34 +299,36 @@ export class CategoriesManagement implements OnInit {
   }
 
   confirmDelete(): void {
-    if (this.categoryToDelete) {
-      this.categories = this.categories.filter(
-        (cat) => cat.id !== this.categoryToDelete!.id && cat.parent_id !== this.categoryToDelete!.id
-      );
-      this.closeDeleteModal();
+    if (this.isProcessing) return;
+    if (!this.categoryToDelete || this.isProcessing) return;
+
+    this.isProcessing = true;
+    this.categoryService.delete(this.categoryToDelete.id).pipe(
+      finalize(() => {
+        this.isProcessing = false;
+        this.closeDeleteModal();
+      })
+    ).subscribe({
+      next: () => {
+        this.successMessage = 'Category deleted successfully!';
+        this.loadCategories();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to delete category. Please try again.';
+        console.error('Error deleting category:', err);
+      }
+    });
+  }
+
+  getConfirmButtonText(action: 'save' | 'delete'): string {
+    const isArabic = this.languageService.currentLanguage() === "ar";
+    if (this.isProcessing) {
+      return isArabic 
+        ? (action === 'save' ? 'جاري الحفظ...' : 'جاري الحذف...')
+        : (action === 'save' ? 'Saving...' : 'Deleting...');
     }
-  }
-
-  exportCategories(): void {
-    console.log("Exporting categories...");
-  }
-
-  getBadgeClass(status: string): string {
-    const baseClass = "inline-flex px-2 py-1 text-xs font-semibold rounded-full";
-
-    switch (status?.toLowerCase()) {
-      case "active":
-      case "true":
-        return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300`;
-      case "inactive":
-      case "false":
-        return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300`;
-      default:
-        return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300`;
-    }
-  }
-
-  formatDate(date: string): string {
-    return new Date(date).toLocaleDateString();
+    return isArabic
+      ? (action === 'save' ? 'حفظ' : 'حذف')
+      : (action === 'save' ? 'Save' : 'Delete');
   }
 }

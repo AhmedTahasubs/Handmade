@@ -434,7 +434,20 @@ export class Register {
         await this.authService.registerCustomer(registerData).toPromise();
       }
     } catch (error) {
-      console.error("Registration failed:", error);
+      if (error) {
+        const isArabic = this.LanguageService.currentLanguage() === 'ar';
+        this.userNameError = isArabic ? 'اسم المستخدم موجود بالفعل' : 'Username already exists';
+        this.emailError = isArabic ? 'البريد الإلكتروني موجود بالفعل' : 'Email already exists';
+        window.scrollTo({ behavior: 'smooth' , top: 50});
+      } else {
+        this.userNameError = this.LanguageService.currentLanguage() === 'ar' 
+          ? 'حدث خطأ أثناء التسجيل' 
+          : 'An error occurred during registration';
+          this.emailError = this.LanguageService.currentLanguage() === 'ar'
+          ? 'حدث خطأ أثناء التسجيل'
+          : 'An error occurred during registration';
+          window.scrollTo({ behavior: 'smooth' , top: 50});
+      }
     } finally {
       this.isLoading = false;
     }
