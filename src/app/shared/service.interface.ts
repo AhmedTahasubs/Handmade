@@ -66,7 +66,7 @@ export interface Review {
 
 // **هذه الواجهة تمثل بيانات تفاصيل الخدمة التي يستخدمها ServiceDetailPage**
 export interface ServiceDetail extends Service {
-  fullDescription: { en: string; ar: string; };
+  fullDescription: string;
   features: { en: string[]; ar: string[]; };
   packages: ServicePackage[];
   gallery: string[];
