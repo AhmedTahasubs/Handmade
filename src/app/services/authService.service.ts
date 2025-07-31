@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, Observable, catchError, tap, throwError } from "rxjs";
 import { Router } from "@angular/router";
 
-interface User {
+export interface User {
   userName: string;
   fullName: string;
   email: string;

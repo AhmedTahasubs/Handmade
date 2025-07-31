@@ -73,12 +73,12 @@ export const routes: Routes = [
   {
     path: '',
     component: DashboardLayout,
-    // to do next
-    // canActivate: [authGuard],
-    // data: { roles: ['admin'] },
+
     children: [
       {
         path: 'admin',
+        canActivate: [authGuard],
+        data: { roles: ['admin'] },
         loadComponent: () => import('./pages/admin/admin').then(m => m.Admin),
         children: [
           { 
