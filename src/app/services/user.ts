@@ -12,11 +12,11 @@ export interface User {
 }
 
 export interface IProduct {
-  id: number;
+ id: number;
   title: string;
   price: number;
   quantity: number;
-  status: string;
+  status: string; 
   createdAt: string;
   sellerId: string;
   serviceId: number;

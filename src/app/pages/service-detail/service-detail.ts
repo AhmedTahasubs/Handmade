@@ -44,7 +44,7 @@ export class ServiceDetailPage implements OnInit {
   
   showContactForm = false;
   contactMessage = '';
-  sellerProducts: Product[] = []; // النوع Product[] للـ frontend
+  sellerProducts: ProductDisplayDto[] = []; // النوع Product[] للـ frontend
   displayedSellerProducts: Product[] = [];
   
   // حقن ServiceService
@@ -123,7 +123,7 @@ export class ServiceDetailPage implements OnInit {
           faq: [], // **ملاحظة:** FAQs تحتاج لجلب من الـ API
           requirements: { en: [], ar: [] }, // **ملاحظة:** Requirements تحتاج لجلب من الـ API
           sellerInfo: { // **ملاحظة:** SellerInfo تحتاج لجلب من الـ API أو تكوينها من DTO
-            id: parseInt(dto.sellerId), // تحويل String لـ number
+            id: dto.sellerId, // تحويل String لـ number
             name: dto.sellerName,
             username: dto.sellerName, // افتراض أن اسم المستخدم هو اسم البائع
             avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=387', // Mocked
@@ -139,25 +139,29 @@ export class ServiceDetailPage implements OnInit {
             joinDate: '', // Mocked
             location: '' // Mocked
           },
-   products: (dto.products ?? []).map((pDto: ProductDisplayDto) => ({
-    id: pDto.id,
-    name: { en: pDto.title, ar: pDto.title },
-    description: { en: pDto.description, ar: pDto.description },
-    price: pDto.price,
-    category: dto.categoryName ?? '',
-    image: pDto.imageUrl || 'assets/product-placeholder.jpg',
-    seller: dto.sellerName ?? '',
-    rating: 0,
-    customizable: false
-  }))
+products: (dto.products ?? []).map((pDto: ProductDisplayDto) => ({
+  id: pDto.id,
+  title: pDto.title,
+  price: pDto.price,
+  quantity: pDto.quantity,
+  status: pDto.status,
+  createdAt: pDto.createdAt,
+  sellerId: dto.sellerId,
+  serviceId: dto.id,
+  imageUrl: pDto.imageUrl || 'assets/product-placeholder.jpg',
+  category: dto.categoryName ?? '',
+  description: pDto.description,
+  sellerName: dto.sellerName ?? '',
+}))
+
 
         };
         console.log('Fetched Service Detail:', this.service);
 
         // قم بتعيين أول باقة أو القيمة الافتراضية إذا كان لديك logic أكثر تعقيدًا للباقات
-        this.selectedPackage = this.service.packages[0] || null;
+        this.selectedPackage = this.service?.packages[0] || null;
         // عرض أول 3 منتجات من البائع
-        this.displayedSellerProducts = this.service.products.slice(0, 3);
+        this.displayedSellerProducts = this.service?.products.slice(0, 3);
         
         // **هنا ممكن تستدعي دوال لجلب Related Services و Reviews لو ليهم APIs منفصلة**
         this.loadRelatedServices(); // لسه بتجيب Mock data، ممكن تعدلها
@@ -273,7 +277,7 @@ private loadReviews(): void {
   }
   
   onRelatedServiceClick(service: Service): void {
-    this.router.navigate(['/service', service.id]);
+    this.router.navigate(['/services', service.id]);
   }
   
   goToSellerProfile(): void {
