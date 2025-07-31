@@ -7,22 +7,9 @@
       >
         <i class="fa-solid fa-bars w-5 h-5"></i>
       </button>
-
-      <div class="relative hidden md:block">
-        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
-        <input
-          type="text"
-          [placeholder]="labels.search"
-          class="pl-10 pr-4 py-2 w-80 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-        />
-      </div>
     </div>
 
     <div class="flex items-center space-x-4">
-      <button class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-        <i class="fa-solid fa-plus w-4 h-4"></i>
-        <span class="text-sm font-medium">{{ labels.addNew }}</span>
-      </button>
 
       <button
         (click)="toggleTheme()"
@@ -41,20 +28,13 @@
         <span class="text-sm font-medium">{{ LanguageService.currentLanguage().toUpperCase() }}</span>
       </button>
 
-      <button class="p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 relative">
-        <i class="fa-solid fa-bell w-5 h-5"></i>
-        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-          7
-        </span>
-      </button>
-
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
           <i class="fa-solid fa-user w-4 h-4 text-white"></i>
         </div>
         <div class="hidden md:block">
-          <p class="text-sm font-medium text-gray-900 dark:text-white">Admin User</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Super Admin</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-white">{{ user?.fullName }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Administrator</p>
         </div>
       </div>
     </div>

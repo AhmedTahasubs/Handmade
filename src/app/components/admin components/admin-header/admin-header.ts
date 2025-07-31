@@ -1,7 +1,8 @@
 import { LanguageService } from './../../../services/language.service';
 import { ThemeService } from './../../../services/theme.service';
-import { Component, Output, EventEmitter } from "@angular/core"
+import { Component, Output, EventEmitter, inject } from "@angular/core"
 import { CommonModule } from "@angular/common"
+import { AuthService } from '../../../services/authService.service';
 @Component({
   selector: "app-admin-header",
   standalone: true,
@@ -10,7 +11,8 @@ import { CommonModule } from "@angular/common"
 })
 export class AdminHeader {
   @Output() onMenuClick = new EventEmitter<void>()
-
+  private authService = inject(AuthService);
+  user = this.authService.getUser();
   constructor(
     public ThemeService: ThemeService,
     public LanguageService: LanguageService,
