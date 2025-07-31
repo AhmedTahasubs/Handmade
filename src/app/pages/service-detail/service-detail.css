@@ -372,9 +372,8 @@ button:focus,
 input:focus,
 textarea:focus {
   outline: none;
-  ring: 2px;
-  ring-color: #3b82f6;
-  ring-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
 /* Print styles */

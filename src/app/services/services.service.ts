@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProductDisplayDto } from '../shared/service.interface';
 
 export interface ServiceDto {
   id: number;
@@ -16,7 +15,7 @@ export interface ServiceDto {
   sellerId: string;
   categoryId: number;
   imageUrl: string | null;
-  products: ProductDisplayDto[]; // <-- هنا استخدمنا الواجهة الجديدة ProductDisplayDto
+  products: ProductDisplayDto[];
 }
 export interface ServiceRequest {
   id?: number;
@@ -27,6 +26,18 @@ export interface ServiceRequest {
   CategoryId: number;
   File: string;
   // Add any other fields your API uses
+}
+export interface ProductDisplayDto {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  quantity: number; 
+  status: string;     
+  createdAt: string;   
+  sellerId: string;
+  serviceId: number;
+  imageUrl: string | null;
 }
 
 @Injectable({

@@ -69,7 +69,6 @@ export class UsersManagement implements OnInit {
       .subscribe({
         next: (users) => {
           this.users = users;
-          console.log('Fetched users:', users);
         },
         error: (error) => {
           console.error('Error loading users:', error);
