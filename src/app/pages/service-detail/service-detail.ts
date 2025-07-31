@@ -19,10 +19,10 @@ import {
   SellerInfo,
   Review,
   ServiceDto,
-  ProductDisplayDto as ProductDto, // هنحتاجها لتحويل الـ ProductDto
-  Product, // الواجهة اللي بيعرضها ProductCardComponent
+  ProductDisplayDto as ProductDto, 
+  Product, 
   ProductDisplayDto,
-} from '../../shared/service.interface'; // تأكد من المسار الصحيح
+} from '../../shared/service.interface'; 
 
 
 @Component({
@@ -89,10 +89,7 @@ export class ServiceDetailPage implements OnInit {
           isCustomizable: false, 
           deliveryTime: this.formatDeliveryTime(dto.deliveryTime),
           
-          fullDescription: {
-            en: 'Transform your photos into stunning digital portrait illustrations! I specialize in creating unique, personalized artwork that captures the essence of your personality. Using professional digital art techniques, I will create a one-of-a-kind portrait that you can use for social media profiles, print as wall art, or give as a memorable gift.',
-            ar: 'حول صورك إلى رسوم بورتريه رقمية مذهلة! أنا متخصص في إنشاء أعمال فنية فريدة وشخصية تلتقط جوهر شخصيتك. باستخدام تقنيات الفن الرقمي المهنية، سأنشئ بورتريه فريد من نوعه يمكنك استخدامه لملفات وسائل التواصل الاجتماعي أو طباعته كعمل فني جداري أو تقديمه كهدية لا تُنسى.'
-          },
+          fullDescription: dto.description,
           features: {
             en: [
               'High-resolution digital artwork', 'Multiple format delivery (PNG, JPG, PDF)',
@@ -204,7 +201,7 @@ private loadRelatedServices(): void {
   this.serviceService.getServicesByCategoryName(this.service.category).subscribe((dtos: ServiceDto[]) => {
     const services = dtos
       .filter(dto => dto.id !== this.service?.id)
-      .map(dto => this.mapDtoToService(dto));
+      .map(dto => this.mapDtoToService(dto)).slice(0, 4);
 
     this.relatedServices = services;
   });
@@ -287,9 +284,7 @@ private loadReviews(): void {
     }
   }
   
-  goBackToServices(): void {
-    this.router.navigate(['/services']);
-  }
+ 
 
   onAddToCart(product: any): void {
     console.log('Adding to cart:', product);

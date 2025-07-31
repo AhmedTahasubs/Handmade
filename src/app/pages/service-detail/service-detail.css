@@ -15,6 +15,14 @@
   transition: all 0.3s ease;
 }
 
+#about-service {
+  overflow-y: auto;
+  max-height: 250px; 
+  word-wrap: break-word;  
+  overflow-wrap: break-word; 
+  word-break: break-all;  
+}
+
 .gallery-image:hover {
   transform: scale(1.05);
 }
