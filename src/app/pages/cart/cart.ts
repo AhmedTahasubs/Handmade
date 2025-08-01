@@ -1,19 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
-
-interface CartItem {
-  id: number;
-  image: string;
-  name: string;
-  artisan: string;
-  price: number;
-  quantity: number;
-  deliveryDate: string;
-}
+import { CartService } from '../../services/cart.service';
+import { ToastService } from '../../services/toast.service';
+import { ShoppingCart, CartItem, UpdateCartItemDto } from '../../services/cart.service';
 
 @Component({
   selector: 'app-cart',
@@ -21,40 +14,38 @@ interface CartItem {
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './cart.html'
 })
-export class CartComponent {
+export class CartComponent implements OnInit {
   themeService = inject(ThemeService);
   languageService = inject(LanguageService);
+  cartService = inject(CartService);
+  toastService = inject(ToastService);
 
-  cartItems: CartItem[] = [
-    {
-      id: 1,
-      image: '/placeholder.svg?height=100&width=100',
-      name: 'Handmade Ceramic Vase',
-      artisan: 'Emma Thompson',
-      price: 85.99,
-      quantity: 1,
-      deliveryDate: '2024-03-15'
-    },
-    {
-      id: 2,
-      image: '/placeholder.svg?height=100&width=100',
-      name: 'Leather Wallet',
-      artisan: 'Michael Brown',
-      price: 45.50,
-      quantity: 2,
-      deliveryDate: '2024-03-18'
-    },
-    {
-      id: 3,
-      image: '/placeholder.svg?height=100&width=100',
-      name: 'Silver Necklace',
-      artisan: 'Sarah Johnson',
-      price: 120.00,
-      quantity: 1,
-      deliveryDate: '2024-03-20'
-    }
-  ];
+  cart: ShoppingCart | null = null;
+  isLoading = true;
 
+  ngOnInit(): void {
+    this.loadCart();
+  }
+
+  loadCart(): void {
+    this.isLoading = true;
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        this.cart = cart;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading cart:', err);
+        this.toastService.showError(
+          this.languageService.currentLanguage() === 'en' 
+            ? 'Failed to load cart' 
+            : 'فشل تحميل السلة'
+        );
+        this.isLoading = false;
+      }
+    });
+  }
+  
   get translations() {
     return {
       en: {
@@ -95,11 +86,11 @@ export class CartComponent {
   }
 
   get subtotal(): number {
-    return this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return this.cart?.items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0) || 0;
   }
 
   get shipping(): number {
-    return 15.00; // Flat rate shipping
+    return 15.00; // Flat rate shipping - you might want to get this from API
   }
 
   get total(): number {
@@ -108,11 +99,69 @@ export class CartComponent {
 
   updateQuantity(item: CartItem, newQuantity: number) {
     if (newQuantity > 0) {
-      item.quantity = newQuantity;
+      const dto: UpdateCartItemDto = { quantity: newQuantity };
+      this.cartService.updateItem(item.id, dto).subscribe({
+        next: () => {
+          this.toastService.showSuccess(
+            this.languageService.currentLanguage() === 'en'
+              ? 'Quantity updated'
+              : 'تم تحديث الكمية'
+          );
+          item.quantity = newQuantity;
+        },
+        error: (err) => {
+          console.error('Error updating quantity:', err);
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en'
+              ? 'Failed to update quantity'
+              : 'فشل تحديث الكمية'
+          );
+          // Revert UI change
+          item.quantity = item.quantity;
+        }
+      });
     }
   }
 
   removeItem(itemId: number) {
-    this.cartItems = this.cartItems.filter(item => item.id !== itemId);
+    this.cartService.removeItem(itemId).subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          this.languageService.currentLanguage() === 'en'
+            ? 'Item removed from cart'
+            : 'تمت إزالة العنصر من السلة'
+        );
+        this.cart!.items = this.cart!.items.filter(item => item.id !== itemId);
+      },
+      error: (err) => {
+        console.error('Error removing item:', err);
+        this.toastService.showError(
+          this.languageService.currentLanguage() === 'en'
+            ? 'Failed to remove item'
+            : 'فشل إزالة العنصر'
+        );
+      }
+    });
+  }
+
+  clearCart() {
+    this.cartService.clearCart().subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          this.languageService.currentLanguage() === 'en'
+            ? 'Cart cleared successfully'
+            : 'تم تفريغ السلة بنجاح'
+        );
+        this.cart!.items = [];
+      },
+      error: (err) => {
+        console.error('Error clearing cart:', err);
+        this.toastService.showError(
+          this.languageService.currentLanguage() === 'en'
+            ? 'Failed to clear cart'
+            : 'فشل تفريغ السلة'
+        );
+      }
+    });
   }
 }
