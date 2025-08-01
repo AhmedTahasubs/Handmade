@@ -1,27 +1,4 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-  <!-- Breadcrumb -->
-  <div class="px-4 py-3 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <nav class="flex mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
-      <ol class="flex items-center space-x-2 rtl:space-x-reverse">
-        <li>
-          <a routerLink="/" class="transition-colors hover:text-blue-600 dark:hover:text-blue-400">
-            {{ labels.home }}
-          </a>
-        </li>
-        <li class="flex items-center">
-          <i class="mx-2 text-gray-400 fas fa-chevron-right"></i>
-          <a routerLink="/products" class="transition-colors hover:text-blue-600 dark:hover:text-blue-400">
-            {{ labels.products }}
-          </a>
-        </li>
-        <li class="flex items-center">
-          <i class="mx-2 text-gray-400 fas fa-chevron-right"></i>
-          <span class="text-gray-900 dark:text-white">{{ product?.title }}</span>
-        </li>
-      </ol>
-    </nav>
-  </div>
-
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 !py-5">
   <!-- Loading State -->
   <div *ngIf="loading" class="flex items-center justify-center min-h-96">
     <div class="text-center">
@@ -42,22 +19,6 @@
             [alt]="product.title"
             class="object-cover w-full h-96 transition-transform duration-300 hover:scale-105"
           />
-
-          <!-- Image Overlay Actions -->
-          <div class="absolute top-4 right-4 flex flex-col space-y-2">
-            <button
-              (click)="onAddToWishlist()"
-              class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
-              [attr.aria-label]="labels.add_to_wishlist">
-              <i class="text-lg fas fa-heart" [class.text-red-500]="isInWishlist"></i>
-            </button>
-            <button
-              (click)="onShare()"
-              class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
-              [attr.aria-label]="labels.share">
-              <i class="text-lg fas fa-share-alt"></i>
-            </button>
-          </div>
         </div>
 
         <!-- Thumbnail Images -->
@@ -92,7 +53,7 @@
             <span class="text-sm text-gray-600 dark:text-gray-400"
                   [class.text-green-600]="product.quantity > 0"
                   [class.text-red-600]="product.quantity === 0">
-              {{ product.quantity > 0 ? labels.in_stock : 'Out of Stock' }}
+              {{ product.quantity > 0 ? labels.in_stock : labels.out_of_stock }}
             </span>
           </div>
         </div>
@@ -203,51 +164,42 @@
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div
           *ngFor="let relatedProduct of relatedProducts; trackBy: trackByProductId"
-          class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow"
+          class="relative bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow"
         >
-          <!-- Wrap the product info inside a routerLink -->
           <a
             [routerLink]="['/products', relatedProduct.id]"
-            class="block relative"
+            class="block"
           >
             <img
               [src]="relatedProduct.imageUrl"
               [alt]="relatedProduct.title"
               class="object-cover w-full h-48 rounded-t-lg"
             />
-          </a>
-          <!-- Wishlist button stays outside the link -->
-          <button
-            (click)="onRelatedProductAddToWishlist(relatedProduct)"
-            class="absolute top-3 right-3 p-2 text-gray-600 bg-white rounded-full shadow-sm hover:text-red-500 transition-colors"
-          >
-            <i class="fas fa-heart"></i>
-          </button>
-          <div class="p-4">
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-              {{ relatedProduct.title }}
-            </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {{ relatedProduct.sellerName || relatedProduct.sellerId }}
-            </p>
-            <div class="flex items-center justify-between">
-          <span class="text-xl font-bold text-gray-900 dark:text-white">
-            ${{ relatedProduct.price }}
-          </span>
-              <button
-                (click)="onRelatedProductAddToCart(relatedProduct)"
-                [disabled]="relatedProduct.quantity === 0"
-                class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <i class="fas fa-cart-plus mr-1"></i>
-                {{ labels.add }}
-              </button>
+            <div class="p-4">
+              <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                {{ relatedProduct.title }}
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {{ relatedProduct.sellerName || relatedProduct.sellerId }}
+              </p>
+              <div class="flex items-center justify-between">
+                <span class="text-xl font-bold text-gray-900 dark:text-white">
+                  ${{ relatedProduct.price }}
+                </span>
+                <button
+                  (click)="onRelatedProductAddToCart(relatedProduct); $event.stopPropagation()"
+                  [disabled]="relatedProduct.quantity === 0"
+                  class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-cart-plus mr-1"></i>
+                  {{ labels.add }}
+                </button>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- Error State -->
