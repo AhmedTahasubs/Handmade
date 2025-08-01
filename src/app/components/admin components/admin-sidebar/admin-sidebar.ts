@@ -18,7 +18,7 @@ export class AdminSidebar {
   user = this.authService.getUser();
   
   currentLanguage = computed(() => this.LanguageService.currentLanguage());
-  navigation = signal<{ name: string; icon: string; href: string; exact: boolean }[]>([]);
+  navigation = signal<{ name: string; icon: string; href: string; exact: boolean ,action?: () => void }[]>([]);
   labels = signal<{ title: string; subtitle: string }>({ title: '', subtitle: '' });
 
   constructor(public LanguageService: LanguageService) {
@@ -35,7 +35,7 @@ export class AdminSidebar {
               { name: "المنتجات", icon: "faBox", href: "/admin/products-management", exact: false },
               { name: "الفئات", icon: "faPalette", href: "/admin/categories-management", exact: false },
               { name: "الرئيسية", icon: "faHome", href: "/", exact: true },
-              { name: "الإعدادات", icon: "faCog", href: "/settings", exact: false },
+              { name: "تسجيل خروج", icon: "faCog", exact: false,action: () => {this.authService.logout();},href:"#" },
             ]
           : [
               { name: "Users", icon: "faUsers", href: "/admin/users-management", exact: false },
@@ -44,8 +44,8 @@ export class AdminSidebar {
               { name: "Products", icon: "faBox", href: "/admin/products-management", exact: false },
               { name: "Categories", icon: "faPalette", href: "/admin/categories-management", exact: false },
               { name: "Home", icon: "faHome", href: "/", exact: true },
-              { name: "Settings", icon: "faCog", href: "/settings", exact: false },
-            ]
+              { name: "Logout", icon: "faCog",href:"logout", exact: false ,action: () => {this.authService.logout();}} 
+          ]
       );
 
       this.labels.set(
@@ -68,7 +68,7 @@ export class AdminSidebar {
       'faUsers': 'fa-users',
       'faBox': 'fa-box',
       'faShoppingBag': 'fa-shopping-bag',
-      'faCog': 'fa-cog',
+      'faCog': 'fa-arrow-right-from-bracket',
       'faPalette': 'fa-palette',
       'faHandsHelping': 'fa-hands-helping',
       'faTimes': 'fa-times'

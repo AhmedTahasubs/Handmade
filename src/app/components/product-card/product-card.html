@@ -14,16 +14,6 @@
     <div
       class="absolute inset-0 flex items-center justify-center gap-4 transition-opacity duration-300 opacity-0 bg-black/40 group-hover:opacity-100"
     >
-      <!-- Wishlist -->
-      <button
-        (click)="onAddToWishlist(); $event.stopPropagation()"
-        class="p-3 text-gray-700 transition-colors rounded-full bg-white/90 hover:bg-white"
-        [attr.aria-label]="
-          language === 'en' ? 'Add to wishlist' : 'أضف للمفضلة'
-        "
-      >
-        <i class="text-lg fas fa-heart"></i>
-      </button>
       <!-- Add to Cart -->
       <button
         (click)="onAddToCart(); $event.stopPropagation()"
@@ -45,14 +35,6 @@
       </span>
     </div>
 
-    <!-- Favorite -->
-    <button
-      (click)="onAddToWishlist(); $event.stopPropagation()"
-      class="absolute p-2 transition rounded-full top-2 right-2 bg-white/80 hover:bg-white"
-      [attr.aria-label]="language === 'en' ? 'Add to favorites' : 'أضف للمفضلة'"
-    >
-      <i class="text-sm text-gray-600 fa-solid fa-heart"></i>
-    </button>
   </div>
 
   <!-- Info -->

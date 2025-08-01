@@ -27,7 +27,7 @@
          status.value === 'pending' ? 'قيد الانتظار' :
          status.value === 'processing' ? 'قيد المعالجة' :
          status.value === 'completed' ? 'مكتمل' : 'ملغى' }}
-      <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+      <span class="bg-white text-black dark:text-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
         {{ getStatusCount(status.value) }}
       </span>
     </button>

@@ -23,7 +23,7 @@
            status.value === 'approved' ? 'موافق عليه' :
            status.value === 'pending' ? 'قيد الانتظار' :
            status.value === 'rejected' ? 'مرفوض' : status.label : status.label }}
-        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+        <span class="bg-white text-black dark:text-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
           {{ getStatusCount(status.value) }}
         </span>
       </button>

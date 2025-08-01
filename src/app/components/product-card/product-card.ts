@@ -35,10 +35,6 @@ export class ProductCardComponent {
     this.addToCart.emit(this.product);
   }
 
-  onAddToWishlist(): void {
-    this.addToWishlist.emit(this.product);
-  }
-
   onProductClick(): void {
     this.router.navigate(['/products', this.product.id]);
   }
