@@ -59,18 +59,20 @@
       </div>
     </div>
 
-    <section class="py-16 mt-16 text-center rounded-lg bg-gray-50 dark:bg-gray-800">
-      <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white transition-transform hover:translate-y-[-3px] duration-300">
-        {{ language === 'en' ? 'Are you an artisan?' : 'هل أنت حرفي؟' }}
-      </h2>
-      <p class="max-w-2xl mx-auto mb-8 text-gray-600 dark:text-gray-400">
-        {{ language === 'en'
-          ? 'Join our community of talented creators and start selling your handmade products to customers worldwide'
-          : 'انضم إلى مجتمعنا من المبدعين الموهوبين وابدأ في بيع منتجاتك المصنوعة يدوياً للعملاء في جميع أنحاء العالم' }}
-      </p>
-      <button class="px-8 py-3 font-semibold text-white transition-all duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-700 active:scale-90 hover:scale-105">
-        {{ language === 'en' ? 'Start Selling' : 'ابدأ البيع' }}
-      </button>
-    </section>
+    @if(!token){
+      <section class="py-16 mt-16 text-center rounded-lg bg-gray-50 dark:bg-gray-800">
+        <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white transition-transform hover:translate-y-[-3px] duration-300">
+          {{ language === 'en' ? 'Are you an artisan?' : 'هل أنت حرفي؟' }}
+        </h2>
+        <p class="max-w-2xl mx-auto mb-8 text-gray-600 dark:text-gray-400">
+          {{ language === 'en'
+            ? 'Join our community of talented creators and start selling your handmade products to customers worldwide'
+            : 'انضم إلى مجتمعنا من المبدعين الموهوبين وابدأ في بيع منتجاتك المصنوعة يدوياً للعملاء في جميع أنحاء العالم' }}
+        </p>
+        <a routerLink="/register"  class="px-8 py-3 font-semibold text-white transition-all duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-700 active:scale-90 hover:scale-105">
+          {{ language === 'en' ? 'Start Selling' : 'ابدأ البيع' }}
+        </a>
+      </section>
+    }
   </main>
 </div>

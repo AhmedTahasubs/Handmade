@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { SearchFilterComponent } from "../../components/search-filter/search-filter";
 import { LanguageService } from '../../services/language.service';
 import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
 
 // تحديث واجهة Category لتتوافق مع DTO من API لاسم الفئة
 // قد ترغب في الاحتفاظ بالاسم: { en: string; ar: string } لأغراض العرض،
@@ -27,12 +28,13 @@ interface Category {
     CommonModule,
     ProductCardComponent, // تأكد من استيراد ProductCardComponent إذا تم استخدامه في القالب
     SearchFilterComponent, // تأكد من استيراد SearchFilterComponent إذا تم استخدامه في القالب
+    RouterModule // استيراد RouterModule
   ]
 })
 export class HomeComponent implements OnInit { // تطبيق OnInit
   private languageService = inject(LanguageService);
   private categoryService = inject(CategoryService); // حقن الخدمة الجديدة
-
+  token: string | null = localStorage.getItem('token');
   // الحصول على اللغة من الخدمة لاستخدامها في القالب
   get language(): 'en' | 'ar' {
     return this.languageService.currentLanguage();

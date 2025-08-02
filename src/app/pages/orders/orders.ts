@@ -1,24 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
-
-interface Order {
-  id: string;
-  date: string;
-  status: 'preparing' | 'shipped' | 'delivered' | 'cancelled';
-  items: {
-    name: string;
-    image: string;
-    quantity: number;
-    price: number;
-  }[];
-  total: number;
-  shippingAddress: string;
-  trackingNumber?: string;
-  estimatedDelivery?: string;
-}
+import { OrderService, Order, OrderStatus } from '../../services/orders.service';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-customer-orders',
@@ -26,68 +12,33 @@ interface Order {
   imports: [CommonModule, RouterModule],
   templateUrl: './orders.html'
 })
-export class CustomerOrdersComponent {
+export class CustomerOrdersComponent implements OnInit {
   themeService = inject(ThemeService);
   languageService = inject(LanguageService);
+  orderService = inject(OrderService);
 
-  orders: Order[] = [
-    {
-      id: 'ORD-78945',
-      date: '2023-11-15',
-      status: 'delivered',
-      items: [
-        {
-          name: 'Handcrafted Ceramic Vase',
-          image: '/placeholder.svg?height=80&width=80',
-          quantity: 1,
-          price: 85.99
-        },
-        {
-          name: 'Artisan Leather Wallet',
-          image: '/placeholder.svg?height=80&width=80',
-          quantity: 2,
-          price: 45.50
-        }
-      ],
-      total: 176.99,
-      shippingAddress: '123 Main St, Cairo, Egypt',
-      trackingNumber: 'TRK789456',
-      estimatedDelivery: '2023-11-20'
-    },
-    {
-      id: 'ORD-12345',
-      date: '2023-12-01',
-      status: 'shipped',
-      items: [
-        {
-          name: 'Silver Filigree Necklace',
-          image: '/placeholder.svg?height=80&width=80',
-          quantity: 1,
-          price: 120.00
-        }
-      ],
-      total: 120.00,
-      shippingAddress: '123 Main St, Cairo, Egypt',
-      trackingNumber: 'TRK123456',
-      estimatedDelivery: '2023-12-10'
-    },
-    {
-      id: 'ORD-45678',
-      date: '2023-12-05',
-      status: 'preparing',
-      items: [
-        {
-          name: 'Handwoven Wool Rug',
-          image: '/placeholder.svg?height=80&width=80',
-          quantity: 1,
-          price: 250.00
-        }
-      ],
-      total: 250.00,
-      shippingAddress: '123 Main St, Cairo, Egypt',
-      estimatedDelivery: '2023-12-20'
-    }
-  ];
+  orders: Order[] = [];
+  isLoading = true;
+  error: string | null = null;
+
+  ngOnInit(): void {
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.isLoading = true;
+    this.error = null;
+    
+    this.orderService.getOrdersByCustomer().pipe(
+      finalize(() => this.isLoading = false),
+      catchError(error => {
+        this.error = this.translations.errorLoadingOrders;
+        return of([]);
+      })
+    ).subscribe(orders => {
+      this.orders = orders;
+    });
+  }
 
   get translations() {
     return {
@@ -102,14 +53,13 @@ export class CustomerOrdersComponent {
         shippingAddress: 'Shipping Address',
         trackingNumber: 'Tracking Number',
         estimatedDelivery: 'Estimated Delivery',
-        viewDetails: 'View Details',
-        contactSupport: 'Contact Support',
         noOrders: "You haven't placed any orders yet",
+        errorLoadingOrders: "Failed to load orders. Please try again later.",
         statuses: {
-          preparing: 'Preparing',
-          shipped: 'Shipped',
-          delivered: 'Delivered',
-          cancelled: 'Cancelled'
+          Pending: 'Pending',
+          Shipped: 'Shipped',
+          Delivered: 'Delivered',
+          Rejected: 'Rejected'
         }
       },
       ar: {
@@ -123,31 +73,50 @@ export class CustomerOrdersComponent {
         shippingAddress: 'عنوان الشحن',
         trackingNumber: 'رقم التتبع',
         estimatedDelivery: 'موعد التوصيل المتوقع',
-        viewDetails: 'عرض التفاصيل',
-        contactSupport: 'اتصل بالدعم',
         noOrders: 'ليس لديك أي طلبات حتى الآن',
+        errorLoadingOrders: "فشل تحميل الطلبات. يرجى المحاولة مرة أخرى لاحقًا.",
         statuses: {
-          preparing: 'قيد التجهيز',
-          shipped: 'تم الشحن',
-          delivered: 'تم التوصيل',
-          cancelled: 'ملغى'
+          Pending: 'قيد الانتظار',
+          Shipped: 'تم الشحن',
+          Delivered: 'تم التوصيل',
+          Rejected: 'مرفوض'
         }
       }
     }[this.languageService.currentLanguage()];
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: OrderStatus): string {
     switch(status) {
-      case 'preparing':
+      case 'Pending':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-      case 'shipped':
+      case 'Shipped':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
-      case 'delivered':
+      case 'Delivered':
         return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-      case 'cancelled':
+      case 'Rejected':
         return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
     }
   }
+  getOverallStatus(order: Order): OrderStatus {
+  // Implement your logic to determine overall order status
+  // For example, if any item is rejected, the order is rejected
+  if (order.items.some(item => item.status === 'Rejected')) {
+    return 'Rejected';
+  }
+  
+  // If all items are delivered, order is delivered
+  if (order.items.every(item => item.status === 'Delivered')) {
+    return 'Delivered';
+  }
+  
+  // If any item is shipped, order is shipped
+  if (order.items.some(item => item.status === 'Shipped')) {
+    return 'Shipped';
+  }
+  
+  // Default to pending
+  return 'Pending';
+}
 }

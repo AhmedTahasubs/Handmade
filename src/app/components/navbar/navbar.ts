@@ -138,13 +138,15 @@ export class NavbarComponent implements OnInit,OnChanges  {
       { label: 'Home', route: '/' },
       { label: 'Categories', route: '/categories' },
       { label: 'Custom Service', route: '/custom-service' },
-      { label: 'Add Service', route: '/add-service' }
+      { label: 'Add Service', route: '/add-service' },
+      { label: 'Orders', route: '/orders' }
     ],
     ar: [
       { label: 'الرئيسية', route: '/' },
       { label: 'الفئات', route: '/categories' },
       { label: 'الخدمات المخصصة', route: '/custom-service' },
-      { label: 'أضف خدمه', route: '/add-service' }
+      { label: 'أضف خدمه', route: '/add-service' },
+      { label: 'الطلبات', route: '/orders'}
     ]
   };
 }

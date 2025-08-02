@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { authGuard } from './guards/auth-guard';
+import { guestGuard } from './guards/guestGuard';
 
 export const routes: Routes = [
   {
@@ -13,23 +14,24 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent)
       },
       { 
-        path: 'login', 
+        path: 'login',
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/login/login').then(m => m.Login)
       },
       { 
         path: 'register', 
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/register/register').then(m => m.Register)
       },
       { 
         path: 'forgot-password', 
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/forgot-password/forgot-password').then(m => m.ForgotPassword)
       },
       { 
         path: 'categories', 
         loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
-
-
       
       {
         path: 'category/services/:id', // el id da bta3 el category ya hammad
@@ -53,18 +55,22 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent)
       },
       {
         path: 'orders',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
       },
       {
         path: 'chat/:userId',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
       },
       {
         path: 'contacts',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/contacts/contacts').then(m => m.ContactsPageComponent)
       },
     ]
