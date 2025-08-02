@@ -68,6 +68,8 @@
   <!-- Data Table -->
   <main *ngIf="!isLoading || products.length > 0">
     <app-data-table
+    [title]="getTranslation('productsList')"
+    [subtitle]="getTranslation('productsSubtitle')"
       [data]="products"
       [columns]="columns"
       [actions]="actions"

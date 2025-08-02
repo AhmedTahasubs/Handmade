@@ -76,6 +76,8 @@
     <ng-container *ngIf="services.length > 0 && !isLoading">
       <app-data-table
         [data]="services"
+        [title]="getTranslation('servicesList')"
+        [subtitle]="getTranslation('servicesSubtitle')"
         [columns]="columns"
         [actions]="actions"
         [searchPlaceholder]="getTranslation('searchServices')"

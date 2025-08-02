@@ -88,6 +88,8 @@ export class SellerServicesManagement implements OnInit {
       deleteServiceSuccess: "Service deleted successfully!",
       saveServiceError: "Failed to save service. Please try again.",
       deleteServiceError: "Failed to delete service. Please try again.",
+      servicesList: "Services List",
+      servicesSubtitle: "Manage your services, view details, and perform actions",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $1",
@@ -128,6 +130,9 @@ export class SellerServicesManagement implements OnInit {
       deleteServiceSuccess: "تم حذف الخدمة بنجاح!",
       saveServiceError: "فشل حفظ الخدمة. يرجى المحاولة مرة أخرى.",
       deleteServiceError: "فشل حذف الخدمة. يرجى المحاولة مرة أخرى.",
+      servicesList: "قائمة الخدمات",
+      servicesSubtitle: "إدارة خدماتك، عرض التفاصيل، وتنفيذ الإجراءات",
+      
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ١ دولار",

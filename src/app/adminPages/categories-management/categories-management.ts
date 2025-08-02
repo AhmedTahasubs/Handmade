@@ -82,6 +82,8 @@ export class CategoriesManagement implements OnInit {
       deleteMessage: "This action cannot be undone. This will permanently delete the category.",
       totalCategories: "Total Categories",
       categoryDetails: "Category Details",
+      tableTitle: "Categories List",
+      tableSubtitle: "Manage your product categories",
       validation: {
         required: "This field is required",
         minLength: "Must be at least 3 characters",
@@ -107,6 +109,8 @@ export class CategoriesManagement implements OnInit {
       deleteMessage: "لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفئة نهائياً.",
       totalCategories: "إجمالي الفئات",
       categoryDetails: "تفاصيل الفئة",
+      tableTitle: "قائمة الفئات",
+      tableSubtitle: "إدارة فئات المنتجات الخاصة بك",
       validation: {
         required: "هذا الحقل مطلوب",
         minLength: "يجب أن يكون على الأقل 3 أحرف",

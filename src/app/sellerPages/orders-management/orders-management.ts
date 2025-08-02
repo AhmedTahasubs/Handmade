@@ -112,6 +112,8 @@ export class SellerOrdersManagement implements OnInit {
       paymentStatus: "Payment Status",
       datePlaced: "Date Placed",
       dateUpdated: "Date Updated",
+      ordersList: "Orders List",
+      ordersSubtitle: "Manage your customer orders efficiently",
     },
     ar: {
       title: "إدارة الطلبات",
@@ -136,6 +138,8 @@ export class SellerOrdersManagement implements OnInit {
       paymentStatus: "حالة الدفع",
       datePlaced: "تاريخ الطلب",
       dateUpdated: "تاريخ التحديث",
+      ordersList: "قائمة الطلبات",
+      ordersSubtitle: "إدارة طلبات العملاء بكفاءة",
     },
   };
 
@@ -156,10 +160,9 @@ export class SellerOrdersManagement implements OnInit {
       .subscribe({
         next: (orders) => {
           this.orders = orders;
-          this.toastService.showSuccess(this.getTranslation('ordersLoaded'));
+
         },
         error: () => {
-          this.toastService.showError(this.getTranslation('errorLoadingOrders'));
         }
       });
   }

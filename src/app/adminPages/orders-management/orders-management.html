@@ -101,7 +101,7 @@
 
     <!-- Data Table -->
     <app-data-table
-      [title]="languageService.currentLanguage() === 'en' ? 'Orders' : 'الطلبات'"
+      [title]="languageService.currentLanguage() === 'en' ? 'Orders List' : 'الطلبات الموجودة'"
       [subtitle]="languageService.currentLanguage() === 'en' ? 'All customer orders and their status' : 'جميع طلبات العملاء وحالتها'"
       [data]="filteredOrders"
       [columns]="columns"

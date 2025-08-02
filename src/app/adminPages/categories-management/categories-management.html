@@ -38,6 +38,8 @@
   <!-- Categories Table -->
   <app-data-table
     *ngIf="!isLoading"
+    [title]="getTranslation('tableTitle')"
+    [subtitle]="getTranslation('tableSubtitle')"
     [data]="categories"
     [columns]="tableColumns"
     [actions]="tableActions"

@@ -89,6 +89,8 @@
   <app-data-table
     *ngIf="!isLoading"
     [data]="filteredOrders"
+    [title]="getTranslation('ordersList')"
+    [subtitle]="getTranslation('ordersSubtitle')"
     [columns]="columns"
     [actions]="actions"
     searchPlaceholder="{{ getTranslation('searchPlaceholder') }}"

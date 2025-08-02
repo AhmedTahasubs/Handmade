@@ -92,6 +92,8 @@ export class SellerProductsManagement implements OnInit {
       deleteProductError: "Failed to delete product. Please try again.",
       loadProductsError: "Failed to load products. Please try again.",
       loadServicesError: "Failed to load services. Please try again.",
+      productsList: "Products List",
+      productsSubtitle: "Manage your product inventory and listings",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $0.01",
@@ -136,6 +138,8 @@ export class SellerProductsManagement implements OnInit {
       deleteProductError: "فشل حذف المنتج. يرجى المحاولة مرة أخرى.",
       loadProductsError: "فشل تحميل المنتجات. يرجى المحاولة مرة أخرى.",
       loadServicesError: "فشل تحميل الخدمات. يرجى المحاولة مرة أخرى.",
+      productsList: "قائمة المنتجات",
+      productsSubtitle: "إدارة مخزون المنتجات والقوائم",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ٠٫٠١ دولار",
