@@ -15,7 +15,18 @@ export interface OrderItem {
   totalPrice: number;
   status: OrderStatus;
 }
-
+export interface SellerOrders{
+  "orderId": number,
+  "createdAt": string,
+  "customerName": string,
+  "customerPhone": string,
+  "productTitle": string,
+  "productImageUrl": string,
+  "quantity": number,
+  "unitPrice": number,
+  "totalPrice": number,
+  "status": string
+}
 export interface Order {
   id: number;
   customerId: string;
@@ -45,59 +56,36 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Create a new order
-   * @param orderData Order details (phoneNumber, address, paymentMethod)
-   */
   createOrder(orderData: CreateOrderRequest): Observable<Order> {
     return this.http.post<Order>(`${this.apiUrl}/CustomerOrders`, orderData);
   }
 
-  /**
-   * Get all orders (admin view)
-   */
   getAllOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.apiUrl}/CustomerOrders`);
   }
 
-  /**
-   * Get orders for a specific customer
-   * @param customerId The customer's ID
-   */
-  getOrdersByCustomer(customerId: string): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/CustomerOrders/customer/${customerId}`);
-  }
 
-  /**
-   * Get orders for a specific seller
-   * @param sellerId The seller's ID
-   */
-  getOrdersBySeller(sellerId: string): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/CustomerOrders/seller/${sellerId}`);
+  getOrdersByCustomer(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/CustomerOrders/customer`);
   }
-
-  /**
-   * Update the status of an order item
-   * @param orderItemId The ID of the order item to update
-   * @param status The new status (Pending, Shipped, Delivered, Rejected)
-   */
-  updateOrderItemStatus(orderItemId: number, status: OrderStatus): Observable<OrderItem> {
+  getOrdersBySeller(): Observable<SellerOrders[]> {
+    return this.http.get<SellerOrders[]>(`${this.apiUrl}/CustomerOrders/seller`);
+  }
+  updateOrderItemStatus(orderItemId: number, status: OrderStatus): Observable<void> {
     const updateData: UpdateOrderItemStatusRequest = { status };
-    return this.http.patch<OrderItem>(
+    return this.http.patch<void>(
       `${this.apiUrl}/CustomerOrders/items/${orderItemId}/status`,
       updateData
     );
   }
 
-  /**
-   * Helper method to get orders based on user role
-   * @param userId The user's ID
-   * @param role 'customer' or 'seller'
-   */
-  getOrdersForUser(userId: string, role: 'customer' | 'seller'): Observable<Order[]> {
+  getOrdersForUser( role: 'customer' | 'seller'): Observable<Order[] | SellerOrders[]> {
     return role === 'customer' 
-      ? this.getOrdersByCustomer(userId) 
-      : this.getOrdersBySeller(userId);
+      ? this.getOrdersByCustomer() 
+      : this.getOrdersBySeller();
   }
 
+  getOrderById(orderId: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/CustomerOrders/${orderId}`);
+  }
 }

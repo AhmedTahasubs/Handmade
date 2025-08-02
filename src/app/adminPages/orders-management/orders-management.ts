@@ -1,50 +1,13 @@
-import { Modal } from './../../components/modal/modal';
-import { LanguageService } from './../../services/language.service';
-import { ThemeService } from './../../services/theme.service';
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { RouterModule } from "@angular/router"
 import { DataTable, type TableColumn, type TableAction } from "./../../components/data-table/data-table"
-
-interface OrderItem {
-  productId: number
-  productName: string
-  productImage: string
-  quantity: number
-  price: number
-  customizations?: string
-}
-
-interface Order {
-  id: string
-  customer: {
-    name: string
-    email: string
-    phone: string
-    avatar: string
-  }
-  items: OrderItem[]
-  totalAmount: number
-  shippingCost: number
-  tax: number
-  finalAmount: number
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
-  paymentStatus: "pending" | "paid" | "failed" | "refunded"
-  paymentMethod: string
-  shippingAddress: {
-    street: string
-    city: string
-    state: string
-    zipCode: string
-    country: string
-  }
-  orderDate: string
-  shippedDate?: string
-  deliveredDate?: string
-  trackingNumber?: string
-  notes?: string
-  artisans: string[]
-}
+import { Modal } from './../../components/modal/modal';
+import { LanguageService } from './../../services/language.service';
+import { ThemeService } from './../../services/theme.service';
+import { OrderService, Order, OrderStatus } from '../../services/orders.service';
+import { finalize } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: "app-orders-management",
@@ -52,200 +15,172 @@ interface Order {
   imports: [CommonModule, RouterModule, DataTable, Modal],
   templateUrl: './orders-management.html'
 })
-export class OrdersManagement {
-  showDetailsModal = false
-  selectedOrder: Order | null = null
-  currentStatusFilter = "all"
+export class OrdersManagement implements OnInit {
+  showDetailsModal = false;
+  selectedOrder: Order | null = null;
+  currentStatusFilter: OrderStatus | 'all' = 'all';
+  isLoading = false;
+  isDetailsLoading = false;
 
   statusFilters = [
     { label: "All", value: "all", icon: "fas fa-shopping-bag" },
-    { label: "Pending", value: "pending", icon: "fas fa-clock" },
-    { label: "Processing", value: "processing", icon: "fas fa-truck" },
-    { label: "Shipped", value: "shipped", icon: "fas fa-truck" },
-    { label: "Delivered", value: "delivered", icon: "fas fa-check-circle" },
-    { label: "Cancelled", value: "cancelled", icon: "fas fa-times-circle" },
-  ]
+    { label: "Pending", value: "Pending", icon: "fas fa-clock" },
+    { label: "Shipped", value: "Shipped", icon: "fas fa-truck" },
+    { label: "Delivered", value: "Delivered", icon: "fas fa-check-circle" },
+    { label: "Rejected", value: "Rejected", icon: "fas fa-times-circle" },
+  ] satisfies Array<{label: string, value: 'all' | OrderStatus, icon: string}>;
 
-  orders: Order[] = [
-    {
-      id: "ORD-2024-001",
-      customer: {
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1 (555) 123-4567",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      items: [
-        {
-          productId: 1,
-          productName: "Handwoven Ceramic Vase",
-          productImage: "/placeholder.svg?height=100&width=100",
-          quantity: 1,
-          price: 89.99,
-          customizations: "Custom blue glaze finish",
-        },
-        {
-          productId: 2,
-          productName: "Knitted Wool Scarf",
-          productImage: "/placeholder.svg?height=100&width=100",
-          quantity: 2,
-          price: 45.5,
-        },
-      ],
-      totalAmount: 180.99,
-      shippingCost: 15.0,
-      tax: 15.68,
-      finalAmount: 211.67,
-      status: "delivered",
-      paymentStatus: "paid",
-      paymentMethod: "Credit Card",
-      shippingAddress: {
-        street: "123 Main Street, Apt 4B",
-        city: "New York",
-        state: "NY",
-        zipCode: "10001",
-        country: "United States",
-      },
-      orderDate: "2024-01-15T10:30:00Z",
-      shippedDate: "2024-01-17T14:20:00Z",
-      deliveredDate: "2024-01-20T16:45:00Z",
-      trackingNumber: "TRK123456789",
-      artisans: ["Emma Thompson", "Sarah Mitchell"],
-    },
-    // ... rest of the orders data
-  ];
+  orders: Order[] = [];
+  filteredOrders: Order[] = [];
 
   columns: TableColumn[] = [
     { key: "id", label: "Order ID", sortable: true, type: "text" },
-    { key: "customer.name", label: "Customer", sortable: true, type: "text" },
-    { key: "finalAmount", label: "Total", sortable: true, type: "currency" },
-    { key: "status", label: "Order Status", sortable: true, type: "badge" },
-    { key: "paymentStatus", label: "Payment", sortable: true, type: "badge" },
-    { key: "paymentMethod", label: "Method", type: "text" },
-    { key: "orderDate", label: "Order Date", sortable: true, type: "date" },
-  ]
+    { key: "customerId", label: "Customer ID", sortable: true, type: "text" },
+    { key: "totalPrice", label: "Total", sortable: true, type: "currency" },
+    { key: "createdAt", label: "Order Date", sortable: true, type: "date" },
+  ];
 
-  actions: TableAction[] = [{ label: "View Details", icon: "fas fa-eye", color: "primary", action: "view" }]
+  actions: TableAction[] = [
+    { label: "View Details", icon: "fas fa-eye", color: "primary", action: "view" }
+  ];
 
   constructor(
-    public ThemeService: ThemeService,
-    public LanguageService: LanguageService,
+    public themeService: ThemeService,
+    public languageService: LanguageService,
+    private orderService: OrderService,
+    private toastService: ToastService
   ) {}
 
-  get filteredOrders(): Order[] {
-    if (this.currentStatusFilter === "all") {
-      return this.orders
-    }
-    return this.orders.filter((order) => order.status === this.currentStatusFilter)
+  ngOnInit(): void {
+    this.loadOrders();
   }
 
-  setStatusFilter(status: string): void {
-    this.currentStatusFilter = status
+  loadOrders(): void {
+    this.isLoading = true;
+    this.orderService.getAllOrders()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (orders) => {
+          this.orders = orders;
+          this.filterOrders();
+        },
+        error: (error) => {
+          console.error('Error loading orders:', error);
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en' 
+              ? 'Failed to load orders' 
+              : 'فشل تحميل الطلبات'
+          );
+        }
+      });
+  }
+
+  setStatusFilter(status: OrderStatus | 'all'): void {
+    this.currentStatusFilter = status;
+    this.filterOrders();
+  }
+
+  filterOrders(): void {
+    if (this.currentStatusFilter === 'all') {
+      this.filteredOrders = [...this.orders];
+    } else {
+      this.filteredOrders = this.orders.filter(order => 
+        order.items.some(item => item.status === this.currentStatusFilter)
+      );
+    }
   }
 
   getFilterButtonClass(status: string): string {
-    const baseClass = "px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+    const baseClass = "px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2";
     if (this.currentStatusFilter === status) {
-      return `${baseClass} bg-blue-600 text-white`
+      return `${baseClass} bg-blue-600 text-white`;
     }
-    return `${baseClass} bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600`
+    return `${baseClass} bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600`;
   }
 
-  getStatusCount(status: string): number {
-    if (status === "all") {
-      return this.orders.length
+  getStatusCount(status: OrderStatus | 'all'): number {
+    if (status === 'all') {
+      return this.orders.length;
     }
-    return this.orders.filter((order) => order.status === status).length
+    return this.orders.reduce((count, order) => 
+      count + order.items.filter(item => item.status === status).length, 0);
   }
 
   getPendingOrdersCount(): number {
-    return this.orders.filter((order) => order.status === "pending").length
+    return this.getStatusCount('Pending');
   }
 
   getDeliveredOrdersCount(): number {
-    return this.orders.filter((order) => order.status === "delivered").length
+    return this.getStatusCount('Delivered');
   }
 
   getTotalRevenue(): string {
-    const total = this.orders
-      .filter((order) => order.paymentStatus === "paid")
-      .reduce((sum, order) => sum + order.finalAmount, 0)
-
+    const total = this.orders.reduce((sum, order) => sum + order.totalPrice, 0);
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(total)
+    }).format(total);
   }
 
-  getOrderStatusBadgeClass(status: string): string {
+  getOrderStatusBadgeClass(status: OrderStatus): string {
     switch (status) {
-      case "delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-      case "shipped":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
-      case "processing":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-      case "pending":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+      case "Delivered":
+        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300";
+      case "Shipped":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300";
+      case "Rejected":
+        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-    }
-  }
-
-  getPaymentStatusBadgeClass(status: string): string {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-      case "failed":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
-      case "refunded":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300"
-    }
-  }
-
-  getPaymentStatusTextClass(status: string): string {
-    switch (status) {
-      case "paid":
-        return "text-green-600 dark:text-green-400"
-      case "pending":
-        return "text-yellow-600 dark:text-yellow-400"
-      case "failed":
-        return "text-red-600 dark:text-red-400"
-      case "refunded":
-        return "text-purple-600 dark:text-purple-400"
-      default:
-        return "text-gray-600 dark:text-gray-400"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300";
     }
   }
 
   onAction(event: { action: string; item: Order }): void {
-    const { action, item } = event
-
-    if (action === "view") {
-      this.viewOrder(item)
+    if (event.action === "view") {
+      this.viewOrder(event.item);
     }
   }
 
   viewOrder(order: Order): void {
-    this.selectedOrder = order
-    this.showDetailsModal = true
+    this.isDetailsLoading = true;
+    this.orderService.getOrderById(order.id)
+      .pipe(finalize(() => this.isDetailsLoading = false))
+      .subscribe({
+        next: (order) => {
+          this.selectedOrder = order;
+          this.showDetailsModal = true;
+        },
+        error: (error) => {
+          console.error('Error loading order details:', error);
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en' 
+              ? 'Failed to load order details' 
+              : 'فشل تحميل تفاصيل الطلب'
+          );
+        }
+      });
   }
 
   closeDetailsModal(): void {
-    this.showDetailsModal = false
-    this.selectedOrder = null
+    this.showDetailsModal = false;
+    this.selectedOrder = null;
   }
 
   onExport(): void {
-    console.log("Export orders data")
     // Implement export logic
+    this.toastService.showSuccess(
+      this.languageService.currentLanguage() === 'en' 
+        ? 'Export started successfully' 
+        : 'تم بدء التصدير بنجاح'
+    );
   }
+  getUniqueStatuses(order: Order): OrderStatus[] {
+  // Get all statuses from order items
+  const allStatuses = order.items.map(item => item.status);
+  
+  // Return only unique statuses
+  return [...new Set(allStatuses)];
+}
 }

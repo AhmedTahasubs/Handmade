@@ -42,7 +42,7 @@ interface SellerRegisterRequest extends CustomerRegisterRequest {
 export class AuthService {
   private baseUrl = 'https://localhost:7047/';
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
-  private currentUser = new BehaviorSubject<User | null>(this.getStoredUser());
+  currentUser = new BehaviorSubject<User | null>(this.getStoredUser());
 
   constructor(
     private http: HttpClient,

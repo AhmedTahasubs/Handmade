@@ -60,14 +60,39 @@
     </div>
   </div>
 
+  <!-- Status Filter -->
+  <div class="flex flex-wrap gap-2 !my-4">
+    <button
+      *ngFor="let status of statusFilters"
+      (click)="setStatusFilter(status.value)"
+      [class]="getFilterButtonClass(status.value)"
+    >
+      <i [class]="status.icon" class="w-4 h-4"></i>
+      {{ languageService.currentLanguage() === 'ar' ? 
+         status.value === 'all' ? 'الكل' :
+         status.value === 'Pending' ? 'قيد الانتظار' :
+         status.value === 'Shipped' ? 'تم الشحن' :
+         status.value === 'Delivered' ? 'تم التسليم' :
+         status.value === 'Rejected' ? 'مرفوض' : status.label : status.label }}
+      <span class="bg-white text-black dark:text-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+        {{ getStatusCount(status.value) }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
   <!-- Data Table -->
   <app-data-table
+    *ngIf="!isLoading"
     [data]="filteredOrders"
     [columns]="columns"
     [actions]="actions"
     searchPlaceholder="{{ getTranslation('searchPlaceholder') }}"
     (actionClicked)="onAction($event)"
-    (exportClicked)="onExport()"
   ></app-data-table>
 
   <!-- Order Details Modal -->
@@ -86,115 +111,62 @@
         <div>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('customerInfo') }}</h3>
           <div class="space-y-2">
-            <p><span class="font-medium">{{ selectedOrder.customer.name }}</span></p>
-            <p class="text-gray-600 dark:text-gray-400">{{ selectedOrder.customer.email }}</p>
-            <p class="text-gray-600 dark:text-gray-400">{{ selectedOrder.customer.phone }}</p>
-          </div>
-        </div>
-        
-        <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('shippingAddress') }}</h3>
-          <div class="space-y-2">
-            <p class="text-gray-600 dark:text-gray-400">{{ selectedOrder.shippingAddress.street }}</p>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{ selectedOrder.shippingAddress.city }}, 
-              {{ selectedOrder.shippingAddress.state }} 
-              {{ selectedOrder.shippingAddress.zipCode }}
-            </p>
-            <p class="text-gray-600 dark:text-gray-400">{{ selectedOrder.shippingAddress.country }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Order Items -->
-      <div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('orderItems') }}</h3>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {{ getTranslation('item') }}
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {{ getTranslation('quantity') }}
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {{ getTranslation('price') }}
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {{ getTranslation('subtotal') }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              <tr *ngFor="let item of selectedOrder.items">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <img [src]="item.image" [alt]="item.name" class="w-10 h-10 rounded-lg object-cover">
-                    <div class="ml-4 rtl:mr-4 rtl:ml-0">
-                      <div class="text-sm font-medium text-gray-900 dark:text-white">{{ item.name }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  {{ item.quantity }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  ${{ item.price }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  ${{ item.price * item.quantity }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Order Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('orderDetails') }}</h3>
-          <div class="space-y-2">
             <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('orderNumber') }}:</span>
-              <span class="font-medium">#{{ selectedOrder.orderNumber }}</span>
+              <span class="text-gray-600 dark:text-gray-400">Name:</span>
+              <span class="font-medium">{{ selectedOrder.customerName }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('status') }}:</span>
-              <span class="text-sm font-medium">{{ getTranslation(selectedOrder.status) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('paymentStatus') }}:</span>
-              <span class="text-sm font-medium">{{ getTranslation(selectedOrder.paymentStatus) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('datePlaced') }}:</span>
-              <span>{{ formatDate(selectedOrder.createdAt) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('dateUpdated') }}:</span>
-              <span>{{ formatDate(selectedOrder.updatedAt) }}</span>
+              <span class="text-gray-600 dark:text-gray-400">Phone:</span>
+              <span>{{ selectedOrder.customerPhone }}</span>
             </div>
           </div>
         </div>
         
         <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('orderTotal') }}</h3>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('productInfo') }}</h3>
           <div class="space-y-2">
             <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('subtotal') }}:</span>
-              <span>${{ getOrderSubtotal(selectedOrder) }}</span>
+              <span class="text-gray-600 dark:text-gray-400">Product:</span>
+              <span class="font-medium">{{ selectedOrder.productTitle }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Shipping:</span>
-              <span>$0.00</span>
+            <div class="flex items-center gap-4 mt-2">
+              <img [src]="selectedOrder.productImageUrl" class="w-16 h-16 object-cover rounded-lg">
+              <div class="flex-1">
+                <div class="flex justify-between">
+                  <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('quantity') }}:</span>
+                  <span>{{ selectedOrder.quantity }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('price') }}:</span>
+                  <span>${{ selectedOrder.unitPrice }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('total') }}:</span>
+                  <span class="font-medium">${{ selectedOrder.totalPrice }}</span>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-              <span class="font-medium">{{ getTranslation('orderTotal') }}:</span>
-              <span class="font-medium">${{ selectedOrder.total }}</span>
-            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ getTranslation('orderDetails') }}</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('orderNumber') }}:</span>
+            <span class="font-medium">#{{ selectedOrder.orderId }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('status') }}:</span>
+            <span [class]="'px-2 py-1 rounded-full text-xs '">
+              {{ selectedOrder.status }}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('datePlaced') }}:</span>
+            <span>{{ formatDate(selectedOrder.createdAt) }}</span>
           </div>
         </div>
       </div>

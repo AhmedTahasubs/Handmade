@@ -17,6 +17,7 @@ export interface TableAction {
   icon: string;
   color: "primary" | "secondary" | "success" | "warning" | "danger";
   action: string;
+  menuItems?:any[]
 }
 
 @Component({
