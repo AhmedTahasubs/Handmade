@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UsersService, UserDisplay, UserResponseById, RegisterAdminRequest, UserResponse } from '../../services/users.service';
 import { finalize } from 'rxjs';
+import { ToastService } from '../../services/toast.service'; // Import the ToastService
 
 @Component({
   selector: "app-users-management",
@@ -19,8 +20,6 @@ export class UsersManagement implements OnInit {
   showModal = false;
   showDetailsModal = false;
   isLoading = false;
-  errorMessage = '';
-  successMessage = '';
   
   currentUser: RegisterAdminRequest = {
     userName: '',
@@ -54,7 +53,8 @@ export class UsersManagement implements OnInit {
   constructor(
     public themeService: ThemeService,
     public languageService: LanguageService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private toastService: ToastService // Inject ToastService
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +63,6 @@ export class UsersManagement implements OnInit {
 
   loadUsers(): void {
     this.isLoading = true;
-    this.errorMessage = '';
     this.usersService.getAll()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -72,7 +71,7 @@ export class UsersManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error loading users:', error);
-          this.errorMessage = this.getErrorMessage('load');
+          this.toastService.showError(this.getErrorMessage('load'));
         }
       });
   }
@@ -86,8 +85,6 @@ export class UsersManagement implements OnInit {
     };
     this.resetValidationErrors();
     this.showModal = true;
-    this.errorMessage = '';
-    this.successMessage = '';
   }
 
   resetValidationErrors(): void {
@@ -123,7 +120,6 @@ export class UsersManagement implements OnInit {
 
   viewUser(userId: string): void {
     this.isLoading = true;
-    this.errorMessage = '';
     this.usersService.getById(userId)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -133,7 +129,7 @@ export class UsersManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error loading user details:', error);
-          this.errorMessage = this.getErrorMessage('details');
+          this.toastService.showError(this.getErrorMessage('details'));
         }
       });
   }
@@ -142,8 +138,6 @@ export class UsersManagement implements OnInit {
     if (!this.validateAdminForm()) return;
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
     
     this.usersService.registerAdmin(this.currentUser)
       .pipe(finalize(() => this.isLoading = false))
@@ -153,7 +147,7 @@ export class UsersManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error registering admin:', error);
-          this.errorMessage = this.getErrorMessage('register');
+          this.toastService.showError(this.getErrorMessage('register'));
         }
       });
   }
@@ -215,14 +209,14 @@ export class UsersManagement implements OnInit {
 
   private handleAdminResponse(response: UserResponse): void {
     if (response.errorMessages?.length > 0) {
-      this.errorMessage = response.errorMessages.join(', ');
+      this.toastService.showError(response.errorMessages.join(', '));
     } else {
-      this.successMessage = this.languageService.currentLanguage() === 'en'
+      const successMessage = this.languageService.currentLanguage() === 'en'
         ? 'Admin registered successfully!'
         : 'تم تسجيل المسؤول بنجاح!';
+      this.toastService.showSuccess(successMessage);
       this.closeModal();
       this.loadUsers();
-      setTimeout(() => this.successMessage = '', 3000);
     }
   }
 
@@ -253,14 +247,6 @@ export class UsersManagement implements OnInit {
     
     const lang = this.languageService.currentLanguage() as keyof LanguageMessages;
     return messages[lang][type];
-  }
-
-  dismissError(): void {
-    this.errorMessage = '';
-  }
-
-  dismissSuccess(): void {
-    this.successMessage = '';
   }
 
   onExport(): void {

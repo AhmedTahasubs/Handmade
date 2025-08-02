@@ -20,43 +20,6 @@
     </button>
   </div>
 
-  <!-- Messages -->
-  <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 dark:bg-red-900/50">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="fas fa-exclamation-circle h-5 w-5 text-red-500 dark:text-red-300"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm text-red-700 dark:text-red-300">
-            {{ errorMessage }}
-          </p>
-        </div>
-      </div>
-      <button type="button" (click)="dismissError()" class="text-red-500 dark:text-red-300">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
-
-  <div *ngIf="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 dark:bg-green-900/50">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="fas fa-check-circle h-5 w-5 text-green-500 dark:text-green-300"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm text-green-700 dark:text-green-300">
-            {{ successMessage }}
-          </p>
-        </div>
-      </div>
-      <button type="button" (click)="dismissSuccess()" class="text-green-500 dark:text-green-300">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
-
   <!-- Loader -->
   <div *ngIf="isLoading" class="flex justify-center items-center p-8">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>

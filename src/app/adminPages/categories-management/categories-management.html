@@ -22,23 +22,6 @@
   <div *ngIf="isLoading" class="flex justify-center items-center p-8">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
-
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-100 px-4 py-3 rounded relative" role="alert">
-    <span class="block sm:inline">{{ errorMessage }}</span>
-    <button (click)="errorMessage = null" class="absolute top-0 bottom-0 right-0 px-4 py-3">
-      <i class="fa-solid fa-times"></i>
-    </button>
-  </div>
-
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="bg-green-100 dark:bg-green-900/50 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-100 px-4 py-3 rounded relative" role="alert">
-    <span class="block sm:inline">{{ successMessage }}</span>
-    <button (click)="successMessage = null" class="absolute top-0 bottom-0 right-0 px-4 py-3">
-      <i class="fa-solid fa-times"></i>
-    </button>
-  </div>
-
   <!-- Stats Card -->
   <div *ngIf="!isLoading" class="bg-white dark:bg-gray-800 rounded-xl p-6 !mb-5 border border-gray-200 dark:border-gray-700">
     <div class="flex items-center justify-between">

@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
 import { RouterModule } from '@angular/router';
 import { ServiceSellerService, ServiceDto, ServiceRequest } from '../../services/services.service';
 import { CategorySellerService, Category } from '../../services/categories.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: "app-seller-services-management",
@@ -20,6 +21,7 @@ export class SellerServicesManagement implements OnInit {
   private languageService = inject(LanguageService);
   private serviceSellerService = inject(ServiceSellerService);
   private categoryService = inject(CategorySellerService);
+  private toastService = inject(ToastService);
 
   currentLanguage: "en" | "ar" = "en";
   showModal = false;
@@ -33,8 +35,6 @@ export class SellerServicesManagement implements OnInit {
   imagePreview: string | ArrayBuffer | null = null;
   isLoading = false;
   formErrors: Record<string, string> = {};
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
 
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
@@ -84,10 +84,10 @@ export class SellerServicesManagement implements OnInit {
       noServices: "No services found",
       noServicesMessage: "You haven't added any services yet. Start by creating one.",
       addServiceSuccess: "Service added successfully!",
-    editServiceSuccess: "Service updated successfully!",
-    deleteServiceSuccess: "Service deleted successfully!",
-    saveServiceError: "Failed to save service. Please try again.",
-    deleteServiceError: "Failed to delete service. Please try again.",
+      editServiceSuccess: "Service updated successfully!",
+      deleteServiceSuccess: "Service deleted successfully!",
+      saveServiceError: "Failed to save service. Please try again.",
+      deleteServiceError: "Failed to delete service. Please try again.",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $1",
@@ -124,10 +124,10 @@ export class SellerServicesManagement implements OnInit {
       noServices: "لا توجد خدمات",
       noServicesMessage: "لم تقم بإضافة أي خدمات بعد. ابدأ بإنشاء واحدة.",
       addServiceSuccess: "تمت إضافة الخدمة بنجاح!",
-    editServiceSuccess: "تم تحديث الخدمة بنجاح!",
-    deleteServiceSuccess: "تم حذف الخدمة بنجاح!",
-    saveServiceError: "فشل حفظ الخدمة. يرجى المحاولة مرة أخرى.",
-    deleteServiceError: "فشل حذف الخدمة. يرجى المحاولة مرة أخرى.",
+      editServiceSuccess: "تم تحديث الخدمة بنجاح!",
+      deleteServiceSuccess: "تم حذف الخدمة بنجاح!",
+      saveServiceError: "فشل حفظ الخدمة. يرجى المحاولة مرة أخرى.",
+      deleteServiceError: "فشل حذف الخدمة. يرجى المحاولة مرة أخرى.",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ١ دولار",
@@ -160,6 +160,7 @@ export class SellerServicesManagement implements OnInit {
       error: (error) => {
         console.error('Error loading services:', error);
         this.isLoading = false;
+        this.toastService.showError(this.getTranslation('saveServiceError'));
       }
     });
   }
@@ -174,6 +175,7 @@ export class SellerServicesManagement implements OnInit {
       error: (error) => {
         console.error('Error loading categories:', error);
         this.isLoading = false;
+        this.toastService.showError(this.getTranslation('saveServiceError'));
       }
     });
   }
@@ -209,13 +211,11 @@ export class SellerServicesManagement implements OnInit {
     if (input.files && input.files[0]) {
       const file = input.files[0];
       
-      // Validate file type
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         this.formErrors['image'] = this.getTranslation('validation.invalidFileType');
         return;
       }
       
-      // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
         this.formErrors['image'] = this.getTranslation('validation.maxFileSize');
         return;
@@ -224,7 +224,6 @@ export class SellerServicesManagement implements OnInit {
       this.selectedFile = file;
       this.formErrors['image'] = '';
       
-      // Create image preview
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
@@ -265,7 +264,6 @@ export class SellerServicesManagement implements OnInit {
       isValid = false;
     }
 
-    // Only require image for new services
     if (!this.isEditing && !this.selectedFile) {
       this.formErrors['image'] = this.getTranslation('validation.required');
       isValid = false;
@@ -353,7 +351,6 @@ export class SellerServicesManagement implements OnInit {
     if (this.selectedFile) {
       formData.append('File', this.selectedFile);
     } else if (this.currentService.id && !this.selectedFile) {
-      // Keep existing image if editing and no new file selected
       const existingService = this.services.find(s => s.id === this.currentService.id);
       if (existingService?.imageUrl) {
         formData.append('ImageUrl', existingService.imageUrl);
@@ -369,12 +366,11 @@ export class SellerServicesManagement implements OnInit {
         this.loadServices();
         this.closeModal();
         this.isLoading = false;
-        this.successMessage = this.getTranslation(this.isEditing ? 'editServiceSuccess' : 'addServiceSuccess');
-        setTimeout(() => this.successMessage = null, 5000); // Auto-dismiss after 5 seconds
+        this.toastService.showSuccess(this.getTranslation(this.isEditing ? 'editServiceSuccess' : 'addServiceSuccess'));
       },
       error: (error) => {
         console.error('Error saving service:', error);
-        this.errorMessage = this.getTranslation('saveServiceError');
+        this.toastService.showError(this.getTranslation('saveServiceError'));
         this.isLoading = false;
         if (form) {
           form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
@@ -415,24 +411,23 @@ export class SellerServicesManagement implements OnInit {
       });
     }
     this.serviceSellerService.delete(this.serviceToDelete.id).subscribe({
-  next: () => {
-    this.loadServices();
-    this.closeDeleteModal();
-    this.isLoading = false;
-    this.successMessage = this.getTranslation('deleteServiceSuccess');
-    setTimeout(() => this.successMessage = null, 5000);
-  },
-  error: (error) => {
-    console.error('Error deleting service:', error);
-    this.errorMessage = this.getTranslation('deleteServiceError');
-    this.isLoading = false;
-    if (modal) {
-      modal.querySelectorAll('button').forEach((button: any) => {
-        button.disabled = false;
-      });
-    }
-  }
-});
+      next: () => {
+        this.loadServices();
+        this.closeDeleteModal();
+        this.isLoading = false;
+        this.toastService.showSuccess(this.getTranslation('deleteServiceSuccess'));
+      },
+      error: (error) => {
+        console.error('Error deleting service:', error);
+        this.toastService.showError(this.getTranslation('deleteServiceError'));
+        this.isLoading = false;
+        if (modal) {
+          modal.querySelectorAll('button').forEach((button: any) => {
+            button.disabled = false;
+          });
+        }
+      }
+    });
   }
 
   onExport(): void {

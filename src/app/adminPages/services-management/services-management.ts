@@ -8,6 +8,7 @@ import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { ServiceSellerService, ServiceDto } from '../../services/services.service';
 import { finalize } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-services-management',
@@ -16,6 +17,7 @@ import { finalize } from 'rxjs';
   templateUrl: './services-management.html'
 })
 export class ServicesManagement implements OnInit {
+  private toastService = inject(ToastService);
   themeService = inject(ThemeService);
   languageService = inject(LanguageService);
   serviceService = inject(ServiceSellerService);
@@ -28,8 +30,6 @@ export class ServicesManagement implements OnInit {
   showRejectModal = false;
   rejectionReason = '';
   isLoading = false;
-  successMessage = '';
-  errorMessage = '';
 
   statusFilters = [
     { label: "All", value: "all", icon: "fas fa-filter" },
@@ -71,7 +71,6 @@ export class ServicesManagement implements OnInit {
 
   loadServices(): void {
     this.isLoading = true;
-    this.errorMessage = '';
     this.serviceService.getAll()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -81,15 +80,13 @@ export class ServicesManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error loading services:', error);
-          this.errorMessage = this.getTranslation('Failed to load services. Please try again later.');
-          this.clearMessagesAfterDelay();
+          this.toastService.showError(this.getTranslation('Failed to load services. Please try again later.'));
         }
       });
   }
 
   loadServiceDetails(id: number): void {
     this.isLoading = true;
-    this.errorMessage = '';
     this.serviceService.getById(id)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -99,8 +96,7 @@ export class ServicesManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error loading service details:', error);
-          this.errorMessage = this.getTranslation('Failed to load service details.');
-          this.clearMessagesAfterDelay();
+          this.toastService.showError(this.getTranslation('Failed to load service details.'));
         }
       });
   }
@@ -151,8 +147,6 @@ export class ServicesManagement implements OnInit {
 
   approveService(service: ServiceDto): void {
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
     
     this.serviceService.update(service.id, { 
       ...service, 
@@ -161,15 +155,13 @@ export class ServicesManagement implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          this.successMessage = this.getTranslation('Service approved successfully!');
+          this.toastService.showSuccess(this.getTranslation('Service approved successfully!'));
           this.loadServices();
           this.closeDetailsModal();
-          this.clearMessagesAfterDelay();
         },
         error: (error) => {
           console.error('Error approving service:', error);
-          this.errorMessage = this.getTranslation('Failed to approve service. Please try again.');
-          this.clearMessagesAfterDelay();
+          this.toastService.showError(this.getTranslation('Failed to approve service. Please try again.'));
         }
       });
   }
@@ -184,8 +176,6 @@ export class ServicesManagement implements OnInit {
     if (!this.selectedService || !this.rejectionReason.trim()) return;
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
     
     this.serviceService.update(this.selectedService.id, { 
       ...this.selectedService, 
@@ -195,15 +185,13 @@ export class ServicesManagement implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          this.successMessage = this.getTranslation('Service rejected successfully!');
+          this.toastService.showSuccess(this.getTranslation('Service rejected successfully!'));
           this.loadServices();
           this.closeRejectModal();
-          this.clearMessagesAfterDelay();
         },
         error: (error) => {
           console.error('Error rejecting service:', error);
-          this.errorMessage = this.getTranslation('Failed to reject service. Please try again.');
-          this.clearMessagesAfterDelay();
+          this.toastService.showError(this.getTranslation('Failed to reject service. Please try again.'));
         }
       });
   }
@@ -251,20 +239,5 @@ export class ServicesManagement implements OnInit {
       }
     }
     return key;
-  }
-
-  dismissError(): void {
-    this.errorMessage = '';
-  }
-
-  dismissSuccess(): void {
-    this.successMessage = '';
-  }
-
-  private clearMessagesAfterDelay(delay: number = 3000): void {
-    setTimeout(() => {
-      this.successMessage = '';
-      this.errorMessage = '';
-    }, delay);
   }
 }

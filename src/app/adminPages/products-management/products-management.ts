@@ -3,10 +3,11 @@ import { TableAction, TableColumn, DataTable } from './../../components/data-tab
 import { Modal } from './../../components/modal/modal';
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { RouterModule } from '@angular/router';
 import { ProductService, Product } from '../../services/products.service';
 import { finalize } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: "app-products-management",
@@ -15,12 +16,15 @@ import { finalize } from 'rxjs';
   imports: [DataTable, Modal, CommonModule, RouterModule],
 })
 export class ProductsManagement implements OnInit {
+  private toastService = inject(ToastService);
+  private productService = inject(ProductService);
+  themeService = inject(ThemeService);
+  languageService = inject(LanguageService);
+
   showDetailsModal = false;
   selectedProduct: Product | null = null;
   currentStatusFilter = "all";
   isLoading = false;
-  errorMessage = '';
-  successMessage = '';
 
   statusFilters = [
     { label: "All", value: "all", icon: "fas fa-filter" },
@@ -52,19 +56,12 @@ export class ProductsManagement implements OnInit {
     { label: "Reject", icon: "fas fa-times", color: "danger", action: "reject"},
   ];
 
-  constructor(
-    public themeService: ThemeService,
-    public languageService: LanguageService,
-    private productService: ProductService
-  ) {}
-
   ngOnInit(): void {
     this.loadProducts();
   }
 
   loadProducts(): void {
     this.isLoading = true;
-    this.errorMessage = '';
     this.productService.getAll()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -74,24 +71,26 @@ export class ProductsManagement implements OnInit {
         },
         error: (error) => {
           console.error('Error loading products:', error);
-          this.errorMessage = this.languageService.currentLanguage() === 'en' 
-            ? 'Failed to load products. Please try again later.' 
-            : 'فشل تحميل المنتجات. يرجى المحاولة مرة أخرى لاحقًا.';
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en' 
+              ? 'Failed to load products. Please try again later.' 
+              : 'فشل تحميل المنتجات. يرجى المحاولة مرة أخرى لاحقًا.'
+          );
         }
       });
   }
 
   filterProducts(): void {
-  if (this.currentStatusFilter === "all") {
-    this.filteredProducts = [...this.products];
-  } else {
-    this.filteredProducts = this.products.filter(
-      (product) =>
-        typeof product.status === 'string' &&
-        product.status.toLowerCase() === this.currentStatusFilter.toLowerCase()
-    );
+    if (this.currentStatusFilter === "all") {
+      this.filteredProducts = [...this.products];
+    } else {
+      this.filteredProducts = this.products.filter(
+        (product) =>
+          typeof product.status === 'string' &&
+          product.status.toLowerCase() === this.currentStatusFilter.toLowerCase()
+      );
+    }
   }
-}
 
   setStatusFilter(status: string): void {
     this.currentStatusFilter = status;
@@ -107,12 +106,13 @@ export class ProductsManagement implements OnInit {
   }
 
   getStatusCount(status: string): number {
-  return this.products.filter(
-    (product) =>
-      typeof product.status === 'string' &&
-      product.status.toLowerCase() === status.toLowerCase()
-  ).length;
-}
+    return this.products.filter(
+      (product) =>
+        typeof product.status === 'string' &&
+        product.status.toLowerCase() === status.toLowerCase()
+    ).length;
+  }
+
   getActiveProductsCount(): number {
     return this.products.filter(
       (product) => product.status.toLowerCase() === "approved"
@@ -152,31 +152,29 @@ export class ProductsManagement implements OnInit {
 
   updateProductStatus(productId: number, status: string): void {
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
     this.productService.updateStatus(productId, status)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
-        //fe hna error by7sl 7awel t7lo
         next: (updatedProduct) => {
           const index = this.products.findIndex(p => p.id === productId);
           if (index !== -1) {
             this.products[index] = updatedProduct;
             this.filterProducts();
           }
-          this.successMessage = this.languageService.currentLanguage() === 'en'
-            ? `Product status updated to ${status} successfully!`
-            : `تم تحديث حالة المنتج إلى ${status === 'approved' ? 'موافق عليه' : 'مرفوض'} بنجاح!`;
-            
-          // Clear success message after 3 seconds
-          setTimeout(() => this.successMessage = '', 3000);
-         location.reload();
+          this.toastService.showSuccess(
+            this.languageService.currentLanguage() === 'en'
+              ? `Product status updated to ${status} successfully!`
+              : `تم تحديث حالة المنتج إلى ${status === 'approved' ? 'موافق عليه' : 'مرفوض'} بنجاح!`
+          );
+          location.reload();
         },
         error: (error) => {
           console.error('Error updating product status:', error);
-          this.errorMessage = this.languageService.currentLanguage() === 'en'
-            ? 'Failed to update product status. Please try again.'
-            : 'فشل تحديث حالة المنتج. يرجى المحاولة مرة أخرى.';
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en'
+              ? 'Failed to update product status. Please try again.'
+              : 'فشل تحديث حالة المنتج. يرجى المحاولة مرة أخرى.'
+          );
         }
       });
   }
@@ -188,13 +186,5 @@ export class ProductsManagement implements OnInit {
 
   onExport(): void {
     console.log("Export products data");
-  }
-
-  dismissError(): void {
-    this.errorMessage = '';
-  }
-
-  dismissSuccess(): void {
-    this.successMessage = '';
   }
 }
