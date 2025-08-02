@@ -36,11 +36,11 @@ export class CartComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading cart:', err);
-        this.toastService.showError(
-          this.languageService.currentLanguage() === 'en' 
-            ? 'Failed to load cart' 
-            : 'فشل تحميل السلة'
-        );
+        // this.toastService.showError(
+        //   this.languageService.currentLanguage() === 'en' 
+        //     ? 'Failed to load cart' 
+        //     : 'فشل تحميل السلة'
+        // );
         this.isLoading = false;
       }
     });

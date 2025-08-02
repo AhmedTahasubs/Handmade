@@ -73,6 +73,11 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./pages/contacts/contacts').then(m => m.ContactsPageComponent)
       },
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadComponent: () => import('./authPages/checkout/checkout').then(m => m.CheckoutComponent)
+      }
     ]
   },
   //dashboard layout
