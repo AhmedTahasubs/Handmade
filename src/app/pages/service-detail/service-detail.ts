@@ -355,7 +355,7 @@ private loadReviews(): void {
       helpful: this.currentLanguage === 'en' ? 'Helpful' : 'مفيد',
       online: this.currentLanguage === 'en' ? 'Online' : 'متصل',
       verified: this.currentLanguage === 'en' ? 'Verified Seller' : 'بائع موثق',
-      Service_products: this.currentLanguage === 'en' ? 'Serices Products' : 'منتجات البائع',
+      Service_products: this.currentLanguage === 'en' ? 'Services Products' : 'منتجات البائع',
       view_all_products: this.currentLanguage === 'en' ? 'View All Products' : 'عرض جميع المنتجات'
     };
   }

@@ -135,7 +135,7 @@
         </div>
 
         <!-- Features -->
-        <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+        <!-- <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
           <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ labels.service_features }}</h2>
           <div class="grid md:grid-cols-2 gap-4">
             <div *ngFor="let feature of service.features[currentLanguage]" class="flex items-center gap-3">
@@ -143,7 +143,7 @@
               <span class="text-gray-700 dark:text-gray-300">{{ feature }}</span>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Seller Products -->
          <div *ngIf="displayedSellerProducts.length > 0">
@@ -156,11 +156,11 @@
               (addToWishlist)="onAddToWishlist($event)">
             </app-product-card>
           </div>
-          <div class="mt-4 text-right">
+          <!-- <div class="mt-4 text-right">
             <button (click)="viewAllSellerProducts()" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
               {{ labels.view_all_products }}
-            </button>
-          </div>
+            </button> -->
+          <!-- </div> -->
         </div> 
 
         <!-- FAQ -->
