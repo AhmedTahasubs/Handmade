@@ -26,50 +26,12 @@
            status.value === 'approved' ? 'موافق عليه' :
            status.value === 'pending' ? 'قيد الانتظار' :
            status.value === 'rejected' ? 'مرفوض' : '' }}
-        <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+        <span class="bg-white text-black dark:text-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
           {{ getStatusCount(status.value) }}
         </span>
       </button>
     </div>
   </div>
-
-  <!-- Messages -->
-  <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 dark:bg-red-900/50">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="fas fa-exclamation-circle h-5 w-5 text-red-500 dark:text-red-300"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm text-red-700 dark:text-red-300">
-            {{ errorMessage }}
-          </p>
-        </div>
-      </div>
-      <button type="button" (click)="dismissError()" class="text-red-500 dark:text-red-300">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
-
-  <div *ngIf="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 dark:bg-green-900/50">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="fas fa-check-circle h-5 w-5 text-green-500 dark:text-green-300"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm text-green-700 dark:text-green-300">
-            {{ successMessage }}
-          </p>
-        </div>
-      </div>
-      <button type="button" (click)="dismissSuccess()" class="text-green-500 dark:text-green-300">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
-
   <!-- Loader -->
   <div *ngIf="isLoading" class="flex justify-center items-center p-8">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
@@ -135,18 +97,31 @@
   </div>
 
   <!-- Data Table -->
-  <div *ngIf="!isLoading">
+ <div *ngIf="!isLoading">
+  <!-- Show table if products exist -->
+  <div *ngIf="products.length > 0; else noProducts">
     <app-data-table
-      title=" {{ languageService.currentLanguage() === 'en' ? 'Products List' : 'قائمة المنتجات' }}"
-      subtitle="All products in the marketplace"
+      [title]="languageService.currentLanguage() === 'en' ? 'Products List' : 'قائمة المنتجات'"
+      [subtitle]="languageService.currentLanguage() === 'en' ? 'All products in the marketplace' : 'جميع المنتجات في المتجر'"
       [data]="filteredProducts"
       [columns]="columns"
       [actions]="actions"
-      searchPlaceholder="Search products..."
+      [searchPlaceholder]="languageService.currentLanguage() === 'en' ? 'Search products...' : 'بحث في المنتجات...'"
       (actionClicked)="onAction($event)"
       (exportClicked)="onExport()"
     ></app-data-table>
   </div>
+
+  <!-- Simple Empty State -->
+  <ng-template #noProducts>
+    <div class="text-center py-12">
+      <i class="fas fa-box-open text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        {{ languageService.currentLanguage() === 'en' ? 'No products yet' : 'لا توجد منتجات بعد' }}
+      </p>
+    </div>
+  </ng-template>
+</div>
 
   <!-- Product Details Modal -->
   <app-modal

@@ -1,165 +1,175 @@
 <div class="space-y-6">
- <!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-      {{ languageService.currentLanguage() === 'en' ? 'Services Management' : 'إدارة الخدمات' }}
-    </h1>
-    <p class="text-gray-600 dark:text-gray-400">
-      {{ languageService.currentLanguage() === 'en' 
-        ? 'Review and manage artisan services' 
-        : 'مراجعة وإدارة خدمات الحرفيين' }}
-    </p>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ getTranslation('Services Management') }}
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ getTranslation('Review and manage artisan services') }}
+      </p>
+    </div>
+    
+    <!-- Status Filter -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        *ngFor="let status of statusFilters"
+        (click)="setStatusFilter(status.value)"
+        [class]="getFilterButtonClass(status.value)"
+      >
+        <i [class]="status.icon" class="w-4 h-4"></i>
+        {{ languageService.currentLanguage() === 'ar' ? 
+           status.value === 'all' ? 'الكل' :
+           status.value === 'approved' ? 'موافق عليه' :
+           status.value === 'pending' ? 'قيد الانتظار' :
+           status.value === 'rejected' ? 'مرفوض' : status.label : status.label }}
+        <span class="bg-white text-black dark:text-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
+          {{ getStatusCount(status.value) }}
+        </span>
+      </button>
+    </div>
   </div>
-  
-  <!-- Status Filter -->
-  <div class="flex gap-2">
-    <button
-      *ngFor="let status of statusFilters"
-      (click)="setStatusFilter(status.value)"
-      [class]="getFilterButtonClass(status.value)"
-      class="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-    >
-      <i [class]="status.icon" class="w-4 h-4"></i>
-      {{ languageService.currentLanguage() === 'en' ? status.label : 
-         status.value === 'all' ? 'الكل' :
-         status.value === 'awaiting' ? 'بانتظار المراجعة' :
-         status.value === 'approved' ? 'مقبول' : 'مرفوض' }}
-      <span class="bg-white dark:bg-gray-800 text-xs px-2 py-1 rounded-full">
-        {{ getStatusCount(status.value) }}
-      </span>
-    </button>
+  <!-- Loader -->
+  <div *ngIf="isLoading" class="flex justify-center items-center p-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
   </div>
-</div>
 
-  <!-- Data Table -->
-  <app-data-table
-    title="Services"
-    subtitle="Manage artisan service submissions"
-    [data]="filteredServices"
-    [columns]="columns"
-    [actions]="actions"
-    searchPlaceholder="Search services..."
-    (actionClicked)="onAction($event)"
-    (exportClicked)="onExport()"
-  ></app-data-table>
+ <!-- Data Table Section -->
+<div *ngIf="!isLoading">
+  <!-- Show table if services exist -->
+  <div *ngIf="services.length > 0; else noServices">
+    <app-data-table
+      [title]="getTranslation('Services List')"
+      [subtitle]="getTranslation('All services in the marketplace')"
+      [data]="filteredServices"
+      [columns]="columns"
+      [actions]="actions"
+      [searchPlaceholder]="getTranslation('Search services...')"
+      (actionClicked)="onAction($event)"
+    ></app-data-table>
+  </div>
+
+  <!-- Simple Empty State -->
+  <ng-template #noServices>
+    <div class="text-center py-12">
+      <i class="fas fa-tools text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        {{ getTranslation('No services yet') }}
+      </p>
+    </div>
+  </ng-template>
+</div>
 
   <!-- Service Details Modal -->
   <app-modal
     [isOpen]="showDetailsModal"
-    title="Service Details"
+    [title]="selectedService?.title || getTranslation('Service Details')"
     [showConfirmButton]="false"
-    cancelText="Close"
+    [cancelText]="getTranslation('Close')"
     (closed)="closeDetailsModal()"
   >
     <div *ngIf="selectedService" class="space-y-6">
-      <!-- Service Images -->
-      <div *ngIf="selectedService.images.length > 0">
-        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Service Images</h4>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <img
-            *ngFor="let image of selectedService.images"
-            [src]="image"
-            [alt]="selectedService.title"
-            class="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-          />
-        </div>
+      <!-- Service Image -->
+      <div *ngIf="selectedService.imageUrl" class="flex justify-center">
+        <img
+          [src]="selectedService.imageUrl"
+          [alt]="selectedService.title"
+          class="w-full max-w-md h-64 object-contain rounded-lg border border-gray-200 dark:border-gray-700"
+        />
       </div>
 
       <!-- Service Info -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Service Information</h4>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            {{ getTranslation('Service Information') }}
+          </h4>
           <div class="space-y-3">
             <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Title</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.title }}</p>
-            </div>
-            <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Description') }}
+              </label>
               <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.description }}</p>
             </div>
             <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Category</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.category }}</p>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Category') }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.categoryName }}</p>
             </div>
             <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Price</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.price | currency }}</p>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Price') }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.basePrice | currency }}</p>
             </div>
             <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Duration</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.duration }}</p>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Delivery Time') }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.deliveryTime }} {{ getTranslation('days') }}</p>
             </div>
           </div>
         </div>
 
         <div>
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Artisan Information</h4>
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            {{ getTranslation('Seller Information') }}
+          </h4>
           <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <img
-                [src]="selectedService.artisan.avatar"
-                [alt]="selectedService.artisan.name"
-                class="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedService.artisan.name }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ selectedService.artisan.email }}</p>
-              </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Seller Name') }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.sellerName }}</p>
             </div>
             <div>
-              <label class="text-xs text-gray-500 dark:text-gray-400">Submitted Date</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.submittedDate | date }}</p>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Rating') }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">
+                {{ selectedService.avgRating || getTranslation('Not rated') }}
+              </p>
             </div>
-            <div *ngIf="selectedService.reviewedDate">
-              <label class="text-xs text-gray-500 dark:text-gray-400">Reviewed Date</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.reviewedDate | date }}</p>
-            </div>
-            <div *ngIf="selectedService.reviewedBy">
-              <label class="text-xs text-gray-500 dark:text-gray-400">Reviewed By</label>
-              <p class="text-sm text-gray-900 dark:text-white">{{ selectedService.reviewedBy }}</p>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTranslation('Status') }}
+              </label>
+              <span 
+                [class]="{
+                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': selectedService.status.toLowerCase() === 'approved',
+                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': selectedService.status.toLowerCase() === 'pending',
+                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': selectedService.status.toLowerCase() === 'rejected'
+                }" 
+                class="px-2 py-1 text-xs font-medium rounded-full"
+              >
+                {{ languageService.currentLanguage() === 'ar' ? 
+                   selectedService.status.toLowerCase() === 'approved' ? 'موافق عليه' :
+                   selectedService.status.toLowerCase() === 'pending' ? 'قيد الانتظار' :
+                   'مرفوض' : 
+                   selectedService.status }}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tags -->
-      <div *ngIf="selectedService.tags.length > 0">
-        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Tags</h4>
-        <div class="flex flex-wrap gap-2">
-          <span
-            *ngFor="let tag of selectedService.tags"
-            class="px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs rounded-full"
-          >
-            {{ tag }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Rejection Reason -->
-      <div *ngIf="selectedService.status === 'rejected' && selectedService.rejectionReason">
-        <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3">Rejection Reason</h4>
-        <p class="text-sm text-gray-900 dark:text-white bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
-          {{ selectedService.rejectionReason }}
-        </p>
-      </div>
-
       <!-- Action Buttons -->
-      <div *ngIf="selectedService.status === 'awaiting'" class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div *ngIf="selectedService.status.toLowerCase() === 'pending'" 
+           class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           (click)="approveService(selectedService)"
           class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2"
         >
-          <i class="fa-solid fa-check w-4 h-4"></i>
-          Approve Service
+          <i class="fas fa-check w-4 h-4"></i>
+          {{ getTranslation('Approve Service') }}
         </button>
         <button
           (click)="openRejectModal(selectedService)"
           class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
         >
-          <i class="fa-solid fa-times w-4 h-4"></i>
-          Reject Service
+          <i class="fas fa-times w-4 h-4"></i>
+          {{ getTranslation('Reject Service') }}
         </button>
       </div>
     </div>
@@ -168,19 +178,20 @@
   <!-- Reject Service Modal -->
   <app-modal
     [isOpen]="showRejectModal"
-    title="Reject Service"
-    confirmText="Reject"
+    [title]="getTranslation('Reject Service')"
+    [confirmText]="getTranslation('Reject')"
     confirmButtonType="danger"
+    [cancelText]="getTranslation('Cancel')"
     (closed)="closeRejectModal()"
     (confirmed)="confirmReject()"
   >
     <div class="space-y-4">
       <p class="text-gray-600 dark:text-gray-400">
-        Please provide a reason for rejecting this service. This will help the artisan understand what needs to be improved.
+        {{ getTranslation('Please provide a reason for rejecting this service.') }}
       </p>
       <textarea
         [(ngModel)]="rejectionReason"
-        placeholder="Enter rejection reason..."
+        [placeholder]="getTranslation('Enter rejection reason...')"
         rows="4"
         class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
       ></textarea>

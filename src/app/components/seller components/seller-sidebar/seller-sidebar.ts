@@ -59,11 +59,14 @@ export class SellerSidebar implements OnInit {
         exact: true
       },
       { 
-        name: isArabic ? "الإعدادات" : "Settings", 
+        name: isArabic ? "تسجيل خروج" : "Logout", 
         icon: "faCog", 
-        href: "/settings",
-        exact: false
+        href: "logout",
+        exact: false,
+        action: () => {
+          this.authService.logout();
       }
+    }
     ];
   }
 
@@ -73,7 +76,7 @@ export class SellerSidebar implements OnInit {
       'faShoppingBag': 'fa-shopping-bag',
       'faBox': 'fa-box',
       'faHandsHelping': 'fa-hands-helping',
-      'faCog': 'fa-cog',
+      'faCog': 'fa-arrow-right-from-bracket',
       'faStore': 'fa-store',
       'faTimes': 'fa-times',
       'faUser': 'fa-user'

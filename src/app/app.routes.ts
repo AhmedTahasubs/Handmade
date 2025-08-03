@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { authGuard } from './guards/auth-guard';
+import { guestGuard } from './guards/guestGuard';
 
 export const routes: Routes = [
   {
@@ -13,24 +14,20 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent)
       },
       { 
-        path: 'login', 
+        path: 'login',
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/login/login').then(m => m.Login)
       },
       { 
         path: 'register', 
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/register/register').then(m => m.Register)
       },
       { 
         path: 'forgot-password', 
+        canActivate: [guestGuard],
         loadComponent: () => import('./authPages/forgot-password/forgot-password').then(m => m.ForgotPassword)
       },
-      { 
-        path: 'categories', 
-        loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
-      },
-
-
-      
       {
         path: 'category/services/:id', // el id da bta3 el category ya hammad
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
@@ -40,12 +37,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
       },
       {
-        path: 'products',
-        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
-      },
-      {
         path: 'products/:id',
         loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
       },
       {
         path: 'sellerProfile/:id',
@@ -53,32 +50,41 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent)
       },
       {
         path: 'orders',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/orders/orders').then(m => m.CustomerOrdersComponent)
       },
       {
         path: 'chat/:userId',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPageComponent)
       },
       {
         path: 'contacts',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/contacts/contacts').then(m => m.ContactsPageComponent)
       },
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadComponent: () => import('./authPages/checkout/checkout').then(m => m.CheckoutComponent)
+      }
     ]
   },
   //dashboard layout
   {
     path: '',
     component: DashboardLayout,
-    // to do next
-    // canActivate: [authGuard],
-    // data: { roles: ['admin'] },
+
     children: [
       {
         path: 'admin',
+        canActivate: [authGuard],
+        data: { roles: ['admin'] },
         loadComponent: () => import('./pages/admin/admin').then(m => m.Admin),
         children: [
           { 

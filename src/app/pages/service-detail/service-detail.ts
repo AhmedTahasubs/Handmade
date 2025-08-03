@@ -2,7 +2,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ServiceCardComponent } from '../../components/service-card/service-card.component';
 import { ReviewItemComponent } from '../../components/review-item/review-item';
@@ -19,16 +19,16 @@ import {
   SellerInfo,
   Review,
   ServiceDto,
-  ProductDisplayDto as ProductDto, // هنحتاجها لتحويل الـ ProductDto
-  Product, // الواجهة اللي بيعرضها ProductCardComponent
+  ProductDisplayDto as ProductDto, 
+  Product, 
   ProductDisplayDto,
-} from '../../shared/service.interface'; // تأكد من المسار الصحيح
+} from '../../shared/service.interface'; 
 
 
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent, ProductCardComponent],
+  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent, ProductCardComponent,RouterModule],
   templateUrl: './service-detail.html',
   styleUrl: './service-detail.css'
 })
@@ -44,7 +44,7 @@ export class ServiceDetailPage implements OnInit {
   
   showContactForm = false;
   contactMessage = '';
-  sellerProducts: Product[] = []; // النوع Product[] للـ frontend
+  sellerProducts: ProductDisplayDto[] = []; // النوع Product[] للـ frontend
   displayedSellerProducts: Product[] = [];
   
   // حقن ServiceService
@@ -66,6 +66,7 @@ export class ServiceDetailPage implements OnInit {
         return;
       }
       this.loadServiceData(); // استدعي دالة تحميل البيانات
+      console.log(this.service)
     });
   }
   
@@ -89,10 +90,7 @@ export class ServiceDetailPage implements OnInit {
           isCustomizable: false, 
           deliveryTime: this.formatDeliveryTime(dto.deliveryTime),
           
-          fullDescription: {
-            en: 'Transform your photos into stunning digital portrait illustrations! I specialize in creating unique, personalized artwork that captures the essence of your personality. Using professional digital art techniques, I will create a one-of-a-kind portrait that you can use for social media profiles, print as wall art, or give as a memorable gift.',
-            ar: 'حول صورك إلى رسوم بورتريه رقمية مذهلة! أنا متخصص في إنشاء أعمال فنية فريدة وشخصية تلتقط جوهر شخصيتك. باستخدام تقنيات الفن الرقمي المهنية، سأنشئ بورتريه فريد من نوعه يمكنك استخدامه لملفات وسائل التواصل الاجتماعي أو طباعته كعمل فني جداري أو تقديمه كهدية لا تُنسى.'
-          },
+          fullDescription: dto.description,
           features: {
             en: [
               'High-resolution digital artwork', 'Multiple format delivery (PNG, JPG, PDF)',
@@ -123,7 +121,7 @@ export class ServiceDetailPage implements OnInit {
           faq: [], // **ملاحظة:** FAQs تحتاج لجلب من الـ API
           requirements: { en: [], ar: [] }, // **ملاحظة:** Requirements تحتاج لجلب من الـ API
           sellerInfo: { // **ملاحظة:** SellerInfo تحتاج لجلب من الـ API أو تكوينها من DTO
-            id: parseInt(dto.sellerId), // تحويل String لـ number
+            id: dto.sellerId, // تحويل String لـ number
             name: dto.sellerName,
             username: dto.sellerName, // افتراض أن اسم المستخدم هو اسم البائع
             avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=387', // Mocked
@@ -139,25 +137,29 @@ export class ServiceDetailPage implements OnInit {
             joinDate: '', // Mocked
             location: '' // Mocked
           },
-   products: (dto.products ?? []).map((pDto: ProductDisplayDto) => ({
-    id: pDto.id,
-    name: { en: pDto.title, ar: pDto.title },
-    description: { en: pDto.description, ar: pDto.description },
-    price: pDto.price,
-    category: dto.categoryName ?? '',
-    image: pDto.imageUrl || 'assets/product-placeholder.jpg',
-    seller: dto.sellerName ?? '',
-    rating: 0,
-    customizable: false
-  }))
+products: (dto.products ?? []).filter(p=>p.status==="approved").map((pDto: ProductDisplayDto) => ({
+  id: pDto.id,
+  title: pDto.title,
+  price: pDto.price,
+  quantity: pDto.quantity,
+  status: pDto.status,
+  createdAt: pDto.createdAt,
+  sellerId: dto.sellerId,
+  serviceId: dto.id,
+  imageUrl: pDto.imageUrl || 'assets/product-placeholder.jpg',
+  category: dto.categoryName ?? '',
+  description: pDto.description,
+  sellerName: dto.sellerName ?? '',
+}))
+
 
         };
         console.log('Fetched Service Detail:', this.service);
 
         // قم بتعيين أول باقة أو القيمة الافتراضية إذا كان لديك logic أكثر تعقيدًا للباقات
-        this.selectedPackage = this.service.packages[0] || null;
+        this.selectedPackage = this.service?.packages[0] || null;
         // عرض أول 3 منتجات من البائع
-        this.displayedSellerProducts = this.service.products.slice(0, 3);
+        this.displayedSellerProducts = this.service?.products.slice(0, 3);
         
         // **هنا ممكن تستدعي دوال لجلب Related Services و Reviews لو ليهم APIs منفصلة**
         this.loadRelatedServices(); // لسه بتجيب Mock data، ممكن تعدلها
@@ -200,7 +202,7 @@ private loadRelatedServices(): void {
   this.serviceService.getServicesByCategoryName(this.service.category).subscribe((dtos: ServiceDto[]) => {
     const services = dtos
       .filter(dto => dto.id !== this.service?.id)
-      .map(dto => this.mapDtoToService(dto));
+      .map(dto => this.mapDtoToService(dto)).slice(0, 4);
 
     this.relatedServices = services;
   });
@@ -273,7 +275,7 @@ private loadReviews(): void {
   }
   
   onRelatedServiceClick(service: Service): void {
-    this.router.navigate(['/service', service.id]);
+    this.router.navigate(['/services', service.id]);
   }
   
   goToSellerProfile(): void {
@@ -283,9 +285,7 @@ private loadReviews(): void {
     }
   }
   
-  goBackToServices(): void {
-    this.router.navigate(['/services']);
-  }
+ 
 
   onAddToCart(product: any): void {
     console.log('Adding to cart:', product);

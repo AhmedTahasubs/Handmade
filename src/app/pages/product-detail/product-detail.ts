@@ -1,8 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Product, ProductService } from '../../services/products.service';
+import { CartService } from '../../services/cart.service';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 interface Labels {
@@ -43,25 +44,20 @@ export class ProductDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly productService = inject(ProductService);
+  private readonly cartService = inject(CartService);
+  private readonly toastService = inject(ToastService);
 
-  // Component state
   product: Product | null = null;
   relatedProducts: Product[] = [];
   loading = true;
   addingToCart = false;
   buyingNow = false;
 
-  // Image handling
   selectedImage = '';
   productImages: string[] = [];
-
-  // Quantity
   quantity = 1;
-
-  // Wishlist state
   isInWishlist = false;
 
-  // Labels for internationalization
   labels: Labels = {
     home: 'Home',
     products: 'Products',
@@ -102,6 +98,10 @@ export class ProductDetailComponent implements OnInit {
     this.loading = true;
     this.productService.getById(id).subscribe({
       next: (product) => {
+        if(product.status !== 'approved') {
+          window.history.back();
+          return;
+        }
         this.product = product;
         this.setupProductImages();
         this.loadRelatedProducts();
@@ -111,7 +111,6 @@ export class ProductDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading product:', error);
         this.loading = false;
-        // Handle error - maybe navigate to 404 page
         this.router.navigate(['/products']);
       }
     });
@@ -119,8 +118,6 @@ export class ProductDetailComponent implements OnInit {
 
   private setupProductImages(): void {
     if (this.product?.imageUrl) {
-      // For now, we'll use the main image as the only image
-      // In a real app, you might have multiple images
       this.productImages = [this.product.imageUrl];
       this.selectedImage = this.product.imageUrl;
     }
@@ -130,7 +127,6 @@ export class ProductDetailComponent implements OnInit {
     if (this.product?.serviceId) {
       this.productService.getByServiceId(this.product.serviceId).subscribe({
         next: (products) => {
-          // Filter out the current product and limit to 4 related products
           this.relatedProducts = products
             .filter(p => p.id !== this.product?.id)
             .slice(0, 4);
@@ -143,17 +139,13 @@ export class ProductDetailComponent implements OnInit {
   }
 
   private checkWishlistStatus(): void {
-    // Check if product is in wishlist (implement based on your wishlist service)
-    // For now, we'll assume it's not in wishlist
     this.isInWishlist = false;
   }
 
-  // Image selection
   selectImage(image: string): void {
     this.selectedImage = image;
   }
 
-  // Quantity controls
   increaseQuantity(): void {
     if (this.product && this.quantity < this.product.quantity) {
       this.quantity++;
@@ -176,67 +168,68 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  // Price calculations
   getDiscountPercentage(): number {
-    // Since your Product interface doesn't have originalPrice,
-    // you might need to add it or calculate discount differently
-    // For now, returning 0
     return 0;
   }
 
-  // Actions
   onAddToCart(): void {
-    if (!this.product) return;
+    if (!this.product || this.addingToCart) return;
 
     this.addingToCart = true;
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(`Adding ${this.quantity} of product ${this.product?.id} to cart`);
-      // Implement your cart service logic here
-      // this.cartService.addToCart(this.product, this.quantity);
+    const cartItemDto = {
+      productId: this.product.id,
+      quantity: this.quantity,
+      unitPrice: this.product.price
+    };
 
-      this.addingToCart = false;
-
-      // Show success message
-      alert('Product added to cart successfully!');
-    }, 1000);
+    this.cartService.addItem(cartItemDto).subscribe({
+      next: () => {
+        this.toastService.showSuccess(`${this.quantity} ${this.product?.title} added to cart!`);
+        this.addingToCart = false;
+      },
+      error: (err) => {
+        console.error('Error adding to cart:', err);
+        this.toastService.showError('Failed to add product to cart');
+        this.addingToCart = false;
+      }
+    });
   }
 
   onBuyNow(): void {
-    if (!this.product) return;
+    if (!this.product || this.buyingNow) return;
 
     this.buyingNow = true;
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(`Buying ${this.quantity} of product ${this.product?.id}`);
-      // Implement your checkout logic here
-      // this.router.navigate(['/checkout'], {
-      //   state: { product: this.product, quantity: this.quantity }
-      // });
+    const cartItemDto = {
+      productId: this.product.id,
+      quantity: this.quantity,
+      unitPrice: this.product.price
+    };
 
-      this.buyingNow = false;
-
-      // For demo, just show alert
-      alert('Redirecting to checkout...');
-    }, 1000);
+    this.cartService.addItem(cartItemDto).subscribe({
+      next: () => {
+        this.buyingNow = false;
+        this.router.navigate(['/checkout']);
+      },
+      error: (err) => {
+        console.error('Error adding to cart:', err);
+        this.toastService.showError('Failed to proceed to checkout');
+        this.buyingNow = false;
+      }
+    });
   }
 
   onAddToWishlist(): void {
     if (!this.product) return;
 
-    // Toggle wishlist status
     this.isInWishlist = !this.isInWishlist;
 
-    // Implement your wishlist service logic here
     if (this.isInWishlist) {
       console.log(`Adding product ${this.product.id} to wishlist`);
-      // this.wishlistService.addToWishlist(this.product);
       alert('Added to wishlist!');
     } else {
       console.log(`Removing product ${this.product.id} from wishlist`);
-      // this.wishlistService.removeFromWishlist(this.product.id);
       alert('Removed from wishlist!');
     }
   }
@@ -253,7 +246,6 @@ export class ProductDetailComponent implements OnInit {
     if (navigator.share && navigator.canShare(shareData)) {
       navigator.share(shareData).catch(console.error);
     } else {
-      // Fallback: copy URL to clipboard
       navigator.clipboard.writeText(window.location.href).then(() => {
         alert('Product URL copied to clipboard!');
       }).catch(() => {
@@ -265,31 +257,37 @@ export class ProductDetailComponent implements OnInit {
   onSellerClick(): void {
     if (!this.product?.sellerId) return;
 
-    // Navigate to seller profile or show seller info
     console.log(`Viewing seller: ${this.product.sellerId}`);
-    // this.router.navigate(['/sellers', this.product.sellerId]);
     alert(`Viewing seller: ${this.product.sellerId}`);
   }
 
-  // Related product actions
   onRelatedProductAddToCart(product: Product): void {
-    console.log(`Adding related product ${product.id} to cart`);
-    // Implement cart logic for related products
-    alert(`Added ${product.title} to cart!`);
+    const cartItemDto = {
+      productId: product.id,
+      quantity: 1,
+      unitPrice: product.price
+    };
+
+    this.cartService.addItem(cartItemDto).subscribe({
+      next: () => {
+        this.toastService.showSuccess(`${product.title} added to cart!`);
+      },
+      error: (err) => {
+        console.error('Error adding related product:', err);
+        this.toastService.showError('Failed to add product to cart');
+      }
+    });
   }
 
   onRelatedProductAddToWishlist(product: Product): void {
     console.log(`Adding related product ${product.id} to wishlist`);
-    // Implement wishlist logic for related products
     alert(`Added ${product.title} to wishlist!`);
   }
 
-  // Navigation
   goBack(): void {
     this.router.navigate(['/products']);
   }
 
-  // Utility methods for template
   trackByProductId(index: number, product: Product): number {
     return product.id;
   }

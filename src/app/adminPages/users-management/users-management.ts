@@ -1,242 +1,257 @@
+import { CommonModule } from '@angular/common';
 import { TableAction, TableColumn, DataTable } from './../../components/data-table/data-table';
 import { Modal } from './../../components/modal/modal';
-import { FormButton } from './../../components/form-button/form-button';
 import { ThemeService } from './../../services/theme.service';
 import { LanguageService } from './../../services/language.service';
-import { Component } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { FormsModule } from "@angular/forms"
+import { Component, OnInit } from "@angular/core";
 import { RouterModule } from '@angular/router';
-
-interface User {
-  id: number
-  name: string
-  email: string
-  phone: string
-  role: string
-  status: string
-  avatar: string
-  joinDate: string
-  lastLogin: string
-  totalOrders: number
-  totalSpent: number
-}
+import { FormsModule } from '@angular/forms';
+import { UsersService, UserDisplay, UserResponseById, RegisterAdminRequest, UserResponse } from '../../services/users.service';
+import { finalize } from 'rxjs';
+import { ToastService } from '../../services/toast.service'; // Import the ToastService
 
 @Component({
   selector: "app-users-management",
+  templateUrl: "./users-management.html",
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTable, Modal,RouterModule],
-  templateUrl: "./users-management.html"
+  imports: [DataTable, Modal, CommonModule, RouterModule, FormsModule],
 })
-export class UsersManagement {
-  showModal = false
-  showDeleteModal = false
-  isEditing = false
-  userToDelete: User | null = null
+export class UsersManagement implements OnInit {
+  showModal = false;
+  showDetailsModal = false;
+  isLoading = false;
+  
+  currentUser: RegisterAdminRequest = {
+    userName: '',
+    name: '',
+    email: '',
+    password: ''
+  };
 
-  currentUser: Partial<User> = {
-    name: "",
-    email: "",
-    phone: "",
-    role: "customer",
-    status: "active",
-  }
+  validationErrors = {
+    userName: '',
+    name: '',
+    email: '',
+    password: ''
+  };
 
-  users: User[] = [
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 (555) 123-4567",
-      role: "admin",
-      status: "active",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-01-15",
-      lastLogin: "2024-01-20",
-      totalOrders: 0,
-      totalSpent: 0,
-    },
-    {
-      id: 2,
-      name: "Emma Johnson",
-      email: "emma.johnson@example.com",
-      phone: "+1 (555) 234-5678",
-      role: "artisan",
-      status: "active",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-02-20",
-      lastLogin: "2024-01-19",
-      totalOrders: 45,
-      totalSpent: 2340.5,
-    },
-    {
-      id: 3,
-      name: "Michael Brown",
-      email: "michael.brown@example.com",
-      phone: "+1 (555) 345-6789",
-      role: "customer",
-      status: "active",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-03-10",
-      lastLogin: "2024-01-18",
-      totalOrders: 12,
-      totalSpent: 890.25,
-    },
-    {
-      id: 4,
-      name: "Sarah Davis",
-      email: "sarah.davis@example.com",
-      phone: "+1 (555) 456-7890",
-      role: "moderator",
-      status: "active",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-04-05",
-      lastLogin: "2024-01-17",
-      totalOrders: 0,
-      totalSpent: 0,
-    },
-    {
-      id: 5,
-      name: "David Wilson",
-      email: "david.wilson@example.com",
-      phone: "+1 (555) 567-8901",
-      role: "customer",
-      status: "inactive",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-05-12",
-      lastLogin: "2023-12-15",
-      totalOrders: 8,
-      totalSpent: 456.75,
-    },
-    {
-      id: 6,
-      name: "Lisa Anderson",
-      email: "lisa.anderson@example.com",
-      phone: "+1 (555) 678-9012",
-      role: "artisan",
-      status: "suspended",
-      avatar: "/placeholder.svg?height=40&width=40",
-      joinDate: "2023-06-18",
-      lastLogin: "2024-01-10",
-      totalOrders: 23,
-      totalSpent: 1250.0,
-    },
-  ]
+  selectedUser: UserResponseById | null = null;
+  users: UserDisplay[] = [];
 
   columns: TableColumn[] = [
-    { key: "avatar", label: "Avatar", type: "image", width: "80px" },
-    { key: "name", label: "Name", sortable: true, type: "text" },
+    { key: "userName", label: "Username", sortable: true, type: "text" },
+    { key: "fullName", label: "Full Name", sortable: true, type: "text" },
     { key: "email", label: "Email", sortable: true, type: "text" },
-    { key: "phone", label: "Phone", type: "text" },
-    { key: "role", label: "Role", sortable: true, type: "badge" },
-    { key: "status", label: "Status", sortable: true, type: "badge" },
-    { key: "joinDate", label: "Join Date", sortable: true, type: "date" },
-    { key: "totalOrders", label: "Orders", sortable: true, type: "text" },
-    { key: "totalSpent", label: "Total Spent", sortable: true, type: "currency" },
-  ]
+    { key: "createdOn", label: "Created On", sortable: true, type: "date" },
+    { key: "lastUpdatedOn", label: "Last Updated", sortable: true, type: "date" },
+  ];
 
   actions: TableAction[] = [
-    { label: "View Details", icon: "eye", color: "primary", action: "view" },
-    { label: "Edit User", icon: "edit", color: "secondary", action: "edit" },
-    { label: "Delete User", icon: "trash", color: "danger", action: "delete" },
-  ]
+    { label: "View Details", icon: "fas fa-eye", color: "primary", action: "view" },
+  ];
 
   constructor(
     public themeService: ThemeService,
     public languageService: LanguageService,
+    private usersService: UsersService,
+    private toastService: ToastService // Inject ToastService
   ) {}
 
-  get modalTitle(): string {
-    return this.isEditing ? "Edit User" : "Add New User"
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoading = true;
+    this.usersService.getAll()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (users) => {
+          this.users = users;
+        },
+        error: (error) => {
+          console.error('Error loading users:', error);
+          this.toastService.showError(this.getErrorMessage('load'));
+        }
+      });
   }
 
   openCreateModal(): void {
-    this.isEditing = false
     this.currentUser = {
-      name: "",
-      email: "",
-      phone: "",
-      role: "customer",
-      status: "active",
-    }
-    this.showModal = true
+      userName: '',
+      name: '',
+      email: '',
+      password: ''
+    };
+    this.resetValidationErrors();
+    this.showModal = true;
+  }
+
+  resetValidationErrors(): void {
+    this.validationErrors = {
+      userName: '',
+      name: '',
+      email: '',
+      password: ''
+    };
   }
 
   closeModal(): void {
-    this.showModal = false
-    this.currentUser = {}
+    this.showModal = false;
   }
 
-  closeDeleteModal(): void {
-    this.showDeleteModal = false
-    this.userToDelete = null
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedUser = null;
   }
 
-  onAction(event: { action: string; item: User }): void {
-    const { action, item } = event
+  onAction(event: { action: string; item: UserDisplay }): void {
+    const { action, item } = event;
 
     switch (action) {
       case "view":
-        this.viewUser(item)
-        break
-      case "edit":
-        this.editUser(item)
-        break
-      case "delete":
-        this.deleteUser(item)
-        break
+        this.viewUser(item.id.toString());
+        break;
+      case "addAdmin":
+        this.openCreateModal();
+        break;
     }
   }
 
-  viewUser(user: User): void {
-    console.log("View user:", user)
+  viewUser(userId: string): void {
+    this.isLoading = true;
+    this.usersService.getById(userId)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (user) => {
+          this.selectedUser = user;
+          this.showDetailsModal = true;
+        },
+        error: (error) => {
+          console.error('Error loading user details:', error);
+          this.toastService.showError(this.getErrorMessage('details'));
+        }
+      });
   }
 
-  editUser(user: User): void {
-    this.isEditing = true
-    this.currentUser = { ...user }
-    this.showModal = true
+  registerAdmin(): void {
+    if (!this.validateAdminForm()) return;
+
+    this.isLoading = true;
+    
+    this.usersService.registerAdmin(this.currentUser)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response) => {
+          this.handleAdminResponse(response);
+        },
+        error: (error) => {
+          console.error('Error registering admin:', error);
+          this.toastService.showError(this.getErrorMessage('register'));
+        }
+      });
   }
 
-  deleteUser(user: User): void {
-    this.userToDelete = user
-    this.showDeleteModal = true
+  private validateAdminForm(): boolean {
+    let isValid = true;
+    this.resetValidationErrors();
+
+    // Username validation
+    if (!this.currentUser.userName) {
+      this.validationErrors.userName = this.languageService.currentLanguage() === 'en' 
+        ? 'Username is required' 
+        : 'اسم المستخدم مطلوب';
+      isValid = false;
+    } else if (this.currentUser.userName.length < 3) {
+      this.validationErrors.userName = this.languageService.currentLanguage() === 'en'
+        ? 'Username must be at least 3 characters'
+        : 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل';
+      isValid = false;
+    }
+
+    // Name validation
+    if (!this.currentUser.name) {
+      this.validationErrors.name = this.languageService.currentLanguage() === 'en'
+        ? 'Full name is required'
+        : 'الاسم الكامل مطلوب';
+      isValid = false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!this.currentUser.email) {
+      this.validationErrors.email = this.languageService.currentLanguage() === 'en'
+        ? 'Email is required'
+        : 'البريد الإلكتروني مطلوب';
+      isValid = false;
+    } else if (!emailRegex.test(this.currentUser.email)) {
+      this.validationErrors.email = this.languageService.currentLanguage() === 'en'
+        ? 'Please enter a valid email address'
+        : 'يرجى إدخال عنوان بريد إلكتروني صالح';
+      isValid = false;
+    }
+
+    // Password validation
+    if (!this.currentUser.password) {
+      this.validationErrors.password = this.languageService.currentLanguage() === 'en'
+        ? 'Password is required'
+        : 'كلمة المرور مطلوبة';
+      isValid = false;
+    } else if (this.currentUser.password.length < 6) {
+      this.validationErrors.password = this.languageService.currentLanguage() === 'en'
+        ? 'Password must be at least 6 characters'
+        : 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
-  saveUser(): void {
-    if (this.isEditing) {
-      const index = this.users.findIndex((u) => u.id === this.currentUser.id)
-      if (index !== -1) {
-        this.users[index] = { ...this.users[index], ...this.currentUser }
-      }
+  private handleAdminResponse(response: UserResponse): void {
+    if (response.errorMessages?.length > 0) {
+      this.toastService.showError(response.errorMessages.join(', '));
     } else {
-      const newUser: User = {
-        id: Math.max(...this.users.map((u) => u.id)) + 1,
-        name: this.currentUser.name || "",
-        email: this.currentUser.email || "",
-        phone: this.currentUser.phone || "",
-        role: this.currentUser.role || "customer",
-        status: this.currentUser.status || "active",
-        avatar: "/placeholder.svg?height=40&width=40",
-        joinDate: new Date().toISOString().split("T")[0],
-        lastLogin: new Date().toISOString().split("T")[0],
-        totalOrders: 0,
-        totalSpent: 0,
-      }
-      this.users.push(newUser)
+      const successMessage = this.languageService.currentLanguage() === 'en'
+        ? 'Admin registered successfully!'
+        : 'تم تسجيل المسؤول بنجاح!';
+      this.toastService.showSuccess(successMessage);
+      this.closeModal();
+      this.loadUsers();
     }
-
-    this.closeModal()
   }
 
-  confirmDelete(): void {
-    if (this.userToDelete) {
-      this.users = this.users.filter((u) => u.id !== this.userToDelete!.id)
-      this.closeDeleteModal()
-    }
+  private getErrorMessage(type: 'load' | 'details' | 'register'): string {
+    type ErrorMessages = {
+      load: string;
+      details: string;
+      register: string;
+    };
+
+    type LanguageMessages = {
+      en: ErrorMessages;
+      ar: ErrorMessages;
+    };
+
+    const messages: LanguageMessages = {
+      en: {
+        load: 'Failed to load users. Please try again later.',
+        details: 'Failed to load user details. Please try again later.',
+        register: 'Failed to register admin. Please try again.'
+      },
+      ar: {
+        load: 'فشل تحميل المستخدمين. يرجى المحاولة مرة أخرى لاحقًا.',
+        details: 'فشل تحميل تفاصيل المستخدم. يرجى المحاولة مرة أخرى لاحقًا.',
+        register: 'فشل تسجيل المسؤول. يرجى المحاولة مرة أخرى.'
+      }
+    };
+    
+    const lang = this.languageService.currentLanguage() as keyof LanguageMessages;
+    return messages[lang][type];
   }
 
   onExport(): void {
-    console.log("Export users data")
+    console.log("Export users data");
+    // Implement export functionality here
+    // Could export to CSV, Excel, etc.
   }
 }

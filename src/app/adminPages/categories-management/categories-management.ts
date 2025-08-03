@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { RouterModule } from '@angular/router';
 import { Category, CategoryRequest, CategorySellerService } from '../../services/categories.service';
 import { finalize } from 'rxjs';
+import { ToastService } from './../../services/toast.service';
 
 @Component({
   selector: "app-categories-management",
@@ -18,6 +19,7 @@ import { finalize } from 'rxjs';
 export class CategoriesManagement implements OnInit {
   private fb = inject(FormBuilder);
   private categoryService = inject(CategorySellerService);
+  private toastService = inject(ToastService);
   themeService = inject(ThemeService);
   languageService = inject(LanguageService);
 
@@ -30,8 +32,6 @@ export class CategoriesManagement implements OnInit {
   isEditMode = false;
   isLoading = false;
   isProcessing = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
 
@@ -66,12 +66,10 @@ export class CategoriesManagement implements OnInit {
     en: {
       title: "Categories Management",
       subtitle: "Manage product categories",
-      
       addCategory: "Add Category",
       editCategory: "Edit Category",
       deleteCategory: "Delete Category",
       categoryName: "Category Name",
-
       image: "Image",
       name: "Name",
       view: "View",
@@ -84,6 +82,11 @@ export class CategoriesManagement implements OnInit {
       deleteMessage: "This action cannot be undone. This will permanently delete the category.",
       totalCategories: "Total Categories",
       categoryDetails: "Category Details",
+      tableTitle: "Categories List",
+      tableSubtitle: "Manage your product categories",
+      noCategoriesTitle:"No categories yet",
+      noCategoriesMessage:"Get started by creating your first category",
+      addFirstCategory: "Add First Category",
       validation: {
         required: "This field is required",
         minLength: "Must be at least 3 characters",
@@ -109,6 +112,11 @@ export class CategoriesManagement implements OnInit {
       deleteMessage: "لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفئة نهائياً.",
       totalCategories: "إجمالي الفئات",
       categoryDetails: "تفاصيل الفئة",
+      tableTitle: "قائمة الفئات",
+      tableSubtitle: "إدارة فئات المنتجات الخاصة بك",
+      noCategoriesTitle:" لا توجد فئات حتى الآن",
+      noCategoriesMessage: "ابدأ بإنشاء فئتك أولى",
+      addFirstCategory: "إضافة الفئة أولى",
       validation: {
         required: "هذا الحقل مطلوب",
         minLength: "يجب أن يكون على الأقل 3 أحرف",
@@ -135,7 +143,6 @@ export class CategoriesManagement implements OnInit {
 
   loadCategories(): void {
     this.isLoading = true;
-    this.errorMessage = null;
     
     this.categoryService.getAll().pipe(
       finalize(() => this.isLoading = false)
@@ -144,7 +151,7 @@ export class CategoriesManagement implements OnInit {
         this.categories = categories;
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load categories. Please try again later.';
+        this.toastService.showError('Failed to load categories. Please try again later.');
         console.error('Error loading categories:', err);
       }
     });
@@ -211,28 +218,14 @@ export class CategoriesManagement implements OnInit {
     this.selectedCategory = null;
     this.categoryForm.reset();
     this.resetFileInput();
-    this.successMessage = null;
-    this.errorMessage = null;
   }
 
   saveCategory(): void {
-     if (this.categoryForm.invalid || this.isProcessing || (!this.isEditMode && !this.selectedFile)) {
-    return;
-  }
-    this.categoryForm.markAllAsTouched();
-
-    if (this.categoryForm.invalid || this.isProcessing) {
-      return;
-    }
-
-    if (!this.isEditMode && !this.selectedFile) {
-      this.errorMessage = this.getTranslation('validation.imageRequired');
+    if (this.categoryForm.invalid || this.isProcessing || (!this.isEditMode && !this.selectedFile)) {
       return;
     }
 
     this.isProcessing = true;
-    this.errorMessage = null;
-    this.successMessage = null;
 
     const formData = new FormData();
     formData.append('name', this.categoryForm.value.name);
@@ -251,14 +244,16 @@ export class CategoriesManagement implements OnInit {
       finalize(() => this.isProcessing = false)
     ).subscribe({
       next: () => {
-        this.successMessage = this.isEditMode 
-          ? 'Category updated successfully!' 
-          : 'Category created successfully!';
+        this.toastService.showSuccess(
+          this.isEditMode 
+            ? 'Category updated successfully!' 
+            : 'Category created successfully!'
+        );
         this.loadCategories();
         this.closeModal();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to save category. Please try again.';
+        this.toastService.showError(err.error?.message || 'Failed to save category. Please try again.');
         console.error('Error saving category:', err);
       }
     });
@@ -310,11 +305,11 @@ export class CategoriesManagement implements OnInit {
       })
     ).subscribe({
       next: () => {
-        this.successMessage = 'Category deleted successfully!';
+        this.toastService.showSuccess('Category deleted successfully!');
         this.loadCategories();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to delete category. Please try again.';
+        this.toastService.showError(err.error?.message || 'Failed to delete category. Please try again.');
         console.error('Error deleting category:', err);
       }
     });

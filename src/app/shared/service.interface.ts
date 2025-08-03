@@ -66,7 +66,7 @@ export interface Review {
 
 // **هذه الواجهة تمثل بيانات تفاصيل الخدمة التي يستخدمها ServiceDetailPage**
 export interface ServiceDetail extends Service {
-  fullDescription: { en: string; ar: string; };
+  fullDescription: string;
   features: { en: string[]; ar: string[]; };
   packages: ServicePackage[];
   gallery: string[];
@@ -95,7 +95,7 @@ export interface FAQ {
 }
 
 export interface SellerInfo {
-  id: number;
+  id: number|string;
   name: string;
   username: string;
   avatar: string;
@@ -115,14 +115,17 @@ export interface SellerInfo {
 // واجهة المنتج التي يستخدمها ProductCardComponent
 export interface Product {
   id: number;
-  name: { en: string; ar: string; };
-  description: { en: string; ar: string; };
+  title: string;
   price: number;
-  category: string; // ممكن تكون فاضية لو الـ DTO مش بيرجعها
-  image: string; // لاحظ أنها image هنا وليست imageUrl
-  seller: string; // ممكن تكون فاضية لو الـ DTO مش بيرجعها
-  rating: number; // ممكن تكون 0 لو الـ DTO مش بيرجعها
-  customizable: boolean;
+  quantity: number;
+  status: string; 
+  createdAt: string;
+  sellerId: string;
+  serviceId: number;
+  imageUrl: string;
+  category: string;
+  description: string;
+  sellerName: string;
 }
 
 // export interface Review {

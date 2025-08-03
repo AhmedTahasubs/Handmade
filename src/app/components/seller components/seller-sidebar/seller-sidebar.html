@@ -44,7 +44,7 @@
         'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700': !router.isActive(item.href, item.exact),
         'flex-row-reverse': languageService.currentLanguage() === 'ar'
       }"
-      (click)="onClose.emit()"
+      (click)="onClose.emit() ; item.action ? item.action() : null"
     >
       <i
         class="fas"

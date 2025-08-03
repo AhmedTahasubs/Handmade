@@ -8,17 +8,6 @@
   <!-- Main Content -->
   <div *ngIf="!loading && service" class="pb-8">
 
-    <!-- Back Button -->
-    <div class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-      <div class="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <button
-          (click)="goBackToServices()"
-          class="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition">
-          <i class="fas fa-arrow-left" [class.fa-arrow-right]="currentLanguage === 'ar'"></i>
-          {{ labels.back_to_services }}
-        </button>
-      </div>
-    </div>
 
     <div class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-3">
 
@@ -74,7 +63,7 @@
                   </ng-container>
                 </div>
                 <span class="font-semibold text-gray-900 dark:text-white">{{ service.rating }}</span>
-                <span class="text-gray-600 dark:text-gray-400">({{ service.reviewCount }} reviews)</span>
+                <span class="text-gray-600 dark:text-gray-400">({{ reviews.length }} reviews)</span>
               </div>
 
               <!-- Seller Quick Info -->
@@ -89,12 +78,7 @@
                     <span *ngIf="service.sellerInfo.isVerified" class="text-green-600 dark:text-green-400">
                       <i class="fas fa-check-circle"></i> {{ labels.verified }}
                     </span>
-                    <span class="px-2 py-1 text-xs rounded-full"
-                          [ngClass]="service.sellerInfo.isOnline
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'">
-                      {{ service.sellerInfo.isOnline ? labels.online : 'Offline' }}
-                    </span>
+                  
                   </div>
                 </div>
               </div>
@@ -109,17 +93,14 @@
                   <i class="fas fa-clock text-blue-500"></i>
                   <span>{{ labels.delivery_time }}: {{ selectedPackage?.deliveryTime || service.deliveryTime }}</span>
                 </div>
-                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <i class="fas fa-redo text-blue-500"></i>
-                  <span>{{ selectedPackage?.revisions || 'Unlimited' }} {{ labels.revisions }}</span>
-                </div>
+                
               </div>
             </div>
           </div>
         </div>
 
         <!-- Service Packages -->
-        <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+        <!-- <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">{{ labels.packages }}</h2>
           <div class="grid md:grid-cols-3 gap-4">
             <div *ngFor="let pkg of service.packages"
@@ -145,16 +126,16 @@
               </ul>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- About Service -->
-        <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+        <div id="about-service" class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 **service-description-card**">
           <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ labels.about_service }}</h2>
-          <p class="text-gray-700 dark:text-gray-300">{{ service.fullDescription[currentLanguage] }}</p>
+          <p class="text-gray-700 dark:text-gray-300">{{ service.fullDescription }}</p>
         </div>
 
         <!-- Features -->
-        <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+        <!-- <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
           <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ labels.service_features }}</h2>
           <div class="grid md:grid-cols-2 gap-4">
             <div *ngFor="let feature of service.features[currentLanguage]" class="flex items-center gap-3">
@@ -162,10 +143,10 @@
               <span class="text-gray-700 dark:text-gray-300">{{ feature }}</span>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Seller Products -->
-        <!-- <div *ngIf="displayedSellerProducts.length > 0">
+         <div *ngIf="displayedSellerProducts.length > 0">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{{ labels.Service_products }}</h2>
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <app-product-card *ngFor="let product of displayedSellerProducts"
@@ -175,12 +156,7 @@
               (addToWishlist)="onAddToWishlist($event)">
             </app-product-card>
           </div>
-          <div class="mt-4 text-right">
-            <button (click)="viewAllSellerProducts()" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
-              {{ labels.view_all_products }}
-            </button>
-          </div>
-        </div> -->
+        </div> 
 
         <!-- FAQ -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800" *ngIf="service.faq.length">
@@ -199,7 +175,6 @@
             </div>
           </div>
         </div>
-
        <!-- Reviews -->
 <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
   <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
@@ -227,7 +202,7 @@
 
       <!-- RIGHT SIDEBAR -->
       <div class="lg:col-span-1 space-y-6 sticky top-8">
-
+        
         <!-- Order Card -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 text-center">
           <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -239,7 +214,7 @@
           <button (click)="orderService()" class="w-full py-3 mb-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
             {{ labels.order_now }} (${{ selectedPackage?.price || service.price }})
           </button>
-          <button (click)="toggleContactForm()" class="w-full py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <button  routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             {{ labels.contact_seller }}
           </button>
 
@@ -253,13 +228,12 @@
               <button (click)="sendMessage()" class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm">
                 {{ labels.send }}
               </button>
-              <button (click)="toggleContactForm()" class="flex-1 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+              <button  (click)="toggleContactForm()" class="flex-1 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
                 {{ labels.cancel }}
               </button>
             </div>
           </div>
         </div>
-
         <!-- Seller Info Card -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ labels.seller_info }}</h3>
@@ -269,13 +243,6 @@
               <h4 class="font-medium text-gray-900 dark:text-white">{{ service.sellerInfo.name }}</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">{{ service.sellerInfo.username }}</p>
               <div class="flex items-center gap-1 mt-1">
-                <div class="flex">
-                  <ng-container *ngFor="let star of getStarArray(); let i = index">
-                    <i class="fas fa-star text-xs text-yellow-400" *ngIf="isStarFilled(i, service.sellerInfo.rating)"></i>
-                    <i class="far fa-star text-xs text-gray-300" *ngIf="!isStarFilled(i, service.sellerInfo.rating)"></i>
-                  </ng-container>
-                </div>
-                <span class="text-xs text-gray-600 dark:text-gray-400">{{ service.sellerInfo.rating }}</span>
               </div>
             </div>
           </div>
@@ -284,8 +251,6 @@
           <div class="space-y-3 text-sm">
             <div class="flex justify-between"><span class="text-gray-600 dark:text-gray-400">{{ labels.response_time }}:</span><span class="text-gray-900 dark:text-white">{{ service.sellerInfo.responseTime }}</span></div>
             <div class="flex justify-between"><span class="text-gray-600 dark:text-gray-400">{{ labels.completed_orders }}:</span><span class="text-gray-900 dark:text-white">{{ service.sellerInfo.completedOrders }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-600 dark:text-gray-400">{{ labels.from }}:</span><span class="text-gray-900 dark:text-white">{{ service.sellerInfo.location }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-600 dark:text-gray-400">{{ labels.member_since }}:</span><span class="text-gray-900 dark:text-white">{{ service.sellerInfo.joinDate | date:'MMM yyyy' }}</span></div>
           </div>
 
           <!-- Seller Skills -->

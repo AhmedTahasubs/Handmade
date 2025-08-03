@@ -53,13 +53,14 @@
 
         <!-- User Actions -->
         <div class="items-center hidden  space-x-1 lg:flex">
-
           <!-- Cart -->
-          <a routerLink="/cart" class="relative p-2 transition-colors rounded-lg text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800">
-            <i class="text-lg fa-solid fa-cart-shopping"></i>
-            <span class="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-blue-600 rounded-full -top-1 -right-1">3</span>
-          </a>
-
+           @if (isLoggedIn) {
+             <a routerLink="/cart" class="relative p-2 transition-colors rounded-lg text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800">
+               <i class="text-lg fa-solid fa-cart-shopping text-gray-700 dark:text-gray-300"></i>
+                <!-- uncomment the next line if you want to show cart item count  bs lazm yb2a updated and fetched-->
+               <!-- <span class="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-blue-600 rounded-full -top-1 -right-1">3</span> -->
+             </a>
+           }
           <!-- Auth Buttons -->
           <ng-container *ngIf="isLoggedIn; else guest">
             <!-- Logged in - User Menu -->

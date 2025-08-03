@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, Observable, catchError, tap, throwError } from "rxjs";
 import { Router } from "@angular/router";
 
-interface User {
+export interface User {
   userName: string;
   fullName: string;
   email: string;
@@ -42,7 +42,7 @@ interface SellerRegisterRequest extends CustomerRegisterRequest {
 export class AuthService {
   private baseUrl = 'https://localhost:7047/';
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
-  private currentUser = new BehaviorSubject<User | null>(this.getStoredUser());
+  currentUser = new BehaviorSubject<User | null>(this.getStoredUser());
 
   constructor(
     private http: HttpClient,
