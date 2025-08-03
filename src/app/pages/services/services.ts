@@ -68,7 +68,8 @@ private router = inject(ActivatedRoute)
   fetchServicesByCategoryId(categoryId: number): void {
   this.serviceService.getServicesByCategoryId(categoryId).subscribe({
     next: (data: ServiceDto[]) => {
-      this.allServices = data.map(dto => ({
+      console.log('Fetched services for category:', data);
+      this.allServices = data.filter(dto=>dto.status==="approved").map(dto => ({
         id: dto.id,
         title: dto.title,
         description: dto.description,

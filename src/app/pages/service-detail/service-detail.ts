@@ -136,7 +136,7 @@ export class ServiceDetailPage implements OnInit {
             joinDate: '', // Mocked
             location: '' // Mocked
           },
-products: (dto.products ?? []).map((pDto: ProductDisplayDto) => ({
+products: (dto.products ?? []).filter(p=>p.status==="approved").map((pDto: ProductDisplayDto) => ({
   id: pDto.id,
   title: pDto.title,
   price: pDto.price,

@@ -98,6 +98,10 @@ export class ProductDetailComponent implements OnInit {
     this.loading = true;
     this.productService.getById(id).subscribe({
       next: (product) => {
+        if(product.status !== 'approved') {
+          window.history.back();
+          return;
+        }
         this.product = product;
         this.setupProductImages();
         this.loadRelatedProducts();
