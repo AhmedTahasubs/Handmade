@@ -11,7 +11,7 @@ import { jwtDecode } from 'jwt-decode';
   styleUrls: ['./navbar.css'],
   imports: [CommonModule, RouterModule]
 })
-export class NavbarComponent implements OnInit,OnChanges  {
+export class NavbarComponent implements OnInit, OnChanges {
   @Input() language: 'en' | 'ar' = 'en';
   @Input() theme: 'light' | 'dark' = 'light';
   @Output() languageChange = new EventEmitter<'en' | 'ar'>();
@@ -32,47 +32,113 @@ export class NavbarComponent implements OnInit,OnChanges  {
     ar: { label: string, route?: string, action?: string, icon: string }[]
   } = { en: [], ar: [] };
 
+  navItems: {
+    en: { label: string, route: string }[],
+    ar: { label: string, route: string }[]
+  } = { en: [], ar: [] };
+
   constructor(private AuthService: AuthService, private eRef: ElementRef) {}
+
+  ngOnInit() {
+    this.AuthService.isLoggedIn().subscribe((status) => {
+      this.isLoggedIn = status;
+
+      if (status) {
+        this.token = this.AuthService.getToken();
+        if (this.token) {
+          const decodedToken: any = jwtDecode(this.token);
+          this.userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+          this.userProfileRoute = this.userRole === 'admin'
+            ? '/admin'
+            : this.userRole === 'seller'
+              ? '/seller'
+              : '/';
+        }
+      } else {
+        this.userRole = null;
+      }
+
+      this.buildUserMenuItems();
+      this.buildNavItems();
+    });
+  }
+
+  ngOnChanges() {
+    this.buildUserMenuItems();
+    this.buildNavItems();
+  }
+
+  logout() {
+    this.AuthService.logout();
+    this.isLoggedIn = false;
+    this.userRole = null;
+    this.buildUserMenuItems();
+    this.buildNavItems();
+    this.isUserMenuOpen = false;
+  }
+
   private buildUserMenuItems() {
-  const dashboardItem = this.userRole !== 'customer'
-    ? { label: this.language === 'en' ? 'Dashboard' : 'لوحة التحكم', route: this.userProfileRoute, icon: 'fa-user' }
-    : null;
+    const dashboardItem = this.userRole !== 'customer' && this.userRole !== null
+      ? { label: this.language === 'en' ? 'Dashboard' : 'لوحة التحكم', route: this.userProfileRoute, icon: 'fa-user' }
+      : null;
 
-  this.userMenuItems = {
-    en: [
-      ...(dashboardItem ? [dashboardItem] : []),
-      { label: 'Settings', route: '/settings', icon: 'fa-cog' },
-      { label: 'Logout', action: 'logout', icon: 'fa-sign-out-alt' }
-    ],
-    ar: [
-      ...(dashboardItem ? [dashboardItem] : []),
-      { label: 'الإعدادات', route: '/settings', icon: 'fa-cog' },
-      { label: 'خروج', action: 'logout', icon: 'fa-sign-out-alt' }
-    ]
-  };
-}
- ngOnInit() {
-  this.AuthService.isLoggedIn().subscribe((status) => {
-    this.isLoggedIn = status;
+    this.userMenuItems = {
+      en: [
+        ...(dashboardItem ? [dashboardItem] : []),
+        { label: 'Settings', route: '/settings', icon: 'fa-cog' },
+        { label: 'Logout', action: 'logout', icon: 'fa-sign-out-alt' }
+      ],
+      ar: [
+        ...(dashboardItem ? [dashboardItem] : []),
+        { label: 'الإعدادات', route: '/settings', icon: 'fa-cog' },
+        { label: 'خروج', action: 'logout', icon: 'fa-sign-out-alt' }
+      ]
+    };
+  }
 
-    if (status) {
-      this.token = this.AuthService.getToken();
-      if (this.token) {
-        const decodedToken: any = jwtDecode(this.token);
-        this.userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-        this.userProfileRoute = this.userRole === 'admin'
-          ? '/admin'
-          : this.userRole === 'seller'
-            ? '/seller'
-            : '/';
+  private buildNavItems() {
+    const homeEn = [{ label: 'Home', route: '/' }];
+    const homeAr = [{ label: 'الرئيسية', route: '/' }];
+
+    const commonEn = [
+      { label: 'Custom Service', route: '/custom-service' },
+      { label: 'Chats', route: '/contacts' },
+      { label: 'Orders', route: '/orders' }
+    ];
+    const commonAr = [
+      { label: 'الخدمات المخصصة', route: '/custom-service' },
+      { label: 'المحادثات', route: '/contacts' },
+      { label: 'الطلبات', route: '/orders' }
+    ];
+
+    const sellerExtra = {
+      en: { label: 'Add Service', route: '/seller/services-management' },
+      ar: { label: 'أضف خدمه', route: '/seller/services-management' }
+    };
+
+    if (!this.isLoggedIn) {
+      // Not logged in: show only Home
+      this.navItems = {
+        en: homeEn,
+        ar: homeAr
+      };
+    } else {
+      if (this.userRole === 'seller') {
+        // Seller: Home + Common + Add Service
+        this.navItems = {
+          en: [...homeEn, ...commonEn, sellerExtra.en],
+          ar: [...homeAr, ...commonAr, sellerExtra.ar]
+        };
+      } else {
+        // Logged in (not seller): Home + Common
+        this.navItems = {
+          en: [...homeEn, ...commonEn],
+          ar: [...homeAr, ...commonAr]
+        };
       }
     }
-    this.buildUserMenuItems();
-  });
-}
-    ngOnChanges() {
-    this.buildUserMenuItems(); // language might affect the labels
   }
+
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     if (
@@ -89,11 +155,6 @@ export class NavbarComponent implements OnInit,OnChanges  {
     if (this.isMenuOpen && mobileMenu && !mobileMenu.contains(event.target)) {
       this.isMenuOpen = false;
     }
-  }
-
-  logout() {
-    this.AuthService.logout();
-    this.isUserMenuOpen = false;
   }
 
   toggleTheme(): void {
@@ -132,21 +193,4 @@ export class NavbarComponent implements OnInit,OnChanges  {
       }
     }
   }
-
-  navItems = {
-    en: [
-      { label: 'Home', route: '/' },
-      { label: 'Categories', route: '/categories' },
-      { label: 'Custom Service', route: '/custom-service' },
-      { label: 'Add Service', route: '/add-service' },
-      { label: 'Orders', route: '/orders' }
-    ],
-    ar: [
-      { label: 'الرئيسية', route: '/' },
-      { label: 'الفئات', route: '/categories' },
-      { label: 'الخدمات المخصصة', route: '/custom-service' },
-      { label: 'أضف خدمه', route: '/add-service' },
-      { label: 'الطلبات', route: '/orders'}
-    ]
-  };
 }
