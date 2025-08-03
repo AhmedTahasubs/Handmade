@@ -50,6 +50,11 @@ export class ProductsPage implements OnInit {
 
   ngOnInit(): void {
     // Check for search results passed via state
+    if(this.products==null)
+    {
+      this.router.navigate(['/']);
+      return;
+    }
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as {
       searchResults: Product[],
@@ -68,7 +73,7 @@ export class ProductsPage implements OnInit {
   loadAllProducts(): void {
     this.productService.getAll().subscribe({
       next: (products) => {
-        this.products = products;
+        this.products = products.filter(p => p.status === 'approved'); // Filter approved products
       },
       error: (error) => {
         console.error('Error loading products:', error);

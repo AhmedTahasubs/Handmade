@@ -344,7 +344,7 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
     // Call the AI search API
     this.productService.search({
       query: this.aiSearchQuery,
-      maxResults: Math.random() * 10 + 5 // Randomly set maxResults between 5 and 15
+      maxResults: Math.round(Math.random() * 10 + 5) // Randomly set maxResults between 5 and 15
     }).subscribe({
       next: (products) => {
         // Navigate to products page with search results
