@@ -148,10 +148,10 @@ export class ServicesManagement implements OnInit {
   approveService(service: ServiceDto): void {
     this.isLoading = true;
     
-    this.serviceService.update(service.id, { 
-      ...service, 
-      status: 'approved' 
-    } as any)
+    const formData = new FormData();
+    formData.append('status', 'approved');
+    
+    this.serviceService.patchStatus(service.id, formData)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
@@ -177,11 +177,11 @@ export class ServicesManagement implements OnInit {
 
     this.isLoading = true;
     
-    this.serviceService.update(this.selectedService.id, { 
-      ...this.selectedService, 
-      status: 'rejected',
-      rejectionReason: this.rejectionReason
-    } as any)
+    const formData = new FormData();
+    formData.append('status', 'rejected');
+    formData.append('rejectionReason', this.rejectionReason);
+    
+    this.serviceService.patchStatus(this.selectedService.id, formData)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
