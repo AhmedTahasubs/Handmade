@@ -41,12 +41,12 @@ export class NavbarComponent implements OnInit,OnChanges  {
   this.userMenuItems = {
     en: [
       ...(dashboardItem ? [dashboardItem] : []),
-      { label: 'Settings', route: '/settings', icon: 'fa-cog' },
+      
       { label: 'Logout', action: 'logout', icon: 'fa-sign-out-alt' }
     ],
     ar: [
       ...(dashboardItem ? [dashboardItem] : []),
-      { label: 'الإعدادات', route: '/settings', icon: 'fa-cog' },
+      // { label: 'الإعدادات', route: '/settings', icon: 'fa-cog' },
       { label: 'خروج', action: 'logout', icon: 'fa-sign-out-alt' }
     ]
   };
@@ -136,16 +136,12 @@ export class NavbarComponent implements OnInit,OnChanges  {
   navItems = {
     en: [
       { label: 'Home', route: '/' },
-      { label: 'Categories', route: '/categories' },
-      { label: 'Custom Service', route: '/custom-service' },
-      { label: 'Add Service', route: '/add-service' },
+      // { label: 'Add Service', route: '/add-service' },
       { label: 'Orders', route: '/orders' }
     ],
     ar: [
       { label: 'الرئيسية', route: '/' },
-      { label: 'الفئات', route: '/categories' },
-      { label: 'الخدمات المخصصة', route: '/custom-service' },
-      { label: 'أضف خدمه', route: '/add-service' },
+      // { label: 'أضف خدمه', route: '/add-service' },
       { label: 'الطلبات', route: '/orders'}
     ]
   };
