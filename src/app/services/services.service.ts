@@ -80,4 +80,9 @@ export class ServiceSellerService {
   update(id: number, formData: FormData): Observable<ServiceDto> {
     return this.http.put<ServiceDto>(`${this.baseUrl}/${id}`, formData);
   }
+  // patch update service status by ID FromForm 
+  patchStatus(id: number, formData: FormData): Observable<ServiceDto> {
+    return this.http.patch<ServiceDto>(`${this.baseUrl}/${id}`, formData);
+  }
+  
 }

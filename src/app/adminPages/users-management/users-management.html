@@ -25,8 +25,10 @@
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
   </div>
 
-  <!-- Data Table -->
-  <div *ngIf="!isLoading && users.length > 0">
+ <!-- Data Table Section -->
+<div *ngIf="!isLoading">
+  <!-- Show table if users exist -->
+  <div *ngIf="users.length > 0; else noUsers">
     <app-data-table
       [title]="languageService.currentLanguage() === 'en' ? 'Users' : 'المستخدمين'"
       [subtitle]="languageService.currentLanguage() === 'en' ? 'All system users' : 'جميع مستخدمي النظام'"
@@ -39,20 +41,30 @@
     ></app-data-table>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!isLoading && users.length === 0" class="text-center py-12">
-    <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-      <i class="fas fa-users text-gray-400 dark:text-gray-500 text-3xl"></i>
+  <!-- Simple Empty State -->
+  <ng-template #noUsers>
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+        <i class="fas fa-users text-gray-400 dark:text-gray-500 text-3xl"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        {{ languageService.currentLanguage() === 'en' ? 'No users found' : 'لا يوجد مستخدمون' }}
+      </h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-6">
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'There are currently no users in the system.' 
+          : 'لا يوجد مستخدمون في النظام حالياً' }}
+      </p>
+      <button
+        (click)="openCreateModal()"
+        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 gap-2"
+      >
+        <i class="fas fa-user-plus w-5 h-5"></i>
+        {{ languageService.currentLanguage() === 'en' ? 'Add First User' : 'إضافة أول مستخدم' }}
+      </button>
     </div>
-    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-      {{ languageService.currentLanguage() === 'en' ? 'No users found' : 'لا يوجد مستخدمون' }}
-    </h3>
-    <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-      {{ languageService.currentLanguage() === 'en' 
-        ? 'There are currently no users in the system.' 
-        : 'لا يوجد مستخدمون في النظام حالياً' }}
-    </p>
-  </div>
+  </ng-template>
+</div>
 
   <!-- Add Admin Modal -->
   <app-modal

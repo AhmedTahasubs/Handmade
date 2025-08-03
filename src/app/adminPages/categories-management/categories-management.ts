@@ -84,6 +84,9 @@ export class CategoriesManagement implements OnInit {
       categoryDetails: "Category Details",
       tableTitle: "Categories List",
       tableSubtitle: "Manage your product categories",
+      noCategoriesTitle:"No categories yet",
+      noCategoriesMessage:"Get started by creating your first category",
+      addFirstCategory: "Add First Category",
       validation: {
         required: "This field is required",
         minLength: "Must be at least 3 characters",
@@ -111,6 +114,9 @@ export class CategoriesManagement implements OnInit {
       categoryDetails: "تفاصيل الفئة",
       tableTitle: "قائمة الفئات",
       tableSubtitle: "إدارة فئات المنتجات الخاصة بك",
+      noCategoriesTitle:" لا توجد فئات حتى الآن",
+      noCategoriesMessage: "ابدأ بإنشاء فئتك أولى",
+      addFirstCategory: "إضافة الفئة أولى",
       validation: {
         required: "هذا الحقل مطلوب",
         minLength: "يجب أن يكون على الأقل 3 أحرف",
