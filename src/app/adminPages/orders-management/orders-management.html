@@ -99,6 +99,8 @@
       </div>
     </div>
 
+    <!-- Conditional Content -->
+  <div *ngIf="orders.length > 0; else noOrders">
     <!-- Data Table -->
     <app-data-table
       [title]="languageService.currentLanguage() === 'en' ? 'Orders List' : 'الطلبات الموجودة'"
@@ -110,6 +112,17 @@
       (actionClicked)="onAction($event)"
       (exportClicked)="onExport()"
     ></app-data-table>
+  </div>
+
+  <!-- Simple Empty State -->
+  <ng-template #noOrders>
+    <div class="text-center py-12">
+      <i class="fas fa-box-open text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        {{ languageService.currentLanguage() === 'en' ? 'No orders yet' : 'لا توجد طلبات بعد' }}
+      </p>
+    </div>
+  </ng-template>
   </div>
 
   <!-- Order Details Modal -->

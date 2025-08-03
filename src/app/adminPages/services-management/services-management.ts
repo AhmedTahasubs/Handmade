@@ -235,6 +235,7 @@ export class ServicesManagement implements OnInit {
         case 'Failed to load service details.': return 'فشل تحميل تفاصيل الخدمة.';
         case 'Failed to approve service. Please try again.': return 'فشل الموافقة على الخدمة. يرجى المحاولة مرة أخرى.';
         case 'Failed to reject service. Please try again.': return 'فشل رفض الخدمة. يرجى المحاولة مرة أخرى.';
+        case 'No services yet': return 'لا توجد خدمات حتى الآن';
         default: return key;
       }
     }

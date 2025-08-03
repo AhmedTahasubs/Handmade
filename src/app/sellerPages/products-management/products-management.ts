@@ -94,6 +94,9 @@ export class SellerProductsManagement implements OnInit {
       loadServicesError: "Failed to load services. Please try again.",
       productsList: "Products List",
       productsSubtitle: "Manage your product inventory and listings",
+      noProductsTitle: "No Products Found",
+      noProductsMessage: "Get started by adding your first product",
+      addFirstProduct: "Add First Product",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $0.01",
@@ -140,6 +143,9 @@ export class SellerProductsManagement implements OnInit {
       loadServicesError: "فشل تحميل الخدمات. يرجى المحاولة مرة أخرى.",
       productsList: "قائمة المنتجات",
       productsSubtitle: "إدارة مخزون المنتجات والقوائم",
+      noProductsTitle: "لا توجد منتجات",
+      noProductsMessage: "ابدأ بإضافة أول منتج لك",
+      addFirstProduct :" أضف أول منتج",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ٠٫٠١ دولار",

@@ -34,8 +34,10 @@
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
   </div>
 
-  <!-- Data Table -->
-  <div *ngIf="!isLoading">
+ <!-- Data Table Section -->
+<div *ngIf="!isLoading">
+  <!-- Show table if services exist -->
+  <div *ngIf="services.length > 0; else noServices">
     <app-data-table
       [title]="getTranslation('Services List')"
       [subtitle]="getTranslation('All services in the marketplace')"
@@ -46,6 +48,17 @@
       (actionClicked)="onAction($event)"
     ></app-data-table>
   </div>
+
+  <!-- Simple Empty State -->
+  <ng-template #noServices>
+    <div class="text-center py-12">
+      <i class="fas fa-tools text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        {{ getTranslation('No services yet') }}
+      </p>
+    </div>
+  </ng-template>
+</div>
 
   <!-- Service Details Modal -->
   <app-modal

@@ -90,6 +90,9 @@ export class SellerServicesManagement implements OnInit {
       deleteServiceError: "Failed to delete service. Please try again.",
       servicesList: "Services List",
       servicesSubtitle: "Manage your services, view details, and perform actions",
+      noServicesTitle:"No services yet",
+      addFirstService:" Add First Service",
+
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $1",
@@ -132,6 +135,8 @@ export class SellerServicesManagement implements OnInit {
       deleteServiceError: "فشل حذف الخدمة. يرجى المحاولة مرة أخرى.",
       servicesList: "قائمة الخدمات",
       servicesSubtitle: "إدارة خدماتك، عرض التفاصيل، وتنفيذ الإجراءات",
+      noServicesTitle: "لا توجد خدمات حتى الآن",
+      addFirstService: "أضف أول خدمة",
       
       validation: {
         required: "هذا الحقل مطلوب",
