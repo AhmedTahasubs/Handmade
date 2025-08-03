@@ -1,17 +1,18 @@
 import { LanguageService } from './../../services/language.service';
 import { ThemeService } from './../../services/theme.service';
-import { Component } from "@angular/core"
+import { Component, OnDestroy } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule } from "@angular/router"
+import { Router, RouterModule } from "@angular/router"
 import { FormButton } from '../../components/form-button/form-button';
 import { FormInputComponent } from "../../components/form-input/form-input";
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/authService.service';
 
 
 @Component({
   selector: "app-forgot-password",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormButton, FormInputComponent,FormsModule],
+  imports: [CommonModule, RouterModule, FormButton, FormInputComponent, FormsModule],
   templateUrl: './forgot-password.html',
   styles: [
     `
@@ -30,24 +31,40 @@ import { FormsModule } from '@angular/forms';
         animation: slide-in-up 0.6s ease-out forwards;
         opacity: 0;
       }
+
+      .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      .success-message {
+        color: #28a745;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
     `,
   ],
 })
-export class ForgotPassword {
+export class ForgotPassword implements OnDestroy {
   // Form data
   email = ""
   isLoading = false
   emailSent = false
   resendCooldown = 0
 
-  // Validation errors
+  // Validation and API errors
   emailError = ""
+  apiError = ""
+  successMessage = ""
 
   private resendTimer?: any
 
   constructor(
     public ThemeService: ThemeService,
     public LanguageService: LanguageService,
+    private authService: AuthService, // إضافة AuthService
+    private router: Router // إضافة Router
   ) {}
 
   get labels() {
@@ -66,6 +83,10 @@ export class ForgotPassword {
           resendIn: "إعادة الإرسال خلال {seconds}ث",
           rememberPassword: "تذكرت كلمة المرور؟",
           backToLogin: "العودة لتسجيل الدخول",
+          sending: "جاري الإرسال...",
+          serverError: "حدث خطأ في الخادم، يرجى المحاولة مرة أخرى",
+          networkError: "خطأ في الاتصال، تحقق من الإنترنت",
+          emailSentSuccess: "إذا كان البريد الإلكتروني موجود، فسيتم إرسال رابط إعادة التعيين"
         }
       : {
           forgotPassword: "Forgot Password?",
@@ -80,6 +101,10 @@ export class ForgotPassword {
           resendIn: "Resend in {seconds}s",
           rememberPassword: "Remember your password?",
           backToLogin: "Back to Login",
+          sending: "Sending...",
+          serverError: "Server error occurred, please try again",
+          networkError: "Network error, please check your connection",
+          emailSentSuccess: "If email exists, reset link has been sent"
         }
   }
 
@@ -92,6 +117,10 @@ export class ForgotPassword {
   }
 
   validateForm(): boolean {
+    // Clear previous errors
+    this.emailError = ""
+    this.apiError = ""
+
     if (!this.email) {
       this.emailError =
         this.LanguageService.currentLanguage() === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required"
@@ -114,14 +143,38 @@ export class ForgotPassword {
     }
 
     this.isLoading = true
+    this.apiError = ""
+    this.successMessage = ""
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // استدعاء الـ API
+      const response = await this.authService.forgotPassword({ email: this.email }).toPromise()
+
       console.log("Password reset email sent to:", this.email)
+      console.log("API Response:", response)
+
+      // إظهار رسالة النجاح
       this.emailSent = true
+      this.successMessage = this.labels.emailSentSuccess
       this.startResendCooldown()
-    } catch (error) {
+
+    } catch (error: any) {
       console.error("Failed to send reset email:", error)
+
+      // التعامل مع أنواع الأخطاء المختلفة
+      if (error.status === 0) {
+        // خطأ في الشبكة
+        this.apiError = this.labels.networkError
+      } else if (error.status >= 500) {
+        // خطأ في الخادم
+        this.apiError = this.labels.serverError
+      } else if (error.error && error.error.message) {
+        // رسالة خطأ من الـ API
+        this.apiError = error.error.message
+      } else {
+        // خطأ عام
+        this.apiError = this.labels.serverError
+      }
     } finally {
       this.isLoading = false
     }
@@ -130,12 +183,30 @@ export class ForgotPassword {
   async resendEmail(): Promise<void> {
     if (this.resendCooldown > 0) return
 
+    this.apiError = ""
+    this.successMessage = ""
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await this.authService.forgotPassword({ email: this.email }).toPromise()
+
       console.log("Password reset email resent to:", this.email)
+      console.log("API Response:", response)
+
+      this.successMessage = this.labels.emailSentSuccess
       this.startResendCooldown()
-    } catch (error) {
+
+    } catch (error: any) {
       console.error("Failed to resend email:", error)
+
+      if (error.status === 0) {
+        this.apiError = this.labels.networkError
+      } else if (error.status >= 500) {
+        this.apiError = this.labels.serverError
+      } else if (error.error && error.error.message) {
+        this.apiError = error.error.message
+      } else {
+        this.apiError = this.labels.serverError
+      }
     }
   }
 
@@ -150,8 +221,19 @@ export class ForgotPassword {
   }
 
   goToLogin(): void {
-    // Navigate to login page
-    // this.router.navigate(['/login'])
+    // التنقل إلى صفحة تسجيل الدخول
+    this.router.navigate(['/login'])
+  }
+
+  // Helper method لتنسيق رسالة العد التنازلي
+  getResendText(): string {
+    const template = this.labels.resendIn
+    return template.replace('{seconds}', this.resendCooldown.toString())
+  }
+
+  // Helper method للتحقق من وجود أخطاء
+  hasErrors(): boolean {
+    return !!(this.emailError || this.apiError)
   }
 
   ngOnDestroy(): void {

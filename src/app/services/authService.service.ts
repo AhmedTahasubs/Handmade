@@ -22,6 +22,19 @@ interface LoginRequest {
   userName: string;
   password: string;
 }
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+}
+export interface ApiResponse {
+  message: string;
+  success?: boolean;
+}
 
 interface CustomerRegisterRequest {
   userName: string;
@@ -116,7 +129,7 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -126,8 +139,8 @@ export class AuthService {
         errorMessage = 'Invalid username or password';
       } else if (error.status === 400) {
         // Try to get error messages from the response if available
-        errorMessage = error.error?.user?.errorMessages?.join(', ') || 
-                      error.error?.message || 
+        errorMessage = error.error?.user?.errorMessages?.join(', ') ||
+                      error.error?.message ||
                       'Validation failed';
       } else if (error.status === 0) {
         errorMessage = 'Unable to connect to server';
@@ -135,7 +148,7 @@ export class AuthService {
         errorMessage = error.error?.message || error.message;
       }
     }
-    
+
     return throwError(() => new Error(errorMessage));
   }
 
@@ -145,6 +158,20 @@ export class AuthService {
     this.loggedIn.next(false);
     this.currentUser.next(null);
     this.router.navigate(['/login']);
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}api/AuthUser/forgot-password`, request)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}api/AuthUser/reset-password`, request)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   getToken(): string | null {
