@@ -312,7 +312,7 @@
     [title]="getTranslation('noServicesTitle')"
     [confirmText]="getTranslation('createService')"
     [cancelText]="getTranslation('cancel')"
-    (closed)="closeNoServicesModal()"
+    (closed)="navigateToServices()"
     (confirmed)="navigateToServices()"
     aria-labelledby="no-services-title"
   >
