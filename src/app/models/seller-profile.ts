@@ -5,4 +5,5 @@ export interface SellerProfile {
   createdOn: string;
   address: string;
   bio: string;
+  imageurl: string;
 }

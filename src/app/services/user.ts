@@ -9,6 +9,7 @@ export interface User {
   createdOn: string;
   address: string;
   bio: string;
+  imageurl: string;
 }
 
 export interface IProduct {
