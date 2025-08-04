@@ -6,7 +6,7 @@ export interface CreateCustomerRequestDto {
   sellerId: string;
   serviceId?: number;
   description: string;
-  referenceImageUrl?: string;
+  file: File;
 }
 
 export interface CustomerRequestResponse {
@@ -28,7 +28,15 @@ export class CustomerRequestService {
   constructor(private http: HttpClient) {}
 
   create(dto: CreateCustomerRequestDto): Observable<CustomerRequestResponse> {
-    return this.http.post<CustomerRequestResponse>(this.baseUrl, dto);
+    const formData = new FormData();
+    formData.append('SellerId', dto.sellerId);
+    if (dto.serviceId !== undefined) {
+      formData.append('ServiceId', dto.serviceId.toString());
+    }
+    formData.append('Description', dto.description);
+    formData.append('File', dto.file);
+
+    return this.http.post<CustomerRequestResponse>(this.baseUrl, formData);
   }
 
   getByCustomer(): Observable<CustomerRequestResponse[]> {

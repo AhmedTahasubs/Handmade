@@ -336,7 +336,7 @@ private loadReviews(): void {
       packages: this.currentLanguage === 'en' ? 'Service Packages' : 'باقات الخدمة',
       popular: this.currentLanguage === 'en' ? 'Most Popular' : 'الأكثر شعبية',
       select_package: this.currentLanguage === 'en' ? 'Continue' : 'متابعة',
-      order_now: this.currentLanguage === 'en' ? 'Order Now' : 'اطلب الآن',
+      order_now: this.currentLanguage === 'en' ? 'Customize Your Order Now' : 'خصص طلبك الآن',
       about_service: this.currentLanguage === 'en' ? 'About This Service' : 'حول هذه الخدمة',
       service_features: this.currentLanguage === 'en' ? 'What You Get' : 'ما ستحصل عليه',
       gallery: this.currentLanguage === 'en' ? 'Portfolio Samples' : 'عينات الأعمال',

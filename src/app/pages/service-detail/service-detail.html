@@ -99,51 +99,11 @@
           </div>
         </div>
 
-        <!-- Service Packages -->
-        <!-- <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">{{ labels.packages }}</h2>
-          <div class="grid md:grid-cols-3 gap-4">
-            <div *ngFor="let pkg of service.packages"
-                 (click)="selectPackage(pkg)"
-                 class="p-6 rounded-lg border cursor-pointer transition relative"
-                 [ngClass]="selectedPackage?.id === pkg.id
-                    ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900'
-                    : 'border-gray-200 dark:border-gray-600'">
-              <div *ngIf="pkg.isPopular" class="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span class="px-3 py-1 text-xs text-white bg-orange-500 rounded-full">
-                  {{ labels.popular }}
-                </span>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center">{{ pkg.name[currentLanguage] }}</h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">{{ pkg.description[currentLanguage] }}</p>
-              <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 text-center mb-4">${{ pkg.price }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">{{ pkg.deliveryTime }} • {{ pkg.revisions }} revisions</div>
-              <ul class="space-y-2 text-sm">
-                <li *ngFor="let feature of pkg.features[currentLanguage]" class="flex items-center gap-2">
-                  <i class="fas fa-check text-green-500"></i>
-                  <span class="text-gray-700 dark:text-gray-300">{{ feature }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div> -->
-
         <!-- About Service -->
         <div id="about-service" class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 **service-description-card**">
           <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ labels.about_service }}</h2>
           <p class="text-gray-700 dark:text-gray-300">{{ service.fullDescription }}</p>
         </div>
-
-        <!-- Features -->
-        <!-- <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ labels.service_features }}</h2>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div *ngFor="let feature of service.features[currentLanguage]" class="flex items-center gap-3">
-              <i class="fas fa-check-circle text-green-500"></i>
-              <span class="text-gray-700 dark:text-gray-300">{{ feature }}</span>
-            </div>
-          </div>
-        </div> -->
 
         <!-- Seller Products -->
          <div *ngIf="displayedSellerProducts.length > 0">
@@ -216,12 +176,13 @@
           <p class="text-gray-600 dark:text-gray-400 mb-6">
             {{ selectedPackage?.name?.[currentLanguage] || 'Basic Package' }}
           </p>
-          <button (click)="orderService()" class="w-full py-3 mb-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
-            {{ labels.order_now }} (${{ selectedPackage?.price || service.price }})
-          </button>
-          <button  routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <button  routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             {{ labels.contact_seller }}
           </button>
+          <button (click)="showContactForm = true" class="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
+            {{ labels.order_now }}
+          </button>
+
 
           <!-- Contact Form -->
           <div *ngIf="showContactForm" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
