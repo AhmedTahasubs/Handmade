@@ -18,6 +18,7 @@ export interface TableAction {
   color: "primary" | "secondary" | "success" | "warning" | "danger";
   action: string;
   menuItems?:any[]
+  disabled?: (item: any) => boolean; // 👈 Add this line
 }
 
 @Component({

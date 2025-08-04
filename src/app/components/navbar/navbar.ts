@@ -101,12 +101,12 @@ export class NavbarComponent implements OnInit, OnChanges {
     const homeAr = [{ label: 'الرئيسية', route: '/' }];
 
     const commonEn = [
-      { label: 'Custom Service', route: '/custom-service' },
+      { label: 'My Custom Service', route: '/customer-service' },
       { label: 'Chats', route: '/contacts' },
       { label: 'Orders', route: '/orders' }
     ];
     const commonAr = [
-      { label: 'الخدمات المخصصة', route: '/custom-service' },
+      { label: 'خدماتي المخصصه', route: '/customer-service' },
       { label: 'المحادثات', route: '/contacts' },
       { label: 'الطلبات', route: '/orders' }
     ];

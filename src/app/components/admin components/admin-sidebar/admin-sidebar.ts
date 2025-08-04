@@ -35,6 +35,7 @@ export class AdminSidebar {
               { name: "المنتجات", icon: "faBox", href: "/admin/products-management", exact: false },
               { name: "الفئات", icon: "faPalette", href: "/admin/categories-management", exact: false },
               { name: "الرئيسية", icon: "faHome", href: "/", exact: true },
+              { name: "طلبات مخصصة", icon: "faBell", href: "/admin/requests-management", exact: false },
               { name: "تسجيل خروج", icon: "faCog", exact: false,action: () => {this.authService.logout();},href:"#" },
             ]
           : [
@@ -43,6 +44,7 @@ export class AdminSidebar {
               { name: "Orders", icon: "faShoppingBag", href: "/admin/orders-management", exact: false },
               { name: "Products", icon: "faBox", href: "/admin/products-management", exact: false },
               { name: "Categories", icon: "faPalette", href: "/admin/categories-management", exact: false },
+              { name: "Custom Requests", icon: "faBell", href: "/admin/requests-management", exact: false },
               { name: "Home", icon: "faHome", href: "/", exact: true },
               { name: "Logout", icon: "faCog",href:"logout", exact: false ,action: () => {this.authService.logout();}} 
           ]
@@ -71,7 +73,8 @@ export class AdminSidebar {
       'faCog': 'fa-arrow-right-from-bracket',
       'faPalette': 'fa-palette',
       'faHandsHelping': 'fa-hands-helping',
-      'faTimes': 'fa-times'
+      'faTimes': 'fa-times',
+      'faBell': 'fa-bell',
     };
     return iconMap[icon] || '';
   }

@@ -106,6 +106,12 @@ export const routes: Routes = [
         path: 'reset-password',
         component: ResetPassword,
       },
+      {
+        path:'customer-service',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./pages/customer-requests/customer-requests').then(m=>m.CustomerRequestsComponent)
+      }
     ],
   },
   //dashboard layout
@@ -162,6 +168,13 @@ export const routes: Routes = [
                 './adminPages/categories-management/categories-management'
               ).then((m) => m.CategoriesManagement),
           },
+          {
+            path: 'requests-management',
+            loadComponent: () =>
+              import('./adminPages/requests-management/requests-management').then(
+                (m) => m.RequestsManagementComponent
+              ),
+          }
         ],
       },
       {
@@ -197,6 +210,13 @@ export const routes: Routes = [
                 (m) => m.SellerOrdersManagement
               ),
           },
+          {
+            path: 'requests-management',
+            loadComponent: () =>
+              import('./sellerPages/requests-management/requests-management').then(
+                (m) => m.SellerCustomRequestsManagement
+              ),
+          }
         ],
       },
     ],

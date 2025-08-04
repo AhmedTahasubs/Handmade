@@ -52,6 +52,12 @@ export class SellerSidebar implements OnInit {
         href: "/seller/orders-management",
         exact: false
       },
+          {
+      name: isArabic?'إدارة الطلبات' : 'Requests Management',
+      icon: 'fabell',
+      href: '/seller/requests-management',
+      exact: false
+    },
       { 
         name: isArabic ? "الرئيسية" : "Home", 
         icon: "faHome", 
@@ -65,8 +71,9 @@ export class SellerSidebar implements OnInit {
         exact: false,
         action: () => {
           this.authService.logout();
-      }
-    }
+      },
+    },
+
     ];
   }
 
@@ -79,7 +86,8 @@ export class SellerSidebar implements OnInit {
       'faCog': 'fa-arrow-right-from-bracket',
       'faStore': 'fa-store',
       'faTimes': 'fa-times',
-      'faUser': 'fa-user'
+      'faUser': 'fa-user',
+      'fabell': 'fa-bell',
     };
     return iconMap[icon] || '';
   }

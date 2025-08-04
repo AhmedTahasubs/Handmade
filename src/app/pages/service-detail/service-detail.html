@@ -168,7 +168,7 @@
       <!-- RIGHT SIDEBAR -->
       <div class="lg:col-span-1 space-y-6 sticky top-8">
         
-        <!-- Order Card -->
+      <!-- Order Card -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 text-center">
           <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             ${{ selectedPackage?.price || service.price }}
@@ -176,30 +176,61 @@
           <p class="text-gray-600 dark:text-gray-400 mb-6">
             {{ selectedPackage?.name?.[currentLanguage] || 'Basic Package' }}
           </p>
-          <button  routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <button routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             {{ labels.contact_seller }}
           </button>
-          <button (click)="showContactForm = true" class="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
+          <button (click)="showRequestForm = true" class="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
             {{ labels.order_now }}
           </button>
 
-
-          <!-- Contact Form -->
-          <div *ngIf="showContactForm" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <textarea [(ngModel)]="contactMessage"
-              [placeholder]="labels.message_placeholder"
-              rows="4"
-              class="w-full p-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none focus:ring-2 focus:ring-blue-500"></textarea>
-            <div class="flex gap-2 mt-3">
-              <button (click)="sendMessage()" class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm">
-                {{ labels.send }}
-              </button>
-              <button  (click)="toggleContactForm()" class="flex-1 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
-                {{ labels.cancel }}
+      <!-- Request Form -->
+      <div *ngIf="showRequestForm" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
+            {{ labels.description }}
+          </label>
+          <textarea [(ngModel)]="requestDescription"
+            [placeholder]="labels.description_placeholder"
+            rows="4"
+            class="w-full p-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none focus:ring-2 focus:ring-blue-500">
+          </textarea>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
+            {{ labels.reference_image }}
+          </label>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
+          <div class="flex flex-col gap-2">
+            <button (click)="fileInput.click()" class="w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+              {{ labels.choose_file }}
+            </button>
+            <div *ngIf="selectedFile" class="mt-2">
+              <img [src]="imagePreview" class="max-h-40 rounded-lg border border-gray-200 dark:border-gray-600">
+              <button (click)="removeImage()" class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                {{ labels.remove_image }}
               </button>
             </div>
           </div>
         </div>
+
+       <div class="flex gap-2 mt-3">
+  <button (click)="createRequest()" [disabled]="!requestDescription || isSubmitting" class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm disabled:opacity-50 flex items-center justify-center">
+    <span *ngIf="!isSubmitting">{{ labels.submit_request }}</span>
+    <span *ngIf="isSubmitting" class="flex items-center">
+      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      {{ labels.processing }}
+    </span>
+  </button>
+  <button (click)="toggleRequestForm()" [disabled]="isSubmitting" class="flex-1 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+    {{ labels.cancel }}
+  </button>
+</div>
+      </div>
+    </div>
         <!-- Seller Info Card -->
         <div class="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ labels.seller_info }}</h3>

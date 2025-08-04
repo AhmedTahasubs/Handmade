@@ -1,0 +1,345 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ getTranslation('title') }}
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ getTranslation('subtitle') }}
+      </p>
+    </div>
+  </header>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading && requests.length === 0" class="flex justify-center items-center py-16">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Data Table Section -->
+  <div *ngIf="!isLoading">
+    <!-- Show table if requests exist -->
+    <div *ngIf="requests.length > 0; else noRequests">
+      <app-data-table
+        [title]="getTranslation('title')"
+        [subtitle]="getTranslation('subtitle')"
+        [data]="requests"
+        [columns]="columns"
+        [actions]="actions"
+        (actionClicked)="onAction($event)"
+      ></app-data-table>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #noRequests>
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-inbox text-gray-400 dark:text-gray-500 text-3xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {{ getTranslation('noRequestsTitle') }}
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          {{ getTranslation('noRequestsMessage') }}
+        </p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Request Details Modal -->
+  <app-modal
+    [isOpen]="showModal"
+    [title]="getTranslation('viewRequest')"
+    [confirmText]="''"
+    [cancelText]="getTranslation('cancel')"
+    (closed)="closeModal()"
+    aria-labelledby="request-details-title"
+  >
+    <div *ngIf="currentRequest" class="space-y-4">
+      <!-- Customer Info -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('customer') }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+          {{ currentRequest.buyerName }}
+        </p>
+      </div>
+
+      <!-- Service Info -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('service') }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+          {{ currentRequest.serviceTitle || 'N/A' }}
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('description') }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+          {{ currentRequest.description }}
+        </p>
+      </div>
+
+      <!-- Reference Image -->
+      <div *ngIf="currentRequest.referenceImageUrl">
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('referenceImage') }}
+        </h3>
+        <img 
+          [src]="currentRequest.referenceImageUrl" 
+          alt="Reference image"
+          class="mt-2 max-w-full h-auto max-h-64 rounded-lg"
+        >
+      </div>
+
+      <!-- Status -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('status') }}
+        </h3>
+        <span 
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
+          [ngClass]="{
+            'bg-yellow-100 text-yellow-800': currentRequest.status === 'Pending',
+            'bg-blue-100 text-blue-800': currentRequest.status === 'Accepted',
+            'bg-red-100 text-red-800': currentRequest.status === 'Rejected',
+            'bg-purple-100 text-purple-800': currentRequest.status === 'InProgress',
+            'bg-green-100 text-green-800': currentRequest.status === 'Completed'
+          }"
+        >
+          {{ currentRequest.status }}
+        </span>
+      </div>
+
+      <!-- Created At -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('createdAt') }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+          {{ currentRequest.createdAt | date:'medium' }}
+        </p>
+      </div>
+    </div>
+  </app-modal>
+
+  <!-- Status Update Modal -->
+  <app-modal
+    [isOpen]="showStatusModal"
+    [title]="getTranslation('updateStatus')"
+    [confirmText]="isLoading ? '' : getTranslation('update')"
+    [cancelText]="getTranslation('cancel')"
+    (closed)="closeStatusModal()"
+    (confirmed)="updateStatus()"
+    aria-labelledby="status-update-title"
+  >
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+
+    <div *ngIf="currentRequest" class="space-y-4">
+      <!-- Current Status -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {{ getTranslation('currentStatus') }}
+        </h3>
+        <span 
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
+          [ngClass]="{
+            'bg-yellow-100 text-yellow-800': currentRequest.status === 'Pending',
+            'bg-blue-100 text-blue-800': currentRequest.status === 'Accepted',
+            'bg-red-100 text-red-800': currentRequest.status === 'Rejected',
+            'bg-purple-100 text-purple-800': currentRequest.status === 'InProgress',
+            'bg-green-100 text-green-800': currentRequest.status === 'Completed'
+          }"
+        >
+          {{ currentRequest.status }}
+        </span>
+      </div>
+
+      <!-- New Status -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+          {{ getTranslation('changeTo') }}
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            *ngFor="let action of statusActions"
+            [disabled]="action.disabled ? action.disabled(currentRequest) : false"
+            (click)="onStatusAction(action.action)"
+            class="px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
+            [ngClass]="{
+              'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/50 dark:text-green-200 dark:hover:bg-green-900': action.color === 'success',
+              'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-200 dark:hover:bg-red-900': action.color === 'danger',
+              'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-200 dark:hover:bg-blue-900': action.color === 'secondary',
+              'bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-900/50 dark:text-purple-200 dark:hover:bg-purple-900': action.color === 'primary',
+              'opacity-50 cursor-not-allowed': action.disabled ? action.disabled(currentRequest) : false
+            }"
+          >
+            <i class="fas fa-{{action.icon}} w-4 h-4"></i>
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </app-modal>
+
+  <!-- Add Product Modal -->
+  <app-modal
+    [isOpen]="showProductModal"
+    [title]="getTranslation('addProductFirst')"
+    [confirmText]="isProductLoading ? '' : getTranslation('addProduct')"
+    [cancelText]="getTranslation('cancel')"
+    (closed)="closeProductModal()"
+    (confirmed)="saveProduct()"
+    aria-labelledby="add-product-title"
+  >
+    <!-- Loading Overlay -->
+    <div *ngIf="isProductLoading" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+
+    <form class="space-y-4" *ngIf="currentProduct">
+      <fieldset class="space-y-4">
+        <legend class="sr-only">Product Information</legend>
+        
+        <!-- Product Name -->
+        <div>
+          <label for="productTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ getTranslation('validation.required') }}
+          </label>
+          <input
+            type="text"
+            id="productTitle"
+            [(ngModel)]="currentProduct.title"
+            name="title"
+            required
+            [class.border-red-500]="productFormErrors['title']"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          />
+          <p *ngIf="productFormErrors['title']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ productFormErrors['title'] }}
+          </p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="productDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ getTranslation('description') }}
+          </label>
+          <textarea
+            id="productDescription"
+            [(ngModel)]="currentProduct.description"
+            name="description"
+            rows="3"
+            required
+            [class.border-red-500]="productFormErrors['description']"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          ></textarea>
+          <p *ngIf="productFormErrors['description']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ productFormErrors['description'] }}
+          </p>
+        </div>
+
+        <!-- Price and Quantity -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="productPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ getTranslation('validation.minPrice') }}
+            </label>
+            <input
+              type="number"
+              id="productPrice"
+              [(ngModel)]="currentProduct.price"
+              name="price"
+              min="0"
+              step="0.01"
+              required
+              [class.border-red-500]="productFormErrors['price']"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            />
+            <p *ngIf="productFormErrors['price']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ productFormErrors['price'] }}
+            </p>
+          </div>
+
+          <div>
+            <label for="productQuantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ getTranslation('validation.minStock') }}
+            </label>
+            <input
+              type="number"
+              id="productQuantity"
+              [(ngModel)]="currentProduct.quantity"
+              name="quantity"
+              min="0"
+              required
+              [class.border-red-500]="productFormErrors['quantity']"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            />
+            <p *ngIf="productFormErrors['quantity']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ productFormErrors['quantity'] }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ getTranslation('validation.required') }}
+          </label>
+
+          <!-- File Input -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <label for="fileInput" class="cursor-pointer">
+              <span class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+                <i class="fas fa-upload w-4 h-4" aria-hidden="true"></i>
+                {{ imagePreview ? 'Change Image' : 'Upload Image' }}
+              </span>
+              <input 
+                type="file" 
+                id="fileInput"
+                (change)="onFileSelected($event)"
+                accept="image/*"
+                class="hidden"
+              >
+            </label>
+
+            <button 
+              type="button" 
+              *ngIf="imagePreview"
+              (click)="resetFileInput()"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="fas fa-trash w-4 h-4" aria-hidden="true"></i>
+              Remove
+            </button>
+          </div>
+
+          <!-- Image Preview -->
+          <div class="mt-4" *ngIf="imagePreview">
+            <img 
+              [src]="imagePreview" 
+              alt="Product preview"
+              class="h-32 w-32 object-cover rounded-lg"
+            >
+          </div>
+
+          <p *ngIf="productFormErrors['image']" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ productFormErrors['image'] }}
+          </p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ getTranslation('validation.maxFileSize') }}. {{ getTranslation('validation.invalidFileType') }}
+          </p>
+        </div>
+      </fieldset>
+    </form>
+  </app-modal>
+</div>

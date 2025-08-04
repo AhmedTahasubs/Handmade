@@ -14,6 +14,9 @@ export interface CustomerRequestResponse {
   buyerId: string;
   sellerId: string;
   serviceId?: number;
+  buyerName: string,
+  sellerName: string,
+  serviceTitle: string,
   description: string;
   referenceImageUrl?: string;
   status: 'Pending' | 'Accepted' | 'Rejected' | 'InProgress' | 'Completed';
@@ -23,9 +26,13 @@ export interface CustomerRequestResponse {
   providedIn: 'root'
 })
 export class CustomerRequestService {
-  private readonly baseUrl = 'https://your-api-url/api/CustomerRequests';
+  private readonly baseUrl = 'https://localhost:7047/api/CustomerRequests';
 
   constructor(private http: HttpClient) {}
+
+  getAll(): Observable<CustomerRequestResponse[]> {
+    return this.http.get<CustomerRequestResponse[]>(`${this.baseUrl}/all`);
+  }
 
   create(dto: CreateCustomerRequestDto): Observable<CustomerRequestResponse> {
     const formData = new FormData();
@@ -49,5 +56,9 @@ export class CustomerRequestService {
 
   updateStatus(id: number, status: string): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/status?status=${status}`, {});
+  }
+
+  getById(id: number): Observable<CustomerRequestResponse> {
+    return this.http.get<CustomerRequestResponse>(`${this.baseUrl}/${id}`);
   }
 }

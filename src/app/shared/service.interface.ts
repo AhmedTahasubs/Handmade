@@ -95,7 +95,7 @@ export interface FAQ {
 }
 
 export interface SellerInfo {
-  id: number|string;
+  id: string;
   name: string;
   username: string;
   avatar: string;
