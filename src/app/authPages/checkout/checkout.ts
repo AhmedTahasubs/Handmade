@@ -82,7 +82,7 @@ export class CheckoutComponent {
     {
       id: 'Visa',
       label: this.translations.visa,
-      icon: 'fa-cc-visa',
+      icon: 'fa-credit-card',
       description: this.translations.visaDescription
     }
   ];

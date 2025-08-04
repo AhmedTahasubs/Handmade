@@ -28,11 +28,6 @@ export const routes: Routes = [
         canActivate: [guestGuard],
         loadComponent: () => import('./authPages/forgot-password/forgot-password').then(m => m.ForgotPassword)
       },
-      { 
-        path: 'categories', 
-        loadComponent: () => import('./pages/categories/categories').then(m => m.CategoriesComponent)
-      },
-      
       {
         path: 'category/services/:id', // el id da bta3 el category ya hammad
         loadComponent: () => import('./pages/services/services').then(m => m.ServicesPage)
@@ -42,12 +37,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/service-detail/service-detail').then(m => m.ServiceDetailPage)
       },
       {
-        path: 'products',
-        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
-      },
-      {
         path: 'products/:id',
         loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./pages/products/products').then(m => m.ProductsPage)
       },
       {
         path: 'sellerProfile/:id',

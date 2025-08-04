@@ -25,7 +25,10 @@ export interface ProductRequest {
   file: string;
   serviceId: number;
 }
-
+export interface ProductSearchRequest {
+  query: string;
+  maxResults?: number;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -64,4 +67,13 @@ export class ProductService {
   formData.append('status', status);
   return this.http.patch<Product>(`${this.baseUrl}/${id}`, formData);
 }
+
+
+
+ search(request: ProductSearchRequest): Observable<Product[]> {
+    return this.http.post<Product[]>(`${this.baseUrl}/search`, request);
+  }
+ updateAllEmbeddings(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/update-all-embeddings`, {});
+  }
 }

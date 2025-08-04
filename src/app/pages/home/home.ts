@@ -5,8 +5,8 @@ import { SearchFilterComponent } from "../../components/search-filter/search-fil
 import { LanguageService } from '../../services/language.service';
 import { CategoryService, CategoryDto } from '../../services/category'; // استيراد الخدمة الجديدة و DTO
 import { Router, RouterModule } from '@angular/router';
-
-
+import { FormsModule } from '@angular/forms'; // Add this import
+import { ProductService } from '../../services/products.service'; // Make sure to import the ProductService
 // تحديث واجهة Category لتتوافق مع DTO من API لاسم الفئة
 // قد ترغب في الاحتفاظ بالاسم: { en: string; ar: string } لأغراض العرض،
 // ولكن بالنسبة للبيانات التي تم جلبها، سنستخدم بنية CategoryDto.
@@ -28,12 +28,14 @@ interface Category {
     CommonModule,
     ProductCardComponent, // تأكد من استيراد ProductCardComponent إذا تم استخدامه في القالب
     SearchFilterComponent, // تأكد من استيراد SearchFilterComponent إذا تم استخدامه في القالب
-    RouterModule // استيراد RouterModule
+    RouterModule, // استيراد RouterModule
+    FormsModule 
   ]
 })
 export class HomeComponent implements OnInit { // تطبيق OnInit
   private languageService = inject(LanguageService);
   private categoryService = inject(CategoryService); // حقن الخدمة الجديدة
+   aiSearchQuery = '';
   token: string | null = localStorage.getItem('token');
   // الحصول على اللغة من الخدمة لاستخدامها في القالب
   get language(): 'en' | 'ar' {
@@ -191,7 +193,7 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
   allCategories: Category[] = [];
   featuredCategories: Category[] = [];
 
-  constructor(private router : Router) {}
+  constructor(private router : Router,private productService: ProductService) {}
 
   ngOnInit(): void {
     this.fetchCategories();
@@ -333,5 +335,30 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
   // **** أضف هذه الدالة الجديدة ****
   trackByCategoryId(index: number, category: Category): number {
     return category.id;
+  }
+
+
+   onAiSearch(): void {
+    if (!this.aiSearchQuery.trim()) return;
+    
+    // Call the AI search API
+    this.productService.search({
+      query: this.aiSearchQuery,
+      maxResults: Math.round(Math.random() * 10 + 5) // Randomly set maxResults between 5 and 15
+    }).subscribe({
+      next: (products) => {
+        // Navigate to products page with search results
+        this.router.navigate(['/products'], {
+          state: { 
+            searchResults: products,
+            searchQuery: this.aiSearchQuery
+          }
+        });
+      },
+      error: (error) => {
+        console.error('AI search error:', error);
+        // You might want to show an error message to the user
+      }
+    });
   }
 }

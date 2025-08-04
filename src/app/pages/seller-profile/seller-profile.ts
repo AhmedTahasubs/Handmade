@@ -70,7 +70,8 @@ export class SellerProfilePage implements OnInit {
   private loadSellerProducts() {
     this.userService.getProductsBySellerId(this.sellerId).subscribe({
       next: (products) => {
-        this.sellerProducts = products;
+        this.sellerProducts = products.filter((product) => product.status === 'approved');
+        console.log('Seller products:', this.sellerProducts);
       },
       error: (error) => {
         console.error('Error fetching products:', error);

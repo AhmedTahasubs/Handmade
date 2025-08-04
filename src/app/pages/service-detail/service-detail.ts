@@ -2,7 +2,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ServiceCardComponent } from '../../components/service-card/service-card.component';
 import { ReviewItemComponent } from '../../components/review-item/review-item';
@@ -28,7 +28,7 @@ import {
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent, ProductCardComponent],
+  imports: [CommonModule, FormsModule, ServiceCardComponent, ReviewItemComponent, ProductCardComponent,RouterModule],
   templateUrl: './service-detail.html',
   styleUrl: './service-detail.css'
 })
@@ -66,6 +66,7 @@ export class ServiceDetailPage implements OnInit {
         return;
       }
       this.loadServiceData(); // استدعي دالة تحميل البيانات
+      console.log(this.service)
     });
   }
   
@@ -136,7 +137,7 @@ export class ServiceDetailPage implements OnInit {
             joinDate: '', // Mocked
             location: '' // Mocked
           },
-products: (dto.products ?? []).map((pDto: ProductDisplayDto) => ({
+products: (dto.products ?? []).filter(p=>p.status==="approved").map((pDto: ProductDisplayDto) => ({
   id: pDto.id,
   title: pDto.title,
   price: pDto.price,
