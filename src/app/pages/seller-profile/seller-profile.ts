@@ -10,6 +10,13 @@ import { LanguageService } from '../../services/language.service';
 import { Router } from '@angular/router';
 import { SellerProfile } from '../../models/seller-profile';
 import { IProduct, UserService } from '../../services/user';
+import { SellerOrders } from '../../services/orders.service';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { map } from 'rxjs/operators';
+
+
 
 @Component({
   selector: 'app-seller-profile',
@@ -23,10 +30,12 @@ export class SellerProfilePage implements OnInit {
   seller: SellerProfile | null = null;
   sellerProducts: Product[] = [];
   loading = true;
-
+  orders: SellerOrders[] = [];
   // Filter and sort options
   selectedCategory = 'all';
   sortOption: 'price-low' | 'price-high' | 'rating' | 'newest' = 'rating';
+  private apiUrl = 'https://localhost:7047/api';
+  private http = inject(HttpClient);
 
   constructor(
     private route: ActivatedRoute,
@@ -34,13 +43,16 @@ export class SellerProfilePage implements OnInit {
     private router: Router,
     private userService: UserService // Inject the service
   ) {}
-
+  completedOrdersCount: number = 0;
   ngOnInit() {
     this.route.params.subscribe((params) => {
       this.sellerId = params['id'];
       this.loadSellerData();
       this.loadSellerProducts();
     });
+    this.getCompletedOrdersCount(this.sellerId).subscribe((count) => {
+    this.completedOrdersCount = count;
+  });
   }
 
   private loadSellerData() {
@@ -130,6 +142,15 @@ export class SellerProfilePage implements OnInit {
       .fill(0)
       .map((_, i) => i);
   }
+  getOrdersBySellerId(sellerId: string): Observable<SellerOrders[]> {
+  return this.http.get<SellerOrders[]>(`${this.apiUrl}/CustomerOrders/seller/${sellerId}`);
+}
+
+getCompletedOrdersCount(sellerId: string): Observable<number> {
+  return this.getOrdersBySellerId(sellerId).pipe(
+    map((orders) => orders.filter((o) => o.status === 'Delivered').length)
+  );
+}
 
   // isStarFilled(index: number): boolean {
   //   return this.seller ? index < Math.floor(this.seller.rating) : false;
@@ -152,7 +173,7 @@ export class SellerProfilePage implements OnInit {
       response_time:
         this.currentLanguage === 'en' ? 'Response time' : 'وقت الاستجابة',
       completed_orders:
-        this.currentLanguage === 'en' ? 'Completed orders' : 'الطلبات المكتملة',
+        `${this.currentLanguage === 'en' ? 'Completed orders' : 'الطلبات المكتملة'}: ${this.completedOrdersCount}`,
       online: this.currentLanguage === 'en' ? 'Online' : 'متصل',
       offline: this.currentLanguage === 'en' ? 'Offline' : 'غير متصل',
       verified: this.currentLanguage === 'en' ? 'Verified Seller' : 'بائع موثق',
