@@ -117,7 +117,7 @@ export class ServiceDetailPage implements OnInit {
             id: dto.sellerId,
             name: dto.sellerName,
             username: dto.sellerName,
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=387',
+            avatar: '',
             rating: dto.avgRating,
             reviewCount: 0,
             responseTime: '1 hour',

@@ -173,7 +173,7 @@ getCompletedOrdersCount(sellerId: string): Observable<number> {
       response_time:
         this.currentLanguage === 'en' ? 'Response time' : 'وقت الاستجابة',
       completed_orders:
-        `${this.currentLanguage === 'en' ? 'Completed orders' : 'الطلبات المكتملة'}: ${this.completedOrdersCount}`,
+        `${this.currentLanguage === 'en' ? 'Completed orders' : 'الطلبات المكتملة'}`,
       online: this.currentLanguage === 'en' ? 'Online' : 'متصل',
       offline: this.currentLanguage === 'en' ? 'Offline' : 'غير متصل',
       verified: this.currentLanguage === 'en' ? 'Verified Seller' : 'بائع موثق',

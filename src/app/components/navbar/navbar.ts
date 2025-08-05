@@ -85,7 +85,6 @@ export class NavbarComponent implements OnInit, OnChanges {
     this.userMenuItems = {
       en: [
         ...(dashboardItem ? [dashboardItem] : []),
-        { label: 'Settings', route: '/settings', icon: 'fa-cog' },
         { label: 'Logout', action: 'logout', icon: 'fa-sign-out-alt' }
       ],
       ar: [

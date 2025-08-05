@@ -12,7 +12,7 @@ export class ToastService {
   private toastsSubject = new BehaviorSubject<Toast[]>([]);
   toasts$ = this.toastsSubject.asObservable();
 
-  private defaultDuration = 5000; // 5 seconds
+  private defaultDuration = 500; // 1/2 second
 
   show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration?: number): void {
     const toast: Toast = { message, type, duration: duration || this.defaultDuration };

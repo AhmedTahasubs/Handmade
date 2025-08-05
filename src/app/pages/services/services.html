@@ -8,11 +8,9 @@
     <app-search-filter
       [language]="currentLanguage"
       [searchTerm]="searchTerm"
-      [selectedCategory]="selectedCategory"
       [priceRange]="priceRange"
       [showCustomizable]="showCustomizable"
-      (searchTermChange)="onSearchTermChange($event)"
-      (selectedCategoryChange)="onSelectedCategoryChange($event)"
+      (searchTermChange)="onSearchTermChange($event)" 
       (priceRangeChange)="onPriceRangeChange($event)"
       (showCustomizableChange)="onShowCustomizableChange($event)"
       (clearAllFilters)="onClearAllFilters()"
