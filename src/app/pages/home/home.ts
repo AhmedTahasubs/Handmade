@@ -277,13 +277,13 @@ export class HomeComponent implements OnInit { // تطبيق OnInit
     const icons: { [key: string]: string } = {
       'ceramics': 'palette', // بافتراض أن فئات منتجاتك لا تزال تستخدم أسماء نصية
       'textiles': 'tshirt',
-      'woodwork': 'tree',
+      'wood': 'tree',
       'leather': 'shoe-prints',
       'jewelry': 'gem',
       'art': 'paint-brush',
       'beauty': 'spa',
       'home': 'home',
-      'bags': 'shopping-bag',
+      'crochet': 'shopping-bag',
       'toys': 'gamepad',
       'candles': 'fire',
       'stationery': 'pen'

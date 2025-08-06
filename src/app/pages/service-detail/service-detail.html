@@ -173,13 +173,14 @@
           <p class="text-gray-600 dark:text-gray-400 mb-6">
             {{ selectedPackage?.name?.[currentLanguage] || 'Basic Package' }}
           </p>
+          @if(auth.loggedIn.value) {
           <button routerLink="/chat/{{service.sellerInfo.id}}" class="w-full py-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             {{ labels.contact_seller }}
           </button>
           <button (click)="showRequestForm = true" class="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
             {{ labels.order_now }}
           </button>
-
+        }
       <!-- Request Form -->
       <div *ngIf="showRequestForm" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div class="mb-4">

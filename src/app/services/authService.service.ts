@@ -54,7 +54,7 @@ interface SellerRegisterRequest extends CustomerRegisterRequest {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private baseUrl = 'https://localhost:7047/';
-  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+  loggedIn = new BehaviorSubject<boolean>(this.hasToken());
   currentUser = new BehaviorSubject<User | null>(this.getStoredUser());
 
   constructor(

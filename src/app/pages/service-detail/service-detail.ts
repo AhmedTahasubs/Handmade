@@ -22,6 +22,7 @@ import {
   ProductDisplayDto,
 } from '../../shared/service.interface'; 
 import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../services/authService.service';
 
 @Component({
   selector: 'app-service-detail',
@@ -49,6 +50,7 @@ export class ServiceDetailPage implements OnInit {
   
   private serviceService = inject(ServiceService);
   private customerRequestService = inject(CustomerRequestService);
+  public auth = inject(AuthService);
   
   constructor(
     private route: ActivatedRoute,

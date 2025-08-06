@@ -5,6 +5,8 @@ import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/authService.service';
+
 
 interface Labels {
   home: string;
@@ -46,6 +48,7 @@ export class ProductDetailComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly cartService = inject(CartService);
   private readonly toastService = inject(ToastService);
+  public readonly authService = inject(AuthService);
 
   product: Product | null = null;
   relatedProducts: Product[] = [];

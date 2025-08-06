@@ -3,6 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../services/authService.service';
 
 interface AddCartItemDto {
   productId: number;
@@ -42,7 +43,8 @@ export class ProductCardComponent {
   constructor(
     private router: Router,
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    public auth: AuthService  
   ) {}
 
   onAddToCart(event: Event): void {

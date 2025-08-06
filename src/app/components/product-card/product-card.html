@@ -15,6 +15,7 @@
       class="absolute inset-0 flex items-center justify-center gap-4 transition-opacity duration-300 opacity-0 bg-black/40 group-hover:opacity-100"
     >
       <!-- Add to Cart -->
+       @if(this.auth.loggedIn.value){
       <button
         (click)="onAddToCart($event)"
         [disabled]="isLoading"
@@ -24,6 +25,7 @@
         <i *ngIf="!isLoading" class="text-lg fas fa-cart-plus"></i>
         <i *ngIf="isLoading" class="text-lg fas fa-spinner fa-spin"></i>
       </button>
+    }
     </div>
 
     <!-- Badge -->
@@ -79,15 +81,17 @@
           {{ language === "en" ? "Starting price" : "السعر الأساسي" }}
         </p>
       </div>
-      <button
-        (click)="onAddToCart($event)"
-        [disabled]="isLoading"
-        class="product-button flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-400"
-      >
-        <i *ngIf="!isLoading" class="fas fa-cart-plus"></i>
-        <i *ngIf="isLoading" class="fas fa-spinner fa-spin"></i>
-        <span>{{ language === "en" ? "Add to Cart" : "أضف للسلة" }}</span>
-      </button>
+      @if(this.auth.loggedIn.value){
+        <button
+          (click)="onAddToCart($event)"
+          [disabled]="isLoading"
+          class="product-button flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-400"
+        >
+          <i *ngIf="!isLoading" class="fas fa-cart-plus"></i>
+          <i *ngIf="isLoading" class="fas fa-spinner fa-spin"></i>
+          <span>{{ language === "en" ? "Add to Cart" : "أضف للسلة" }}</span>
+        </button>
+      }
     </div>
   </div>
 </div>

@@ -84,6 +84,7 @@
         </div>
 
         <!-- Quantity and Add to Cart -->
+                   @if(this.authService.loggedIn.value){
         <div class="space-y-4" *ngIf="product.quantity > 0">
           <div class="flex items-center gap-4">
             <label class="font-medium text-gray-900 dark:text-white">{{ labels.quantity }}:</label>
@@ -130,8 +131,9 @@
               <span>{{ buyingNow ? labels.processing : labels.buy_now }}</span>
             </button>
           </div>
+        
         </div>
-
+      }
         <!-- Out of Stock Message -->
         <div *ngIf="product.quantity === 0" class="p-4 bg-red-50 rounded-lg dark:bg-red-900/20">
           <div class="flex items-center gap-3">
@@ -186,6 +188,7 @@
                 <span class="text-xl font-bold text-gray-900 dark:text-white">
                   ${{ relatedProduct.price }}
                 </span>
+                @if(this.authService.loggedIn.value){
                 <button
                   (click)="onRelatedProductAddToCart(relatedProduct); $event.stopPropagation()"
                   [disabled]="relatedProduct.quantity === 0"
@@ -194,6 +197,7 @@
                   <i class="fas fa-cart-plus mr-1"></i>
                   {{ labels.add }}
                 </button>
+              }
               </div>
             </div>
           </a>

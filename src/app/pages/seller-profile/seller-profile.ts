@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
-
+import { AuthService } from '../../services/authService.service';
 
 
 @Component({
@@ -41,7 +41,8 @@ export class SellerProfilePage implements OnInit {
     private route: ActivatedRoute,
     public languageService: LanguageService,
     private router: Router,
-    private userService: UserService // Inject the service
+    private userService: UserService, // Inject the service
+    public auth: AuthService
   ) {}
   completedOrdersCount: number = 0;
   ngOnInit() {
