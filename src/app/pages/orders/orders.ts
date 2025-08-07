@@ -3,26 +3,41 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
-import { OrderService, Order, OrderStatus } from '../../services/orders.service';
+import { OrderService, Order, OrderStatus, OrderItem} from '../../services/orders.service';
 import { catchError, finalize, of } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { ReviewService, CreateServiceReviewDto } from '../../services/review';
+import { Product } from '../../services/products.service';
+import { ToastService } from '../../services/toast.service';
+import { ProductService } from '../../services/products.service';
+import { Modal } from './../../components/modal/modal';
+import { ServiceSellerService } from '../../services/services.service';
+
+
 
 @Component({
   selector: 'app-customer-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule, Modal],
   templateUrl: './orders.html'
 })
 export class CustomerOrdersComponent implements OnInit {
   themeService = inject(ThemeService);
   languageService = inject(LanguageService);
   orderService = inject(OrderService);
-
+  showModal = false;
+  selectedServiceId: number | null = null;
+  currentReview = { comment: '', rating: 0 };
+  currentUserId = ''; 
+  product : Product[] =[];
   orders: Order[] = [];
+  orderItems: OrderItem[] = [];
   isLoading = true;
   error: string | null = null;
 
   ngOnInit(): void {
     this.loadOrders();
+    this.loadProducts();
   }
 
   loadOrders(): void {
@@ -119,4 +134,91 @@ export class CustomerOrdersComponent implements OnInit {
   // Default to pending
   return 'Pending';
 }
+
+
+ constructor(private reviewService: ReviewService,private toastService: ToastService, private productService: ProductService) {}
+
+
+
+ loadProducts(): void {
+    this.productService.getAll().subscribe({
+      next: (products) => {
+        this.product = products;
+        console.log('products loaded successfully', this.product);
+      },
+      error: (err) => {
+        console.error(' failed to load products', err);
+      }
+    });
+  }
+  openAddReviewModal(orderItemId: number): void {
+     console.log('Opening review modal for order item ID:', orderItemId);
+    const orderItem = this.orders.flatMap(order => order.items).find(item => item.id === orderItemId);
+    console.log(orderItem?.id || 'No order item found with this ID');
+    if (!orderItem) return;
+    
+
+    const pro = this.product.find(product => product.id=== orderItem.productId);
+    console.log(pro?.id|| 'No pro id found with this ID');
+    this.selectedServiceId = pro?.serviceId || null;
+    console.log(this.selectedServiceId || 'No service id found with this ID');
+    this.currentReview = { comment: '', rating: 0 };
+    this.showModal = true;
+  }
+
+
+
+
+
+
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedServiceId = null;
+  }
+
+  saveReview(): void {
+    if (!this.selectedServiceId) return;
+
+    if (this.currentReview.rating < 0) {
+    this.currentReview.rating = 0;
+    } 
+    else if (this.currentReview.rating > 5) {
+    this.currentReview.rating = 5;
+    }
+    if (!this.currentReview.comment.trim()) {
+      this.toastService.showError(
+        this.languageService.currentLanguage() === 'en'
+          ? 'Comment cannot be empty'
+          : 'لا يمكن أن يكون التعليق فارغًا'
+      );
+      return;
+    }
+
+    const dto: CreateServiceReviewDto = {
+      serviceId: this.selectedServiceId,
+      reviewerId: this.orders[0].customerId, 
+      rating: this.currentReview.rating,
+      comment: this.currentReview.comment
+    };
+
+    this.reviewService.createReview(dto).subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          this.languageService.currentLanguage() === 'en'
+            ? 'review added successfully'
+            : 'تم إضافة المراجعة بنجاح'
+        );
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('Error adding the review:', err);
+        this.toastService.showError(
+          this.languageService.currentLanguage() === 'en'
+            ? 'Failed to add review'
+            : '  فشل إضافة المراجعة'
+        );
+      }
+    });
+  }
+
 }

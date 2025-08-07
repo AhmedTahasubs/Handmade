@@ -68,7 +68,68 @@
               </span>
             </div>
             <div class="text-gray-900 dark:text-white font-medium">
-              {{ item.totalPrice | currency }}
+              <p>{{ item.totalPrice | currency }}</p>
+              <!-- review part -->
+              <button
+              *ngIf="item.status === 'Pending'" 
+                (click)="openAddReviewModal(item.id)"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+               
+                 {{ languageService.currentLanguage() === 'en' ? 'Add Review' : 'إضافة مراجعة' }}
+              </button>
+
+              <app-modal
+                [isOpen]="showModal"
+                [title]="languageService.currentLanguage() === 'en' ? 'Add Review' : 'إضافة مراجعة'"
+                [confirmText]="isLoading ? '' : languageService.currentLanguage() === 'en' ? 'save' : 'حفظ'"
+                (closed)="closeModal()"
+                (confirmed)="saveReview()"
+              >
+                <div *ngIf="isLoading" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+                  <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600"></div>
+                </div>
+
+                <form class="space-y-4" *ngIf="currentReview" (ngSubmit)="saveReview()">
+                  <fieldset class="space-y-4">
+                    <legend class="sr-only">Review Information</legend>
+
+                    
+                    <div>
+                      <label for="reviewRating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{languageService.currentLanguage() === 'en' ? 'Rating (0-5)' : 'تقييم (0-5)'}}
+                      </label>
+                      <input
+                        type="number"
+                        id="reviewRating"
+                        [(ngModel)]="currentReview.rating"
+                        name="rating"
+                        min="0"
+                        max="5"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
+                      />
+                      
+                    </div>
+                    <div>
+                      <label for="reviewComment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{languageService.currentLanguage() === 'en' ? 'Comment' : 'تعليق'}}
+                      </label>
+                      <textarea
+                        id="reviewComment"
+                        [(ngModel)]="currentReview.comment"
+                        name="comment"
+                        rows="3"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
+                      ></textarea>
+                    </div>
+                  </fieldset>
+                </form>
+              </app-modal>
+
+
+
             </div>
           </div>
         </div>
