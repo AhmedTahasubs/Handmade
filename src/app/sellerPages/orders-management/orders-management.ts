@@ -115,7 +115,9 @@ export class SellerOrdersManagement implements OnInit {
       ordersList: "Orders List",
       ordersSubtitle: "Manage your customer orders efficiently",
       noOrdersTitle: "No Orders Yet",
-      noOrdersMessage: "There are currently no orders in the system"
+      noOrdersMessage: "There are currently no orders in the system",
+      statusUpdated:" Status Updated",
+      errorUpdatingStatus:" Error updating status",
     },
     ar: {
       title: "إدارة الطلبات",
@@ -143,7 +145,9 @@ export class SellerOrdersManagement implements OnInit {
       ordersList: "قائمة الطلبات",
       ordersSubtitle: "إدارة طلبات العملاء بكفاءة",
       noOrdersTitle: "لا توجد طلبات حتى الآن",
-      noOrdersMessage: "لا توجد طلبات حالياً في النظام"
+      noOrdersMessage: "لا توجد طلبات حالياً في النظام",
+      statusUpdated:"حالة مُعدلة",
+      errorUpdatingStatus:"خطأ في تحديث الحالة",
     },
   };
 
