@@ -6,7 +6,7 @@ import { Component, effect, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from '@angular/router';
-import { OrderService, SellerOrders, OrderStatus } from '../../services/orders.service';
+import { OrderService, SellerOrders, OrderStatus, CustomerOrdrItem } from '../../services/orders.service';
 import { ToastService } from '../../services/toast.service';
 import { finalize } from 'rxjs';
 
@@ -31,7 +31,7 @@ export class SellerOrdersManagement implements OnInit {
   isUpdatingStatus = false;
 
   orders: SellerOrders[] = [];
-
+  items : CustomerOrdrItem[] = [];
   columns: TableColumn[] = [
     { 
       key: "productImageUrl", 
@@ -155,15 +155,31 @@ export class SellerOrdersManagement implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
+    this.loaditems();
   }
 
   loadOrders(): void {
+    console.log("Loading orders for seller");
     this.isLoading = true;
     this.orderService.getOrdersBySeller()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (orders) => {
           this.orders = orders;
+
+        },
+        error: () => {
+        }
+      });
+  }
+  loaditems(): void {
+    console.log("Loading items for seller");
+    this.isLoading = true;
+    this.orderService.getItemsBySeller()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (items) => {
+          this.items = items;
 
         },
         error: () => {
@@ -252,7 +268,17 @@ export class SellerOrdersManagement implements OnInit {
 
   updateOrderStatus(order: SellerOrders, status: OrderStatus): void {
     this.isUpdatingStatus = true;
-    this.orderService.updateOrderItemStatus(order.orderId, status)
+    console.log(this.items);
+    console.log('Order ID:', order.orderId);
+console.log('Available items:', this.items.map(i => i.CustomerOrderId));
+
+    const i=this.items.find(item => item.product.id === order.productId);
+    console.log('Order item:', i);
+    if (!i) {
+      console.error("Order item not found for order ID:", order.orderId);
+      return;
+    }
+    this.orderService.updateOrderItemStatus(i?.id, status)
       .pipe(finalize(() => this.isUpdatingStatus = false))
       .subscribe({
         next: () => {
