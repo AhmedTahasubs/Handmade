@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Product } from './products.service';
 
 export type OrderStatus = 'Pending' | 'Shipped' | 'Delivered' | 'Rejected';
 
@@ -25,7 +26,8 @@ export interface SellerOrders{
   "quantity": number,
   "unitPrice": number,
   "totalPrice": number,
-  "status": string
+  "status": string,
+  "productId": number,
 }
 export interface Order {
   id: number;
@@ -47,7 +49,16 @@ export interface CreateOrderRequest {
 export interface UpdateOrderItemStatusRequest {
   status: OrderStatus;
 }
-
+export interface CustomerOrdrItem{
+  id: number;
+  CustomerOrderId: number;
+  productId: number;
+  product: Product;
+  sellerId: string;
+  quantity: number;
+  unitPrice: number;
+  status: OrderStatus;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -87,5 +98,8 @@ export class OrderService {
 
   getOrderById(orderId: number): Observable<Order> {
     return this.http.get<Order>(`${this.apiUrl}/CustomerOrders/${orderId}`);
+  }
+  getItemsBySeller():Observable<CustomerOrdrItem[]> {
+    return this.http.get<CustomerOrdrItem[]>(`${this.apiUrl}/CustomerOrders/seller/items`);
   }
 }
