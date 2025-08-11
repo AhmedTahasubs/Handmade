@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { OrderService } from '../../services/orders.service';
+import { PaymentService } from '../../services/payment-service';
 
 @Component({
   selector: 'app-checkout',
@@ -18,6 +19,7 @@ export class CheckoutComponent {
   languageService = inject(LanguageService);
   orderService = inject(OrderService);
   router = inject(Router);
+  paymentService = inject(PaymentService);
 
   checkoutForm: FormGroup;
   isLoading = false;
@@ -80,7 +82,7 @@ export class CheckoutComponent {
       description: this.translations.cashDescription
     },
     {
-      id: 'Visa',
+      id: 'Card',
       label: this.translations.visa,
       icon: 'fa-credit-card',
       description: this.translations.visaDescription
@@ -88,30 +90,52 @@ export class CheckoutComponent {
   ];
 
   onSubmit(): void {
-    if (this.checkoutForm.invalid) {
-      this.checkoutForm.markAllAsTouched();
-      return;
-    }
+  if (this.checkoutForm.invalid) {
+    this.checkoutForm.markAllAsTouched();
+    return;
+  }
 
-    this.isLoading = true;
-    this.error = null;
+  this.isLoading = true;
+  this.error = null;
 
-    const orderData = {
-      phoneNumber: this.checkoutForm.value.phoneNumber,
-      address: this.checkoutForm.value.address,
-      paymentMethod: this.checkoutForm.value.paymentMethod
-    };
+  const orderData = {
+    phoneNumber: this.checkoutForm.value.phoneNumber,
+    address: this.checkoutForm.value.address,
+    paymentMethod: this.checkoutForm.value.paymentMethod
+  };
 
-    this.orderService.createOrder(orderData).subscribe({
-      next: () => {
+  this.orderService.createOrder(orderData).subscribe({
+    next: (order) => {
+      const paymentMethod = this.checkoutForm.value.paymentMethod;
+
+      if (paymentMethod === 'Cash') {
+        // For cash on delivery, redirect directly to orders page
         this.isLoading = false;
         this.router.navigate(['/orders']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.error = this.translations.tryAgain;
-        console.error('Order failed:', err);
+      } else if (paymentMethod === 'Card') {
+        // For card payment, create payment token and redirect to Paymob
+        this.paymentService.createPaymentToken(order.id, 'card').subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            if (response.redirectUrl) {
+              // Redirect to Paymob payment page
+              window.location.href = response.redirectUrl;
+            }
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.error = this.translations.tryAgain;
+            console.error('Payment token creation failed:', err);
+          }
+        });
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.isLoading = false;
+      this.error = this.translations.tryAgain;
+      console.error('Order failed:', err);
+    }
+  });
+}
+
 }
