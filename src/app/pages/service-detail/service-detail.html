@@ -62,7 +62,7 @@
                     <i class="far fa-star text-gray-300 text-sm" *ngIf="!isStarFilled(i, service.rating) && !isStarHalf(i, service.rating)"></i>
                   </ng-container>
                 </div>
-                <span class="font-semibold text-gray-900 dark:text-white">{{ service.rating }}</span>
+                <span class="font-semibold text-gray-900 dark:text-white">{{ service.rating.toFixed(1) }}</span>
                 <span class="text-gray-600 dark:text-gray-400">({{ reviews.length }} reviews)</span>
               </div>
 
