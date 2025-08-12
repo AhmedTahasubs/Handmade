@@ -16,6 +16,7 @@ export interface ServiceDto {
   categoryId: number;
   imageUrl: string | null;
   products: ProductDisplayDto[];
+  reason: string | null;
 }
 export interface ServiceRequest {
   id?: number;
@@ -84,5 +85,12 @@ export class ServiceSellerService {
   patchStatus(id: number, formData: FormData): Observable<ServiceDto> {
     return this.http.patch<ServiceDto>(`${this.baseUrl}/${id}`, formData);
   }
-  
+
+  // patch update service reason by id 
+  patchReason(id: number, reason:string){
+    return this.http.patch(`${this.baseUrl}/reason/${id}`, {
+      reason:reason
+    }
+  );
+  }
 }

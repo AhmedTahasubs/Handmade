@@ -1,0 +1,29 @@
+/* Add any custom styles here */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Animation for file upload */
+img {
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.02);
+}
+
+/* RTL adjustments */
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* Dark mode transitions */
+.dark .bg-white {
+  transition: background-color 0.3s ease;
+}
+
+.dark .border-gray-200 {
+  transition: border-color 0.3s ease;
+}

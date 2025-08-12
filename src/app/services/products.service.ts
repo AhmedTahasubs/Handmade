@@ -15,6 +15,7 @@ export interface Product {
   imageUrl: string;
   sellerName: string;
   category:string
+  rejectionReason:string|null;
 }
 
 export interface ProductRequest {
@@ -75,5 +76,11 @@ export class ProductService {
   }
  updateAllEmbeddings(): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/update-all-embeddings`, {});
+  }
+
+  patchReasoning(id: number, rejectionReason: string):Observable<Product>{
+    return this.http.patch<Product>(`${this.baseUrl}/Reason/${id}`, {
+      rejectionReason
+    });
   }
 }

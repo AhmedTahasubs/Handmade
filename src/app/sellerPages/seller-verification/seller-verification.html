@@ -1,0 +1,137 @@
+<div class="max-w-4xl mx-auto p-6" [dir]="currentLanguage() === 'ar' ? 'rtl' : 'ltr'">
+  <!-- Verified State -->
+  <div *ngIf="verificationStatus === 'verified'" 
+       class="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/20 rounded-lg p-6 mb-6">
+    <div class="flex items-start gap-4">
+      <div class="flex-shrink-0">
+        <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-3xl"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-green-800 dark:text-green-200 mb-2">
+          {{ getTranslation('verifiedTitle') }}
+        </h2>
+        <p class="text-green-700 dark:text-green-300 mb-4">
+          {{ getTranslation('verifiedSubtitle') }}
+        </p>
+        <p class="text-green-600 dark:text-green-400 text-sm">
+          <i class="fas fa-check-circle mr-2"></i>
+          {{ getTranslation('nothingToDo') }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejected State -->
+  <div *ngIf="verificationStatus === 'rejected'" 
+       class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20 rounded-lg p-6 mb-6">
+    <div class="flex items-start gap-4">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-3xl"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-red-800 dark:text-red-200 mb-2">
+          {{ getTranslation('rejectedTitle') }}
+        </h2>
+        <p class="text-red-700 dark:text-red-300 mb-4">
+          {{ getTranslation('rejectedSubtitle') }}
+        </p>
+        
+        <div *ngIf="rejectionReason" class="mt-4">
+          <h3 class="font-medium text-red-800 dark:text-red-200 mb-2">
+            {{ getTranslation('rejectionReason') }}:
+          </h3>
+          <p class="text-red-700 dark:text-red-300">
+            {{ rejectionReason }}
+          </p>
+        </div>
+        
+        <button class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+          <i class="fas fa-headset mr-2"></i>
+          {{ getTranslation('contactSupport') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Verification -->
+  <div *ngIf="verificationStatus === 'pending'">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      {{ getTranslation('title') }}
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mb-6">
+      {{ getTranslation('subtitle') }}
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Front ID Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          {{ getTranslation('frontId') }}
+        </h3>
+        
+        <div *ngIf="frontPreview" class="mb-4">
+          <img [src]="frontPreview" alt="Front of ID" class="w-full h-auto max-h-64 object-contain rounded-lg">
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <label class="cursor-pointer">
+            <span class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+              <i class="fas fa-upload"></i>
+              {{ frontPreview ? getTranslation('change') : getTranslation('upload') }}
+            </span>
+            <input type="file" (change)="onFileSelected($event, 'front')" accept="image/jpeg,image/png" class="hidden">
+          </label>
+          
+          <button *ngIf="frontPreview" 
+                  (click)="removeImage('front')"
+                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2">
+            <i class="fas fa-trash"></i>
+            {{ getTranslation('remove') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Back ID Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          {{ getTranslation('backId') }}
+        </h3>
+        
+        <div *ngIf="backPreview" class="mb-4">
+          <img [src]="backPreview" alt="Back of ID" class="w-full h-auto max-h-64 object-contain rounded-lg">
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <label class="cursor-pointer">
+            <span class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+              <i class="fas fa-upload"></i>
+              {{ backPreview ? getTranslation('change') : getTranslation('upload') }}
+            </span>
+            <input type="file" (change)="onFileSelected($event, 'back')" accept="image/jpeg,image/png" class="hidden">
+          </label>
+          
+          <button *ngIf="backPreview" 
+                  (click)="removeImage('back')"
+                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2">
+            <i class="fas fa-trash"></i>
+            {{ getTranslation('remove') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/20 rounded-lg p-4 mb-6">
+      <p class="text-blue-700 dark:text-blue-300 text-sm">
+        <i class="fas fa-info-circle mr-2"></i>
+        {{ getTranslation('verificationNote') }}
+      </p>
+    </div>
+
+    <button (click)="submitVerification()"
+            [disabled]="isSubmitting || !frontPreview || !backPreview"
+            class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+      <i class="fas fa-paper-plane mr-2"></i>
+      {{ isSubmitting ? getTranslation('submitting') : getTranslation('submit') }}
+    </button>
+  </div>
+</div>

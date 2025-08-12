@@ -173,15 +173,14 @@ export class ServicesManagement implements OnInit {
   }
 
   confirmReject(): void {
-    if (!this.selectedService || !this.rejectionReason.trim()) return;
+    if (!this.selectedService || !this.rejectionReason.trim()) {
+      this.toastService.showError(this.getTranslation('Please provide a rejection reason.'));
+      return;
+    }
 
     this.isLoading = true;
     
-    const formData = new FormData();
-    formData.append('status', 'rejected');
-    formData.append('rejectionReason', this.rejectionReason);
-    
-    this.serviceService.patchStatus(this.selectedService.id, formData)
+    this.serviceService.patchReason(this.selectedService.id, this.rejectionReason)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
@@ -195,6 +194,7 @@ export class ServicesManagement implements OnInit {
         }
       });
   }
+
 
   closeDetailsModal(): void {
     this.showDetailsModal = false;

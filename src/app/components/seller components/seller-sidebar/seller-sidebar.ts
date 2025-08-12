@@ -35,6 +35,12 @@ export class SellerSidebar implements OnInit {
 
     this.navigation = [
       { 
+        name: isArabic ? "التحقق" : "Verification", 
+        icon: "faIdCard", 
+        href: "/seller/verification",
+        exact: false
+      },
+      { 
         name: isArabic ? "الخدمات" : "Services", 
         icon: "faHandsHelping", 
         href: "/seller/services-management",
@@ -53,7 +59,7 @@ export class SellerSidebar implements OnInit {
         exact: false
       },
           {
-      name: isArabic?'إدارة الطلبات' : 'Requests Management',
+      name: isArabic?'الطلبات' : 'Requests',
       icon: 'fabell',
       href: '/seller/requests-management',
       exact: false
@@ -74,6 +80,7 @@ export class SellerSidebar implements OnInit {
       },
     },
 
+
     ];
   }
 
@@ -88,6 +95,7 @@ export class SellerSidebar implements OnInit {
       'faTimes': 'fa-times',
       'faUser': 'fa-user',
       'fabell': 'fa-bell',
+      'faIdCard':'fa-id-card',
     };
     return iconMap[icon] || '';
   }

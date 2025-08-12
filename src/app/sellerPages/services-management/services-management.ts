@@ -35,7 +35,8 @@ export class SellerServicesManagement implements OnInit {
   imagePreview: string | ArrayBuffer | null = null;
   isLoading = false;
   formErrors: Record<string, string> = {};
-
+  showRejectionReasonModal = false;
+  serviceToEdit: ServiceDto | null = null;
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
     { key: "title", label: "Service", sortable: true, type: "text" },
@@ -92,6 +93,10 @@ export class SellerServicesManagement implements OnInit {
       servicesSubtitle: "Manage your services, view details, and perform actions",
       noServicesTitle:"No services yet",
       addFirstService:" Add First Service",
+      rejectionReasonTitle: "Rejection Reason",
+    rejectionReasonHeading: "Your service was rejected for the following reason:",
+    rejectionReasonInstructions: "Please review the reason and make the necessary changes before resubmitting.",
+    continueEditing: "Continue Editing",
 
       validation: {
         required: "This field is required",
@@ -137,6 +142,10 @@ export class SellerServicesManagement implements OnInit {
       servicesSubtitle: "إدارة خدماتك، عرض التفاصيل، وتنفيذ الإجراءات",
       noServicesTitle: "لا توجد خدمات حتى الآن",
       addFirstService: "أضف أول خدمة",
+      rejectionReasonTitle: "سبب الرفض",
+    rejectionReasonHeading: "تم رفض خدمتك للأسباب التالية:",
+    rejectionReasonInstructions: "يرجى مراجعة السبب وإجراء التعديلات اللازمة قبل إعادة الإرسال.",
+    continueEditing: "متابعة التعديل",
       
       validation: {
         required: "هذا الحقل مطلوب",
@@ -298,6 +307,7 @@ export class SellerServicesManagement implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.currentService = {};
+    this.serviceToEdit = null;
     this.formErrors = {};
     this.resetFileInput();
   }
@@ -321,6 +331,7 @@ export class SellerServicesManagement implements OnInit {
   }
 
   editService(service: ServiceDto): void {
+     this.serviceToEdit = service;
     this.isEditing = true;
     this.currentService = {
       id: service.id,
@@ -330,7 +341,11 @@ export class SellerServicesManagement implements OnInit {
       DeliveryTime: service.deliveryTime,
       CategoryId: service.categoryId,
     };
-    this.showModal = true;
+    if (service.status.toLowerCase() === 'rejected' && service.reason) {
+      this.showRejectionReasonModal = true;
+    } else {
+      this.showModal = true;
+    }
   }
 
   deleteService(service: ServiceDto): void {
@@ -442,5 +457,9 @@ export class SellerServicesManagement implements OnInit {
 
   onExport(): void {
     console.log("Export services data");
+  }
+   closeRejectionReasonModal(): void {
+    this.showRejectionReasonModal = false;
+    this.showModal = true;
   }
 }

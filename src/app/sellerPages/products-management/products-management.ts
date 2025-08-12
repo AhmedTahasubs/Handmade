@@ -37,6 +37,8 @@ export class SellerProductsManagement implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
   formErrors: Record<string, string> = {};
+  showRejectionReasonModal = false;
+  productToEdit: Product | null = null;
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
     { key: "title", label: "Product", sortable: true, type: "text" },
@@ -97,6 +99,10 @@ export class SellerProductsManagement implements OnInit {
       noProductsTitle: "No Products Found",
       noProductsMessage: "Get started by adding your first product",
       addFirstProduct: "Add First Product",
+      rejectionReasonTitle: "Rejection Reason",
+    rejectionReasonHeading: "Your product was rejected for the following reason:",
+    rejectionReasonInstructions: "Please review the reason and make the necessary changes before resubmitting.",
+    continueEditing: "Continue Editing",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $0.01",
@@ -146,6 +152,10 @@ export class SellerProductsManagement implements OnInit {
       noProductsTitle: "لا توجد منتجات",
       noProductsMessage: "ابدأ بإضافة أول منتج لك",
       addFirstProduct :" أضف أول منتج",
+      rejectionReasonTitle: "سبب الرفض",
+    rejectionReasonHeading: "تم رفض منتجك للأسباب التالية:",
+    rejectionReasonInstructions: "يرجى مراجعة السبب وإجراء التعديلات اللازمة قبل إعادة الإرسال.",
+    continueEditing: "متابعة التعديل",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ٠٫٠١ دولار",
@@ -319,6 +329,8 @@ export class SellerProductsManagement implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.currentProduct = {};
+      this.productToEdit = null;
+
     this.formErrors = {};
     this.resetFileInput();
   }
@@ -346,18 +358,25 @@ export class SellerProductsManagement implements OnInit {
   }
 
   editProduct(product: Product): void {
-    this.isEditing = true;
-    this.currentProduct = { 
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      quantity: product.quantity,
-      serviceId: product.serviceId
-    };
-    this.imagePreview = product.imageUrl || null;
+  this.productToEdit = product;
+  this.isEditing = true;
+  this.currentProduct = { 
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    price: product.price,
+    quantity: product.quantity,
+    serviceId: product.serviceId
+  };
+  this.imagePreview = product.imageUrl || null;
+  
+  // Show rejection reason if product is rejected
+  if (product.status.toLowerCase() === 'rejected' && product.rejectionReason) {
+    this.showRejectionReasonModal = true;
+  } else {
     this.showModal = true;
   }
+}
 
   deleteProduct(product: Product): void {
     this.productToDelete = product;
@@ -486,4 +505,8 @@ export class SellerProductsManagement implements OnInit {
     this.router.navigate(['/seller/services-management']);
     this.closeNoServicesModal();
   }
+  closeRejectionReasonModal(): void {
+  this.showRejectionReasonModal = false;
+  this.showModal = true;
+}
 }

@@ -41,6 +41,7 @@
           *ngIf="showConfirmButton"
           (click)="confirm()"
           [class]="getConfirmButtonClass()"
+           [disabled]="isConfirmDisabled"
           class="px-4 py-2 rounded-lg transition-colors duration-200"
         >
           {{ confirmText }}

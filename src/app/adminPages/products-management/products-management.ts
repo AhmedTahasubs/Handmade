@@ -8,12 +8,13 @@ import { RouterModule } from '@angular/router';
 import { ProductService, Product } from '../../services/products.service';
 import { finalize } from 'rxjs';
 import { ToastService } from '../../services/toast.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: "app-products-management",
   templateUrl: "./products-management.html",
   standalone: true,
-  imports: [DataTable, Modal, CommonModule, RouterModule],
+  imports: [DataTable, Modal, CommonModule, RouterModule, FormsModule],
 })
 export class ProductsManagement implements OnInit {
   private toastService = inject(ToastService);
@@ -22,9 +23,11 @@ export class ProductsManagement implements OnInit {
   languageService = inject(LanguageService);
 
   showDetailsModal = false;
+  showRejectModal = false;
   selectedProduct: Product | null = null;
   currentStatusFilter = "all";
   isLoading = false;
+  rejectionReason = '';
 
   statusFilters = [
     { label: "All", value: "all", icon: "fas fa-filter" },
@@ -140,7 +143,7 @@ export class ProductsManagement implements OnInit {
         this.updateProductStatus(item.id, 'approved');
         break;
       case "reject":
-        this.updateProductStatus(item.id, 'rejected');
+        this.openRejectModal(item);
         break;
     }
   }
@@ -148,6 +151,51 @@ export class ProductsManagement implements OnInit {
   viewProduct(product: Product): void {
     this.selectedProduct = product;
     this.showDetailsModal = true;
+  }
+
+  openRejectModal(product: Product): void {
+    this.selectedProduct = product;
+    this.rejectionReason = '';
+    this.showRejectModal = true;
+  }
+
+  confirmReject(): void {
+    if (!this.selectedProduct || !this.rejectionReason.trim()) {
+      this.toastService.showError(
+        this.languageService.currentLanguage() === 'en'
+          ? 'Please provide a rejection reason.'
+          : 'الرجاء تقديم سبب الرفض.'
+      );
+      return;
+    }
+
+    this.isLoading = true;
+    this.productService.patchReasoning(this.selectedProduct.id, this.rejectionReason)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (updatedProduct : Product) => {
+          const index = this.products.findIndex(p => p.id === this.selectedProduct?.id);
+          if (index !== -1) {
+            this.products[index] = updatedProduct;
+            this.filterProducts();
+          }
+          this.toastService.showSuccess(
+            this.languageService.currentLanguage() === 'en'
+              ? 'Product rejected successfully!'
+              : 'تم رفض المنتج بنجاح!'
+          );
+          this.closeRejectModal();
+          this.loadProducts();
+        },
+        error: (error) => {
+          console.error('Error rejecting product:', error);
+          this.toastService.showError(
+            this.languageService.currentLanguage() === 'en'
+              ? 'Failed to reject product. Please try again.'
+              : 'فشل رفض المنتج. يرجى المحاولة مرة أخرى.'
+          );
+        }
+      });
   }
 
   updateProductStatus(productId: number, status: string): void {
@@ -182,6 +230,12 @@ export class ProductsManagement implements OnInit {
   closeDetailsModal(): void {
     this.showDetailsModal = false;
     this.selectedProduct = null;
+  }
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+    this.selectedProduct = null;
+    this.rejectionReason = '';
   }
 
   onExport(): void {

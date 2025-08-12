@@ -216,6 +216,10 @@ export const routes: Routes = [
               import('./sellerPages/requests-management/requests-management').then(
                 (m) => m.SellerCustomRequestsManagement
               ),
+          },
+          {
+            path:'verification',
+            loadComponent: ()=>import('./sellerPages/seller-verification/seller-verification').then(m=>m.SellerVerificationComponent)
           }
         ],
       },
