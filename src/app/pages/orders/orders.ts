@@ -12,13 +12,15 @@ import { ToastService } from '../../services/toast.service';
 import { ProductService } from '../../services/products.service';
 import { Modal } from './../../components/modal/modal';
 import { ServiceSellerService } from '../../services/services.service';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal.component';
+import { StarRatingComponent } from '../../components/star-rating/star-rating';
 
 
 
 @Component({
   selector: 'app-customer-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, Modal],
+  imports: [CommonModule, RouterModule, FormsModule, Modal, ConfirmModal,StarRatingComponent],
   templateUrl: './orders.html'
 })
 export class CustomerOrdersComponent implements OnInit {
@@ -34,6 +36,9 @@ export class CustomerOrdersComponent implements OnInit {
   orderItems: OrderItem[] = [];
   isLoading = true;
   error: string | null = null;
+  showCancelModal = false;
+  orderToCancel: Order | null = null;
+  isCancelling = false;
 
   ngOnInit(): void {
     this.loadOrders();
@@ -179,12 +184,7 @@ export class CustomerOrdersComponent implements OnInit {
   saveReview(): void {
     if (!this.selectedServiceId) return;
 
-    if (this.currentReview.rating < 0) {
-    this.currentReview.rating = 0;
-    } 
-    else if (this.currentReview.rating > 5) {
-    this.currentReview.rating = 5;
-    }
+    // Remove the rating validation since stars handle it
     if (!this.currentReview.comment.trim()) {
       this.toastService.showError(
         this.languageService.currentLanguage() === 'en'
@@ -219,6 +219,42 @@ export class CustomerOrdersComponent implements OnInit {
         );
       }
     });
+  }
+   openCancelModal(order: Order): void {
+    this.orderToCancel = order;
+    this.showCancelModal = true;
+  }
+  confirmCancel(): void {
+    if (!this.orderToCancel) return;
+    
+    this.isCancelling = true;
+    this.orderService.cancelOrder(this.orderToCancel.id).subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          this.languageService.currentLanguage() === 'en' 
+            ? 'Order cancelled successfully' 
+            : 'تم إلغاء الطلب بنجاح'
+        );
+        this.loadOrders(); // Refresh the orders list
+      },
+      error: (err) => {
+        console.error('Error cancelling order:', err);
+        this.toastService.showError(
+          this.languageService.currentLanguage() === 'en' 
+            ? 'Failed to cancel order' 
+            : 'فشل إلغاء الطلب'
+        );
+      },
+      complete: () => {
+        this.isCancelling = false;
+        this.showCancelModal = false;
+        this.orderToCancel = null;
+      }
+    });
+  }
+   canCancel(order: Order): boolean {
+    return !this.getOverallStatus(order).includes('Delivered') && 
+           !this.getOverallStatus(order).includes('Rejected');
   }
 
 }

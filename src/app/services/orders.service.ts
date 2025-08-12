@@ -102,4 +102,10 @@ export class OrderService {
   getItemsBySeller():Observable<CustomerOrdrItem[]> {
     return this.http.get<CustomerOrdrItem[]>(`${this.apiUrl}/CustomerOrders/seller/items`);
   }
+
+  cancelOrder(orderId: number): Observable<string> {
+  return this.http.delete(`${this.apiUrl}/CustomerOrders/cancel/${orderId}`, {
+    responseType: 'text'
+  });
+}
 }

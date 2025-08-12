@@ -27,8 +27,8 @@
   </div>
 
   <!-- Orders List -->
-  <div *ngIf="!isLoading && !error && orders.length > 0; else noOrders" class="space-y-6">
-    <div *ngFor="let order of orders" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+  <div *ngIf="!isLoading && !error && orders.length > 0; else noOrders" class="space-y-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div *ngFor="let order of orders" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden ">
       <!-- Order Header -->
       <div class="border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -96,20 +96,12 @@
 
                     
                     <div>
-                      <label for="reviewRating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{languageService.currentLanguage() === 'en' ? 'Rating (0-5)' : 'تقييم (0-5)'}}
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{languageService.currentLanguage() === 'en' ? 'Rating' : 'التقييم'}}
                       </label>
-                      <input
-                        type="number"
-                        id="reviewRating"
-                        [(ngModel)]="currentReview.rating"
-                        name="rating"
-                        min="0"
-                        max="5"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
-                      />
-                      
+                      <app-star-rating 
+                        [(currentRating)]="currentReview.rating"
+                      ></app-star-rating>
                     </div>
                     <div>
                       <label for="reviewComment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -121,7 +113,7 @@
                         name="comment"
                         rows="3"
                         required
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       ></textarea>
                     </div>
                   </fieldset>
@@ -147,6 +139,13 @@
                 {{ order.totalPrice | currency }}
               </span>
             </div>
+             <button
+              *ngIf="canCancel(order)"
+              (click)="openCancelModal(order)"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-colors"
+            >
+              {{ languageService.currentLanguage() === 'en' ? 'Cancel Order' : 'إلغاء الطلب' }}
+            </button>
           </div>
         </div>
       </div>
@@ -166,4 +165,17 @@
       </button>
     </div>
   </ng-template>
+  <app-confirm-modal
+    [isOpen]="showCancelModal"
+    [title]="languageService.currentLanguage() === 'en' ? 'Cancel Order' : 'إلغاء الطلب'"
+    [message]="languageService.currentLanguage() === 'en' 
+      ? 'Are you sure you want to cancel this order?' 
+      : 'هل أنت متأكد أنك تريد إلغاء هذا الطلب؟'"
+    [confirmText]="languageService.currentLanguage() === 'en' ? 'Cancel Order' : 'إلغاء الطلب'"
+    [cancelText]="languageService.currentLanguage() === 'en' ? 'Go Back' : 'العودة'"
+    [isProcessing]="isCancelling"
+    confirmButtonClass="bg-red-600 hover:bg-red-700"
+    (closed)="showCancelModal = false; orderToCancel = null"
+    (confirmed)="confirmCancel()"
+  ></app-confirm-modal>
 </div>
