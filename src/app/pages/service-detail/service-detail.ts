@@ -63,11 +63,25 @@ export class ServiceDetailPage implements OnInit {
     this.route.params.subscribe(params => {
       this.serviceId = +params['id'];
       if (isNaN(this.serviceId)) {
-        this.router.navigate(['/services']);
+        this.router.navigate(['/']);
         return;
       }
+    this.resetServiceDate();
+
       this.loadServiceData();
     });
+  }
+  
+  resetServiceDate(): void {
+    this.service = null;
+    this.relatedServices = [];
+    this.reviews = [];
+    this.loading = true;
+    this.selectedPackage = null;
+    this.activeGalleryImage = 0;
+    this.expandedFAQ = null;
+    this.showRequestForm = false;
+    this.requestDescription = '';
   }
   
   private loadServiceData() {
