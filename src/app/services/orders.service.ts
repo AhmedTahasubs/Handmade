@@ -31,7 +31,7 @@ export interface SellerOrders{
 }
 export interface Order {
   id: number;
-  customerId: string;
+  customerName: string;
   createdAt: string;
   items: OrderItem[];
   totalPrice: number;

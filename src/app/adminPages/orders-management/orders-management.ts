@@ -35,7 +35,7 @@ export class OrdersManagement implements OnInit {
 
   columns: TableColumn[] = [
     { key: "id", label: "Order ID", sortable: true, type: "text" },
-    { key: "customerId", label: "Customer ID", sortable: true, type: "text" },
+    { key: "customerName", label: "Customer Name", sortable: true, type: "text" },
     { key: "totalPrice", label: "Total", sortable: true, type: "currency" },
     { key: "createdAt", label: "Order Date", sortable: true, type: "date" },
   ];

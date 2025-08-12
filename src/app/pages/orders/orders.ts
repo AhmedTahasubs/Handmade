@@ -196,7 +196,7 @@ export class CustomerOrdersComponent implements OnInit {
 
     const dto: CreateServiceReviewDto = {
       serviceId: this.selectedServiceId,
-      reviewerId: this.orders[0].customerId, 
+      reviewerId: this.orders[0].customerName, 
       rating: this.currentReview.rating,
       comment: this.currentReview.comment
     };
