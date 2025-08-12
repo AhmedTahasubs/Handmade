@@ -134,11 +134,11 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Name:</span>
-              <span class="font-medium">{{ selectedOrder.customerName }}</span>
+              <span class="font-medium dark:text-white text-black">{{ selectedOrder.customerName }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Phone:</span>
-              <span>{{ selectedOrder.customerPhone }}</span>
+              <span class="font-medium dark:text-white text-black">{{ selectedOrder.customerPhone }}</span>
             </div>
           </div>
         </div>
@@ -148,22 +148,22 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Product:</span>
-              <span class="font-medium">{{ selectedOrder.productTitle }}</span>
+              <span class="font-medium dark:text-white text-black">{{ selectedOrder.productTitle }}</span>
             </div>
             <div class="flex items-center gap-4 mt-2">
               <img [src]="selectedOrder.productImageUrl" class="w-16 h-16 object-cover rounded-lg">
               <div class="flex-1">
                 <div class="flex justify-between">
                   <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('quantity') }}:</span>
-                  <span>{{ selectedOrder.quantity }}</span>
+                  <span class="font-medium dark:text-white text-black">{{ selectedOrder.quantity }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('price') }}:</span>
-                  <span>${{ selectedOrder.unitPrice }}</span>
+                  <span class="font-medium dark:text-white text-black">${{ selectedOrder.unitPrice }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('total') }}:</span>
-                  <span class="font-medium">${{ selectedOrder.totalPrice }}</span>
+                  <span class="font-medium dark:text-white text-black">${{ selectedOrder.totalPrice }}</span>
                 </div>
               </div>
             </div>
@@ -177,17 +177,17 @@
         <div class="space-y-3">
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('orderNumber') }}:</span>
-            <span class="font-medium">#{{ selectedOrder.orderId }}</span>
+            <span class="font-medium dark:text-white text-black">#{{ selectedOrder.orderId }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('status') }}:</span>
-            <span [class]="'px-2 py-1 rounded-full text-xs '">
+            <span class='px-2 py-1 rounded-full bg-gray-600 text-white'>
               {{ selectedOrder.status }}
             </span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">{{ getTranslation('datePlaced') }}:</span>
-            <span>{{ formatDate(selectedOrder.createdAt) }}</span>
+            <span class="font-medium dark:text-white text-black">{{ formatDate(selectedOrder.createdAt) }}</span>
           </div>
         </div>
       </div>
