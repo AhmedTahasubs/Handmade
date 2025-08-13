@@ -333,4 +333,28 @@
       </p>
     </div>
   </app-modal>
+
+  <!-- Verification Required Modal -->
+<app-modal
+  [isOpen]="showVerificationRequiredModal"
+  [title]="getTranslation('verificationRequiredTitle')"
+  [cancelText]="getTranslation('cancel')"
+  [confirmText]="getTranslation('goToVerification')"
+  [showCancelButton]="false"
+  (closed)="navigateToVerification()"
+  (confirmed)="navigateToVerification()"
+  aria-labelledby="verification-required-title"
+>
+  <div class="text-center">
+    <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-xl"></i>
+    </div>
+    <h2 id="verification-required-title" class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      {{ getTranslation('verificationRequiredHeading') }}
+    </h2>
+    <p class="text-gray-500 dark:text-gray-400 mb-4">
+      {{ getTranslation('verificationRequiredMessage') }}
+    </p>
+  </div>
+</app-modal>
 </div>

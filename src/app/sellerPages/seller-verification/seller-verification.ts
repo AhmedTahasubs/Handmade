@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { ToastService } from '../../services/toast.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: 'app-seller-verification',
@@ -12,38 +13,35 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './seller-verification.html',
   styleUrl:'./seller-verification.css',
 })
-export class SellerVerificationComponent {
+export class SellerVerificationComponent implements OnInit {
   private themeService = inject(ThemeService);
   private languageService = inject(LanguageService);
   private toastService = inject(ToastService);
+  private usersService = inject(UsersService);
 
   currentLanguage = this.languageService.currentLanguage;
   isDarkMode = this.themeService.isDark;
 
-  // Verification state
-  verificationStatus: 'pending' | 'verified' | 'rejected' = 'pending';
+  verificationStatus: string = 'Pending';
   rejectionReason: string | null = null;
-
-  // File uploads
+  profileImage: File | null = null;
   frontIdImage: File | null = null;
-  backIdImage: File | null = null;
+  profilePreview: string | ArrayBuffer | null = null;
   frontPreview: string | ArrayBuffer | null = null;
-  backPreview: string | ArrayBuffer | null = null;
   isSubmitting = false;
 
-  // Translations
   private translations:any = {
     en: {
       title: "Identity Verification",
       subtitle: "Verify your identity to access all seller features",
       verifiedTitle: "Verification Complete",
       verifiedSubtitle: "Your identity has been successfully verified",
-      pendingTitle: "Verification Required",
-      pendingSubtitle: "Upload your ID card photos to complete verification",
+      pendingTitle: "Verification Pending",
+      pendingSubtitle: "Your verification is under review. Please wait.",
       rejectedTitle: "Verification Rejected",
       rejectedSubtitle: "Please correct the issues and resubmit",
+      profileImage: "Profile Image",
       frontId: "Front of ID Card",
-      backId: "Back of ID Card",
       upload: "Upload",
       change: "Change",
       remove: "Remove",
@@ -61,12 +59,12 @@ export class SellerVerificationComponent {
       subtitle: "قم بتأكيد هويتك للوصول إلى جميع ميزات البائع",
       verifiedTitle: "اكتمل التحقق",
       verifiedSubtitle: "تم التحقق من هويتك بنجاح",
-      pendingTitle: "مطلوب التحقق",
-      pendingSubtitle: "قم بتحميل صور بطاقة الهوية لإكمال عملية التحقق",
+      pendingTitle: "التحقق قيد المراجعة",
+      pendingSubtitle: "طلب التحقق الخاص بك قيد المراجعة. يرجى الانتظار.",
       rejectedTitle: "تم رفض التحقق",
       rejectedSubtitle: "يرجى تصحيح المشكلات وإعادة الإرسال",
+      profileImage: "صورة الملف الشخصي",
       frontId: "وجه بطاقة الهوية",
-      backId: "ظهر بطاقة الهوية",
       upload: "رفع",
       change: "تغيير",
       remove: "إزالة",
@@ -81,17 +79,34 @@ export class SellerVerificationComponent {
     }
   };
 
+  ngOnInit(): void {
+    this.checkSellerStatus();
+  }
+
+  checkSellerStatus(): void {
+    this.usersService.getSellerStatus().subscribe({
+      next: (response) => {
+        this.verificationStatus = response.status;  
+        if (this.verificationStatus === 'Rejected') {
+          this.resetForm();
+        }                      
+      },
+      error: (err) => {
+        this.toastService.showError('Failed to fetch verification status');
+      }
+    });
+  }
+
   getTranslation(key: string): string {
     const lang = this.currentLanguage();
     return this.translations[lang][key] || key;
   }
 
-  onFileSelected(event: Event, type: 'front' | 'back'): void {
+  onFileSelected(event: Event, type: 'profile' | 'front'): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
       
-      // Validate file
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         this.toastService.showError(this.getTranslation('allowedFormats'));
         return;
@@ -102,61 +117,68 @@ export class SellerVerificationComponent {
         return;
       }
       
-      // Set file and preview
-      if (type === 'front') {
+      if (type === 'profile') {
+        this.profileImage = file;
+        this.readFile(file, 'profile');
+      } else {
         this.frontIdImage = file;
         this.readFile(file, 'front');
-      } else {
-        this.backIdImage = file;
-        this.readFile(file, 'back');
       }
     }
   }
 
-  private readFile(file: File, type: 'front' | 'back'): void {
+  private readFile(file: File, type: 'profile' | 'front'): void {
     const reader = new FileReader();
     reader.onload = () => {
-      if (type === 'front') {
-        this.frontPreview = reader.result;
+      if (type === 'profile') {
+        this.profilePreview = reader.result;
       } else {
-        this.backPreview = reader.result;
+        this.frontPreview = reader.result;
       }
     };
     reader.readAsDataURL(file);
   }
 
-  removeImage(type: 'front' | 'back'): void {
-    if (type === 'front') {
+  removeImage(type: 'profile' | 'front'): void {
+    if (type === 'profile') {
+      this.profileImage = null;
+      this.profilePreview = null;
+    } else {
       this.frontIdImage = null;
       this.frontPreview = null;
-    } else {
-      this.backIdImage = null;
-      this.backPreview = null;
     }
   }
 
   submitVerification(): void {
-    if (!this.frontIdImage || !this.backIdImage) {
+    if (!this.profileImage || !this.frontIdImage) {
       this.toastService.showError(this.getTranslation('upload') + ' ' + 
-        (!this.frontIdImage ? this.getTranslation('frontId') : this.getTranslation('backId')));
+        (!this.profileImage ? this.getTranslation('profileImage') : this.getTranslation('frontId')));
       return;
     }
 
     this.isSubmitting = true;
     
-    // Here you would normally call your API
-    console.log('Submitting verification:', {
-      frontId: this.frontIdImage,
-      backId: this.backIdImage
-    });
+    const formData = new FormData();
+    formData.append('ProfileImage', this.profileImage);
+    formData.append('IdCardImage', this.frontIdImage);
 
-    // Simulate API response after 2 seconds
-    setTimeout(() => {
-      this.isSubmitting = false;
-      // Mock response - replace with actual API call
-      this.verificationStatus = 'verified'; // Change to 'rejected' to test that state
-      this.rejectionReason = null; // "ID image is blurry" for rejected state
-      this.toastService.showSuccess('Verification submitted successfully');
-    }, 2000);
+    this.usersService.uploadUserImage(formData).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.verificationStatus = 'pending';
+        this.toastService.showSuccess('Verification submitted successfully');
+        this.checkSellerStatus();
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.toastService.showError('Failed to submit verification');
+      }
+    });
+  }
+    private resetForm(): void {
+    this.profileImage = null;
+    this.frontIdImage = null;
+    this.profilePreview = null;
+    this.frontPreview = null;
   }
 }

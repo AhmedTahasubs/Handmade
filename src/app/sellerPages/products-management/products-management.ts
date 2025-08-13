@@ -10,6 +10,7 @@ import { ProductService, Product, ProductRequest } from '../../services/products
 import { ServiceSellerService, ServiceDto } from '../../services/services.service';
 import { jwtDecode } from "jwt-decode";
 import { ToastService } from '../../services/toast.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: "app-seller-products-management",
@@ -23,7 +24,8 @@ export class SellerProductsManagement implements OnInit {
   private productService = inject(ProductService);
   private serviceService = inject(ServiceSellerService);
   private toastService = inject(ToastService);
-
+  private usersService = inject(UsersService);
+  showVerificationRequiredModal = false;
   currentLanguage: "en" | "ar" = "en";
   showModal = false;
   showDeleteModal = false;
@@ -103,6 +105,9 @@ export class SellerProductsManagement implements OnInit {
     rejectionReasonHeading: "Your product was rejected for the following reason:",
     rejectionReasonInstructions: "Please review the reason and make the necessary changes before resubmitting.",
     continueEditing: "Continue Editing",
+    verificationRequiredTitle: "Verification Required",
+    verificationRequiredMessage: "You need to verify your seller account before you can manage products.",
+    goToVerification: "Go to Verification",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $0.01",
@@ -156,6 +161,9 @@ export class SellerProductsManagement implements OnInit {
     rejectionReasonHeading: "تم رفض منتجك للأسباب التالية:",
     rejectionReasonInstructions: "يرجى مراجعة السبب وإجراء التعديلات اللازمة قبل إعادة الإرسال.",
     continueEditing: "متابعة التعديل",
+    verificationRequiredTitle: "التحقق مطلوب",
+    verificationRequiredMessage: "يجب عليك التحقق من حساب البائع الخاص بك قبل أن تتمكن من إدارة المنتجات.",
+    goToVerification: "الذهاب إلى التحقق",
       validation: {
         required: "هذا الحقل مطلوب",
         minPrice: "يجب أن يكون السعر على الأقل ٠٫٠١ دولار",
@@ -174,7 +182,7 @@ export class SellerProductsManagement implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadServicesAndThenProducts();
+     this.checkSellerVerification();
   }
 
   loadProducts(): void {
@@ -508,5 +516,25 @@ export class SellerProductsManagement implements OnInit {
   closeRejectionReasonModal(): void {
   this.showRejectionReasonModal = false;
   this.showModal = true;
+}
+checkSellerVerification(): void {
+  this.usersService.getSellerStatus().subscribe({
+    next: (status) => {
+      if (status.status !== 'Verified') {
+        this.showVerificationRequiredModal = true;
+      } else {
+        this.loadServicesAndThenProducts();
+      }
+    },
+    error: (err) => {
+      console.error('Error checking verification status:', err);
+      this.toastService.showError('Failed to check verification status');
+    }
+  });
+}
+
+navigateToVerification(): void {
+  this.router.navigate(['/seller/verification']);
+  this.showVerificationRequiredModal = false;
 }
 }

@@ -10,6 +10,7 @@ import { ProductService, Product, ProductRequest } from '../../services/products
 import { CustomerRequestService, CustomerRequestResponse } from '../../services/customer-request.service';
 import { jwtDecode } from "jwt-decode";
 import { ToastService } from '../../services/toast.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: "app-seller-custom-requests",
@@ -23,7 +24,8 @@ export class SellerCustomRequestsManagement implements OnInit {
   private customerRequestService = inject(CustomerRequestService);
   private productService = inject(ProductService);
   private toastService = inject(ToastService);
-
+  showVerificationRequiredModal = false;
+  private usersService = inject(UsersService);
   currentLanguage: "en" | "ar" = "en";
   showModal = false;
   showStatusModal = false;
@@ -93,6 +95,9 @@ actions: TableAction[] = [
       loadRequestsError: "Failed to load requests. Please try again.",
       productAddedSuccess: "Product added successfully!",
       addProductError: "Failed to add product. Please try again.",
+       verificationRequiredTitle: "Verification Required",
+    verificationRequiredMessage: "You need to verify your seller account before you can manage custom requests.",
+    goToVerification: "Go to Verification",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $0.01",
@@ -119,6 +124,9 @@ actions: TableAction[] = [
       referenceImage: "صورة مرجعية",
       createdAt: "تاريخ الإنشاء",
       noRequestsTitle: "لا توجد طلبات",
+      verificationRequiredTitle: "التحقق مطلوب",
+    verificationRequiredMessage: "يجب عليك التحقق من حساب البائع الخاص بك قبل أن تتمكن من إدارة الطلبات المخصصة.",
+    goToVerification: "الذهاب إلى التحقق",
       noRequestsMessage: "ليس لديك أي طلبات مخصصة حتى الآن",
       addProductFirst: "أضف المنتج أولاً",
       addProduct: "إضافة منتج",
@@ -146,9 +154,28 @@ actions: TableAction[] = [
   }
 
   ngOnInit(): void {
-    this.loadRequests();
+     this.checkSellerVerification();
   }
+  checkSellerVerification(): void {
+  this.usersService.getSellerStatus().subscribe({
+    next: (status) => {
+      if (status.status !== 'Verified') {
+        this.showVerificationRequiredModal = true;
+      } else {
+        this.loadRequests(); // Only load requests if verified
+      }
+    },
+    error: (err) => {
+      console.error('Error checking verification status:', err);
+      this.toastService.showError('Failed to check verification status');
+    }
+  });
+}
 
+navigateToVerification(): void {
+  this.router.navigate(['/seller/verification']);
+  this.showVerificationRequiredModal = false;
+}
   loadRequests(): void {
     this.isLoading = true;
     this.customerRequestService.getBySeller().subscribe({

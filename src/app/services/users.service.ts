@@ -11,20 +11,22 @@ export interface UserDisplay {
   isDeleted: boolean;
   lastUpdatedOn: string;
 }
+
 export interface UserResponse {
   userName: string;
   fullName: string;
   email: string;
- errorMessages: any[]
+  errorMessages: any[];
 }
-export interface UserResponseById{
-    id: string,
-    userName:string,
-    fullName:string,
-    createdOn:string,
-    address:string,
-    bio:string,
-    imageurl:string,
+
+export interface UserResponseById {
+  id: string;
+  userName: string;
+  fullName: string;
+  createdOn: string;
+  address: string;
+  bio: string;
+  imageurl: string;
 }
 
 export interface RegisterAdminRequest {
@@ -32,6 +34,33 @@ export interface RegisterAdminRequest {
   name: string;
   email: string;
   password: string;
+}
+
+export interface ImageUploadRequestDto {
+  // Define the properties based on your ImageUploadRequestDto in C#
+  // For example:
+  file: File;
+  // Add other properties if needed
+}
+
+export interface UpdateOrderItemStatusRequest {
+  Status: string; // or whatever type your status is
+}
+enum userStatus{
+  verified= "Verified",
+  rejected="Rejected",
+  pending="Pending",
+  unverified="Unverified"
+}
+export interface SellerStatusResponse {
+  status: userStatus;
+}
+
+export interface UnverifiedSeller {
+  // Define the properties based on what GetAllUnVerifiedSellers returns
+  id: string;
+  userName: string;
+  // Add other properties as needed
 }
 
 @Injectable({
@@ -48,12 +77,37 @@ export class UsersService {
   }
 
   // GET user by ID
-    getById(id: string): Observable<UserResponseById> {
-        return this.http.get<UserResponseById>(`${this.baseUrl}/${id}`);
-    }
+  getById(id: string): Observable<UserResponseById> {
+    return this.http.get<UserResponseById>(`${this.baseUrl}/${id}`);
+  }
 
   // POST: Register new admin
   registerAdmin(adminData: RegisterAdminRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(`${this.authBaseUrl}/register`, adminData);
+  }
+
+  // POST: Upload user image
+  uploadUserImage(request: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/uploadUserImage`, request);
+  }
+
+  // DELETE: Delete user by ID
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  // POST: Edit seller status
+  editSellerStatus(id: string, request: UpdateOrderItemStatusRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/EditSellerStatus/${id}`, request);
+  }
+
+  // GET: All unverified sellers
+  getAllUnVerifiedSellers(): Observable<UnverifiedSeller[]> {
+    return this.http.get<UnverifiedSeller[]>(`${this.baseUrl}/UnVerifiedSellers`);
+  }
+
+  // GET: Seller verification status for current user
+  getSellerStatus(): Observable<SellerStatusResponse> {
+    return this.http.get<SellerStatusResponse>(`${this.baseUrl}/SellerStatus`);
   }
 }

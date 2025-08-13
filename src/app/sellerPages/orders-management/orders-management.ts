@@ -5,10 +5,11 @@ import { ThemeService } from './../../services/theme.service';
 import { Component, effect, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { OrderService, SellerOrders, OrderStatus, CustomerOrdrItem } from '../../services/orders.service';
 import { ToastService } from '../../services/toast.service';
 import { finalize } from 'rxjs';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: "app-seller-orders-management",
@@ -21,6 +22,10 @@ export class SellerOrdersManagement implements OnInit {
   languageService = inject(LanguageService);
   private orderService = inject(OrderService);
   private toastService = inject(ToastService);
+  private usersService = inject(UsersService);
+  private router = inject(Router);
+
+  showVerificationRequiredModal = false;
 
   currentLanguage: "en" | "ar" = "en";
   searchTerm = "";
@@ -118,6 +123,9 @@ export class SellerOrdersManagement implements OnInit {
       noOrdersMessage: "There are currently no orders in the system",
       statusUpdated:" Status Updated",
       errorUpdatingStatus:" Error updating status",
+      verificationRequiredTitle: "Verification Required",
+verificationRequiredMessage: "You need to verify your seller account before you can manage orders.",
+goToVerification: "Go to Verification",
     },
     ar: {
       title: "إدارة الطلبات",
@@ -148,6 +156,10 @@ export class SellerOrdersManagement implements OnInit {
       noOrdersMessage: "لا توجد طلبات حالياً في النظام",
       statusUpdated:"حالة مُعدلة",
       errorUpdatingStatus:"خطأ في تحديث الحالة",
+      verificationRequiredTitle: "تأكيد الحساب",
+      verificationRequiredMessage: "يجب عليك تأكيد حسابك قبل إدارة الطلبات.",
+      goToVerification: "إذهب إلى تأكيد الحساب",
+
     },
   };
 
@@ -158,10 +170,29 @@ export class SellerOrdersManagement implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadOrders();
-    this.loaditems();
+  this.checkSellerVerification();
   }
+  checkSellerVerification(): void {
+  this.usersService.getSellerStatus().subscribe({
+    next: (status) => {
+      if (status.status !== 'Verified') {
+        this.showVerificationRequiredModal = true;
+      } else {
+        this.loadOrders(); // Only load orders if verified
+        this.loaditems();
+      }
+    },
+    error: (err) => {
+      console.error('Error checking verification status:', err);
+      this.toastService.showError('Failed to check verification status');
+    }
+  });
+}
 
+navigateToVerification(): void {
+  this.router.navigate(['/seller/verification']);
+  this.showVerificationRequiredModal = false;
+}
   loadOrders(): void {
     console.log("Loading orders for seller");
     this.isLoading = true;

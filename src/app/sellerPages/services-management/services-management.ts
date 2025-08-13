@@ -5,10 +5,11 @@ import { ThemeService } from './../../services/theme.service';
 import { Component, effect, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ServiceSellerService, ServiceDto, ServiceRequest } from '../../services/services.service';
 import { CategorySellerService, Category } from '../../services/categories.service';
 import { ToastService } from '../../services/toast.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: "app-seller-services-management",
@@ -37,6 +38,10 @@ export class SellerServicesManagement implements OnInit {
   formErrors: Record<string, string> = {};
   showRejectionReasonModal = false;
   serviceToEdit: ServiceDto | null = null;
+  private usersService = inject(UsersService);
+  private router = inject(Router);
+  showVerificationRequiredModal = false;
+
   columns: TableColumn[] = [
     { key: "imageUrl", label: "Image", type: "image", width: "80px" },
     { key: "title", label: "Service", sortable: true, type: "text" },
@@ -97,7 +102,11 @@ export class SellerServicesManagement implements OnInit {
     rejectionReasonHeading: "Your service was rejected for the following reason:",
     rejectionReasonInstructions: "Please review the reason and make the necessary changes before resubmitting.",
     continueEditing: "Continue Editing",
-
+      verificationRequiredTitle: "Verification Required",
+    verificationRequiredHeading: "Seller Verification Needed",
+    verificationRequiredMessage: "You need to verify your seller account before you can manage services.",
+    goToVerification: "Go to Verification",
+    cancel: "Cancel",
       validation: {
         required: "This field is required",
         minPrice: "Price must be at least $1",
@@ -146,6 +155,11 @@ export class SellerServicesManagement implements OnInit {
     rejectionReasonHeading: "تم رفض خدمتك للأسباب التالية:",
     rejectionReasonInstructions: "يرجى مراجعة السبب وإجراء التعديلات اللازمة قبل إعادة الإرسال.",
     continueEditing: "متابعة التعديل",
+    verificationRequiredTitle: "Verification Required",
+    verificationRequiredHeading: "Seller Verification Needed",
+    verificationRequiredMessage: "You need to verify your seller account before you can manage services.",
+    goToVerification: "Go to Verification",
+    cancel: "Cancel",
       
       validation: {
         required: "هذا الحقل مطلوب",
@@ -165,8 +179,7 @@ export class SellerServicesManagement implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadServices();
-    this.loadCategories();
+    this.checkVerificationStatus();
   }
 
   loadServices(): void {
@@ -461,5 +474,26 @@ export class SellerServicesManagement implements OnInit {
    closeRejectionReasonModal(): void {
     this.showRejectionReasonModal = false;
     this.showModal = true;
+  }
+  checkVerificationStatus(): void {
+  this.usersService.getSellerStatus().subscribe({
+    next: (status) => {
+      if (status.status !== 'Verified') {
+        this.showVerificationRequiredModal = true;
+      } else {
+        this.loadServices();
+        this.loadCategories();
+      }
+    },
+    error: (err) => {
+      console.error('Error checking verification status:', err);
+      this.toastService.showError('Failed to check verification status');
+    }
+  });
+  }
+
+  navigateToVerification(): void {
+    this.showVerificationRequiredModal = false;
+    this.router.navigate(['/seller/verification']);
   }
 }
