@@ -32,7 +32,7 @@ export interface SellerOrders{
 }
 export interface Order {
   id: number;
-  customerName: string;
+  customerId: string;
   createdAt: string;
   items: OrderItem[];
   totalPrice: number;
