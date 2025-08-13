@@ -460,6 +460,12 @@ export class SellerProductsManagement implements OnInit {
         this.closeModal();
         this.isLoading = false;
         this.toastService.showSuccess(this.getTranslation(this.isEditing ? 'editProductSuccess' : 'addProductSuccess'));
+        this.isEditing = false;
+        if (form) {
+          form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
+            element.disabled = false;
+          });
+        }
       },
       error: (error) => {
         console.error('Error saving product:', error);

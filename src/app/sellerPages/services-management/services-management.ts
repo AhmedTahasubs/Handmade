@@ -323,6 +323,15 @@ export class SellerServicesManagement implements OnInit {
     this.serviceToEdit = null;
     this.formErrors = {};
     this.resetFileInput();
+    this.isEditing = false;
+    setTimeout(() => {
+    const form = document.querySelector('form');
+    if (form) {
+      form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
+        element.disabled = false;
+      });
+    }
+  });
   }
 
   closeDeleteModal(): void {
@@ -405,6 +414,12 @@ export class SellerServicesManagement implements OnInit {
         this.closeModal();
         this.isLoading = false;
         this.toastService.showSuccess(this.getTranslation(this.isEditing ? 'editServiceSuccess' : 'addServiceSuccess'));
+        this.isEditing = false;
+        if (form) {
+        form.querySelectorAll('input, select, textarea, button').forEach((element: any) => {
+          element.disabled = false;
+        });
+      }
       },
       error: (error) => {
         console.error('Error saving service:', error);
