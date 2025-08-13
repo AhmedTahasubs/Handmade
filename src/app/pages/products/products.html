@@ -62,8 +62,8 @@
           <app-product-card
             [product]="product"
             [language]="language"
-            (addToCart)="onAddToCart($event)"
-            (addToWishlist)="onAddToWishlist($event)">
+            (addToCart)="onAddToCart(product)"
+            (addToWishlist)="onAddToWishlist(product)">
           </app-product-card>
         }
       </div>
