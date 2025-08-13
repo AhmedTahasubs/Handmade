@@ -158,6 +158,7 @@ export class CustomerOrdersComponent implements OnInit {
   }
   openAddReviewModal(orderItemId: number): void {
      console.log('Opening review modal for order item ID:', orderItemId);
+     
     const orderItem = this.orders.flatMap(order => order.items).find(item => item.id === orderItemId);
     console.log(orderItem?.id || 'No order item found with this ID');
     if (!orderItem) return;
@@ -193,10 +194,13 @@ export class CustomerOrdersComponent implements OnInit {
       );
       return;
     }
-
+    const token = localStorage.getItem('token');
+const payload = JSON.parse(atob(token!.split('.')[1]));
+const customerId = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+    
     const dto: CreateServiceReviewDto = {
       serviceId: this.selectedServiceId,
-      reviewerId: this.orders[0].customerName, 
+      reviewerId:customerId, 
       rating: this.currentReview.rating,
       comment: this.currentReview.comment
     };
