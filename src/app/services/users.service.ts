@@ -56,11 +56,18 @@ export interface SellerStatusResponse {
   status: userStatus;
 }
 
-export interface UnverifiedSeller {
-  // Define the properties based on what GetAllUnVerifiedSellers returns
+export interface PendingSeller {
   id: string;
   userName: string;
-  // Add other properties as needed
+  fullName: string;
+  createdOn: Date;
+  email: string;
+  isDeleted: boolean;
+  lastUpdatedOn: Date|null;
+  roles: string[];
+  nationalId: string;
+  profileImageUrl: string;
+  idCardImageUrl: string;
 }
 
 @Injectable({
@@ -102,8 +109,8 @@ export class UsersService {
   }
 
   // GET: All unverified sellers
-  getAllUnVerifiedSellers(): Observable<UnverifiedSeller[]> {
-    return this.http.get<UnverifiedSeller[]>(`${this.baseUrl}/UnVerifiedSellers`);
+  getAllPendingSellers(): Observable<PendingSeller[]> {
+    return this.http.get<PendingSeller[]>(`${this.baseUrl}/PendingSellers`);
   }
 
   // GET: Seller verification status for current user

@@ -139,6 +139,10 @@ export const routes: Routes = [
               ),
           },
           {
+            path:'artisans-management',
+            loadComponent: () => import('./adminPages/pending-sellers-management/pending-sellers-management').then(m=>m.PendingSellersManagementComponent) 
+          },
+          {
             path: 'products-management',
             loadComponent: () =>
               import(

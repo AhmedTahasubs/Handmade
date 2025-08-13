@@ -1,0 +1,157 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ languageService.currentLanguage() === 'en' ? 'Pending Sellers' : 'البائعون المعلقون' }}
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'Manage and verify pending seller accounts' 
+          : 'إدارة وتحقق من حسابات البائعين المعلقين' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="isLoading" class="flex justify-center items-center p-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+  </div>
+
+  <!-- Data Table Section -->
+  <div *ngIf="!isLoading">
+    <!-- Show table if sellers exist -->
+    <div *ngIf="pendingSellers.length > 0; else noSellers">
+      <app-data-table
+        [title]="languageService.currentLanguage() === 'en' ? 'Pending Sellers' : 'البائعون المعلقون'"
+        [subtitle]="languageService.currentLanguage() === 'en' 
+          ? 'Sellers waiting for verification' 
+          : 'البائعون في انتظار التحقق'"
+        [data]="pendingSellers"
+        [columns]="columns"
+        [actions]="actions"
+        [searchPlaceholder]="languageService.currentLanguage() === 'en' 
+          ? 'Search pending sellers...' 
+          : 'بحث البائعين المعلقين...'"
+        (actionClicked)="onAction($event)"
+      ></app-data-table>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #noSellers>
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-user-check text-gray-400 dark:text-gray-500 text-3xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {{ languageService.currentLanguage() === 'en' ? 'No pending sellers' : 'لا يوجد بائعون معلقون' }}
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">
+          {{ languageService.currentLanguage() === 'en' 
+            ? 'All sellers have been processed.' 
+            : 'تمت معالجة جميع البائعين.' }}
+        </p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Seller Details Modal -->
+  <app-modal
+    [isOpen]="showDetailsModal"
+    [title]="languageService.currentLanguage() === 'en' ? 'Seller Details' : 'تفاصيل البائع'"
+    [showConfirmButton]="false"
+    [cancelText]="languageService.currentLanguage() === 'en' ? 'Close' : 'إغلاق'"
+    (closed)="closeDetailsModal()"
+    size="lg"
+  >
+    <div *ngIf="selectedSeller" class="space-y-6">
+      <!-- Seller Profile Section -->
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Profile Image -->
+        <div class="flex-shrink-0">
+          <div class="w-32 h-32 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center overflow-hidden">
+            <img *ngIf="selectedSeller.profileImageUrl" 
+                 [src]="selectedSeller.profileImageUrl" 
+                 alt="Profile Image" 
+                 class="w-full h-full object-cover">
+            <i *ngIf="!selectedSeller.profileImageUrl" 
+               class="fas fa-user text-gray-500 dark:text-gray-300 text-4xl"></i>
+          </div>
+          <h3 class="mt-2 text-lg font-semibold text-center text-gray-900 dark:text-white">
+            {{ selectedSeller.fullName }}
+          </h3>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="flex-grow space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Username' : 'اسم المستخدم' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedSeller.userName }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Email' : 'البريد الإلكتروني' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedSeller.email }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'National ID' : 'الهوية الوطنية' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedSeller.nationalId }}</p>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400">
+                {{ languageService.currentLanguage() === 'en' ? 'Created On' : 'تاريخ الإنشاء' }}
+              </label>
+              <p class="text-sm text-gray-900 dark:text-white">{{ selectedSeller.createdOn | date }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ID Card Image -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ languageService.currentLanguage() === 'en' ? 'ID Card Image' : 'صورة الهوية' }}
+        </label>
+        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+          <div class="max-w-2xl mx-auto">
+            <img *ngIf="selectedSeller.idCardImageUrl" 
+                 [src]="selectedSeller.idCardImageUrl" 
+                 alt="ID Card" 
+                 class="w-full h-auto rounded border border-gray-300 dark:border-gray-600">
+            <div *ngIf="!selectedSeller.idCardImageUrl" 
+                 class="text-center py-8 text-gray-500 dark:text-gray-400">
+              <i class="fas fa-id-card text-4xl mb-2"></i>
+              <p>{{ languageService.currentLanguage() === 'en' 
+                  ? 'No ID card image available' 
+                  : 'لا توجد صورة للهوية' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 pt-4">
+        <button
+          (click)="rejectSeller(selectedSeller.id)"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
+        >
+          <i class="fas fa-times w-4 h-4"></i>
+          {{ languageService.currentLanguage() === 'en' ? 'Reject' : 'رفض' }}
+        </button>
+        <button
+          (click)="verifySeller(selectedSeller.id)"
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+        >
+          <i class="fas fa-check w-4 h-4"></i>
+          {{ languageService.currentLanguage() === 'en' ? 'Verify' : 'تحقق' }}
+        </button>
+      </div>
+    </div>
+  </app-modal>
+</div>

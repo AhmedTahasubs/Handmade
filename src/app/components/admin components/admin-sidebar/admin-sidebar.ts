@@ -29,7 +29,8 @@ export class AdminSidebar {
       this.navigation.set(
         lang === "ar"
           ? [
-              { name: "الحرفيون", icon: "faUsers", href: "/admin/users-management", exact: false },
+              { name: "المستخدمين", icon: "faUsers", href: "/admin/users-management", exact: false },
+              { name: "الحرفيون", icon: "fa-user-tie", href: "/admin/artisans-management", exact: false },
               { name: "الخدمات", icon: "faHandsHelping", href: "/admin/services-management", exact: false },
               { name: "الطلبات", icon: "faShoppingBag", href: "/admin/orders-management", exact: false },
               { name: "المنتجات", icon: "faBox", href: "/admin/products-management", exact: false },
@@ -40,6 +41,8 @@ export class AdminSidebar {
             ]
           : [
               { name: "Users", icon: "faUsers", href: "/admin/users-management", exact: false },
+              {name:"Artisans",icon:"fa-user-tie",exact:false,href:"/admin/artisans-management"},
+              
               { name: "Services", icon: "faHandsHelping", href: "/admin/services-management", exact: false },
               { name: "Orders", icon: "faShoppingBag", href: "/admin/orders-management", exact: false },
               { name: "Products", icon: "faBox", href: "/admin/products-management", exact: false },
@@ -75,6 +78,7 @@ export class AdminSidebar {
       'faHandsHelping': 'fa-hands-helping',
       'faTimes': 'fa-times',
       'faBell': 'fa-bell',
+      'fa-user-tie':'fa-user-tie'
     };
     return iconMap[icon] || '';
   }
