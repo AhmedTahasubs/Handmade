@@ -274,9 +274,9 @@ export class SellerOrdersManagement implements OnInit {
     this.isUpdatingStatus = true;
     console.log(this.items);
     console.log('Order ID:', order.orderId);
-console.log('Available items:', this.items.map(i => i.CustomerOrderId));
+    console.log('Available items:', this.items.map(i => i.CustomerOrderId));
 
-    const i=this.items.find(item => item.product.id === order.productId);
+    const i=this.items.find(item => item.id === order.id);
     console.log('Order item:', i);
     if (!i) {
       console.error("Order item not found for order ID:", order.orderId);
@@ -286,12 +286,13 @@ console.log('Available items:', this.items.map(i => i.CustomerOrderId));
       .pipe(finalize(() => this.isUpdatingStatus = false))
       .subscribe({
         next: () => {
-          const index = this.orders.findIndex(o => o.orderId === order.orderId);
+          const index = this.items.findIndex(i => i.id === order.id);
           if (index !== -1) {
-            this.orders[index] = {
-              ...this.orders[index],
+            this.items[index] = {
+              ...this.items[index],
               status: status
             };
+            this.items = [...this.items];
           }
           this.toastService.showSuccess(this.getTranslation('statusUpdated'));
         },

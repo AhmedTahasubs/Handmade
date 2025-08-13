@@ -98,7 +98,21 @@ export class CartComponent implements OnInit {
   }
 
   updateQuantity(item: CartItem, newQuantity: number) {
-    if (newQuantity > 0) {
+  
+    if (newQuantity < 1) {
+    newQuantity = 1;
+  }
+
+  if (newQuantity > item.inStock) { // 👈 الشرط المهم
+    this.toastService.showError(
+      this.languageService.currentLanguage() === 'en'
+        ? `Only ${item.inStock} items available`
+        : `الكمية المتاحة ${item.inStock} فقط`
+    );
+    return;
+  }
+    
+    
       const dto: UpdateCartItemDto = { quantity: newQuantity };
       this.cartService.updateItem(item.id, dto).subscribe({
         next: () => {
@@ -108,6 +122,7 @@ export class CartComponent implements OnInit {
               : 'تم تحديث الكمية'
           );
           item.quantity = newQuantity;
+          console.log (item.inStock);
         },
         error: (err) => {
           console.error('Error updating quantity:', err);
@@ -120,7 +135,7 @@ export class CartComponent implements OnInit {
           item.quantity = item.quantity;
         }
       });
-    }
+    
   }
 
   removeItem(itemId: number) {
