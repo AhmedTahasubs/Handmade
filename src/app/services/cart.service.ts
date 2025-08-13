@@ -41,6 +41,7 @@ export interface CartItem {
     quantity: number;
     unitPrice: number;
     totalPrice: number;
+    inStock: number;
 }
 
 export interface ShoppingCart {

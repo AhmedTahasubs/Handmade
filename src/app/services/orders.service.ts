@@ -17,6 +17,7 @@ export interface OrderItem {
   status: OrderStatus;
 }
 export interface SellerOrders{
+  "id": number,
   "orderId": number,
   "createdAt": string,
   "customerName": string,
