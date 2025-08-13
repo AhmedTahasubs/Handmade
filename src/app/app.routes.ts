@@ -128,6 +128,11 @@ export const routes: Routes = [
         children: [
           {
             path: '',
+            redirectTo: 'users-management',
+            pathMatch: 'full',
+          },
+          {
+            path: 'users-management',
             loadComponent: () =>
               import('./adminPages/users-management/users-management').then(
                 (m) => m.UsersManagement
