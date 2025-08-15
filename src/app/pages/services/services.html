@@ -8,7 +8,7 @@
     <app-search-filter
       [language]="currentLanguage"
       [searchTerm]="searchTerm"
-      [priceRange]="priceRange"
+      [priceRange]="this.priceRange"
       [showCustomizable]="showCustomizable"
       (searchTermChange)="onSearchTermChange($event)" 
       (priceRangeChange)="onPriceRangeChange($event)"

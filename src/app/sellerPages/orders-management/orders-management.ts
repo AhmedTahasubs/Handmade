@@ -326,9 +326,12 @@ navigateToVerification(): void {
             this.items = [...this.items];
           }
           this.toastService.showSuccess(this.getTranslation('statusUpdated'));
+          this.checkSellerVerification()
         },
         error: () => {
           this.toastService.showError(this.getTranslation('errorUpdatingStatus'));
+          this.loadOrders();
+          this.checkSellerVerification()
         }
       });
   }

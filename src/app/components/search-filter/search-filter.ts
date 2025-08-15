@@ -18,7 +18,7 @@ export class SearchFilterComponent {
   @Input() language: 'en' | 'ar' = 'en';
   @Input() searchTerm: string = '';
   @Input() selectedCategory: string = 'all';
-  @Input() priceRange: number[] = [0, 1000];
+  @Input() priceRange: number[] = [0,1000];
   @Input() showCustomizable: boolean = false;
 
   @Output() searchTermChange = new EventEmitter<string>();
@@ -88,7 +88,7 @@ export class SearchFilterComponent {
   }
 
   onPriceRangeChange(value: number): void {
-    this.priceRangeChange.emit([this.priceRange[0], value]);
+    this.priceRangeChange.emit([0,value]);
   }
 
   onCustomizableChange(value: boolean): void {

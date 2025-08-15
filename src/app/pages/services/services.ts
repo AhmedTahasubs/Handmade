@@ -43,7 +43,8 @@ export class ServicesPage implements OnInit {
 
   searchTerm: string = '';
   selectedCategory: string = 'all';
-  priceRange: number[] = [0, 1000];
+  
+  priceRange: number[] = [];
   showCustomizable: boolean = false;
   
   sortOption: 'price-low' | 'price-high' | 'rating' | 'newest' = 'rating';
@@ -82,6 +83,11 @@ private router = inject(ActivatedRoute)
         isCustomizable: false,
         deliveryTime: this.formatDeliveryTime(dto.deliveryTime)
       }));
+         const maxPrice = this.allServices.length
+      ? Math.max(...this.allServices.map(s => s.price))
+      : 0;
+
+    this.priceRange = [0, maxPrice];
       console.log('Services for category', categoryId, this.allServices);
     },
     error: (error) => {

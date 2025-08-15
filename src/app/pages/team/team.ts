@@ -66,7 +66,7 @@ export class TeamComponent {
       phone: '01142392700',
       linkedin: 'https://www.linkedin.com/in/ahmed-hasona-6788b2146',
       github: 'https://github.com/ahmed2103',
-      imageUrl: 'https://avatars.githubusercontent.com/u/57801103?v=4'
+      imageUrl: 'hasona.png'
     },
 
   ];
