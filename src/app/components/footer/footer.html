@@ -1,6 +1,6 @@
 <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
   <div class="container mx-auto px-4 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
       
       <!-- Brand -->
       <div class="space-y-4">
@@ -12,9 +12,9 @@
         </div>
         <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ content.description }}</p>
         <div class="flex gap-4 text-xl">
-          <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-x-twitter text-gray-500 dark:text-gray-400"></i></a>
-          <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-facebook-f text-gray-500 dark:text-gray-400"></i></a>
-          <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-github text-gray-500 dark:text-gray-400"></i></a>
+          <a href="https://github.com/AhmedTahasubs" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-github text-gray-500 dark:text-gray-400"></i></a>
+          <a href="https://www.linkedin.com/in/ahmedtahamuhammed/" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-linkedin text-gray-500 dark:text-gray-400"></i></a>
+          <a href="https://wa.me/201113795716" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-whatsapp text-gray-500 dark:text-gray-400"></i></a>
         </div>
       </div>
 
@@ -22,25 +22,14 @@
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ content.quickLinks }}</h3>
         <ul class="space-y-2">
-          <li *ngFor="let link of content.links">
-            <a href="#" class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
-              {{ link }}
+          <li *ngFor="let link of quickLinks">
+            <a [routerLink]="link.route" class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
+              {{ link.text }}
             </a>
           </li>
         </ul>
       </div>
 
-      <!-- Categories -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ content.categories }}</h3>
-        <ul class="space-y-2">
-          <li *ngFor="let category of content.categoryLinks">
-            <a href="#" class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
-              {{ category }}
-            </a>
-          </li>
-        </ul>
-      </div>
 
       <!-- Contact & Newsletter -->
       <div class="space-y-4">
@@ -52,7 +41,7 @@
           </div>
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-phone text-blue-600"></i>
-            <span>{{ content.contactInfo.phone }}</span>
+            <a href="tel:{{content.contactInfo.phone}}" class="hover:text-blue-600 transition">{{ content.contactInfo.phone }}</a>
           </div>
           <div class="flex items-start gap-2">
             <i class="fa-solid fa-location-dot text-blue-600 mt-1"></i>
@@ -86,9 +75,9 @@
       <p class="text-sm text-gray-600 dark:text-gray-400">{{ content.rights }}</p>
       <div class="flex items-center gap-4 mt-4 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
         <span>{{ content.followUs }}:</span>
-        <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-github"></i></a>
+        <a href="https://github.com/AhmedTahasubs" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/ahmedtahamuhammed/" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="https://wa.me/201113795716" target="_blank" class="hover:text-blue-600 transition"><i class="fa-brands fa-whatsapp"></i></a>
       </div>
     </div>
   </div>

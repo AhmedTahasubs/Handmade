@@ -1,0 +1,34 @@
+.team-member-card {
+  position: relative;
+  z-index: 1;
+}
+
+.team-member-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.team-member-card:hover::before {
+  transform: scaleX(1);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.team-member-card:hover {
+  animation: float 3s ease-in-out infinite;
+}

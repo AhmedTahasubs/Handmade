@@ -1,0 +1,84 @@
+<div class="bg-gray-100 dark:bg-gray-900 text-black dark:text-white">
+    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="prose dark:prose-invert prose-lg">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+        {{ languageService.currentLanguage() === 'en' ? 'Terms of Service' : 'شروط الخدمة' }}
+        </h1>
+
+        <section class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">
+            {{ languageService.currentLanguage() === 'en' ? '1. Acceptance of Terms' : '1. قبول الشروط' }}
+        </h2>
+        <p>
+            {{ languageService.currentLanguage() === 'en' 
+            ? 'By accessing or using our platform, you agree to be bound by these Terms of Service.' 
+            : 'باستخدامك لمنصتنا، فإنك توافق على الالتزام بشروط الخدمة هذه.' }}
+        </p>
+        </section>
+
+        <section class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">
+            {{ languageService.currentLanguage() === 'en' ? '2. User Responsibilities' : '2. مسؤوليات المستخدم' }}
+        </h2>
+        <ul class="list-disc pl-6 space-y-2">
+            <li>
+            {{ languageService.currentLanguage() === 'en' 
+                ? 'You must provide accurate information when creating an account' 
+                : 'يجب تقديم معلومات دقيقة عند إنشاء الحساب' }}
+            </li>
+            <li>
+            {{ languageService.currentLanguage() === 'en' 
+                ? 'You are responsible for maintaining the confidentiality of your account' 
+                : 'أنت مسؤول عن الحفاظ على سرية حسابك' }}
+            </li>
+            <li>
+            {{ languageService.currentLanguage() === 'en' 
+                ? 'You agree not to use the service for any illegal activities' 
+                : 'تتعهد بعدم استخدام الخدمة لأي أنشطة غير قانونية' }}
+            </li>
+        </ul>
+        </section>
+
+        <section class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">
+            {{ languageService.currentLanguage() === 'en' ? '3. Intellectual Property' : '3. الملكية الفكرية' }}
+        </h2>
+        <p>
+            {{ languageService.currentLanguage() === 'en' 
+            ? 'All content and materials available on the platform are our property or licensed to us.' 
+            : 'جميع المحتويات والمواد المتاحة على المنصة هي ملكنا أو مرخصة لنا.' }}
+        </p>
+        </section>
+
+        <section class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">
+            {{ languageService.currentLanguage() === 'en' ? '4. Termination' : '4. الإنهاء' }}
+        </h2>
+        <p>
+            {{ languageService.currentLanguage() === 'en' 
+            ? 'We reserve the right to terminate or suspend access to our service for any violation of these terms.' 
+            : 'نحتفظ بالحق في إنهاء أو تعليق الوصول إلى خدمتنا لأي انتهاك لهذه الشروط.' }}
+        </p>
+        </section>
+
+        <section class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">
+            {{ languageService.currentLanguage() === 'en' ? '5. Changes to Terms' : '5. تغييرات الشروط' }}
+        </h2>
+        <p>
+            {{ languageService.currentLanguage() === 'en' 
+            ? 'We may modify these terms at any time. Continued use constitutes acceptance of the modified terms.' 
+            : 'قد نقوم بتعديل هذه الشروط في أي وقت. الاستمرار في الاستخدام يعني قبول الشروط المعدلة.' }}
+        </p>
+        </section>
+
+        <div class="mt-12 text-sm text-gray-500 dark:text-gray-400">
+        <p>
+            {{ languageService.currentLanguage() === 'en' 
+            ? 'Last updated: September 2025' 
+            : 'آخر تحديث: سبتمبر 2025' }}
+        </p>
+        </div>
+    </div>
+    </div>
+</div>

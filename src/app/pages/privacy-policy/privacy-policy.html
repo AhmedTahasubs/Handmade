@@ -1,0 +1,84 @@
+<div class="bg-gray-100 dark:bg-gray-900 text-black dark:text-white">
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 transition-colors duration-300">
+  <div class="prose dark:prose-invert prose-lg">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+      {{ languageService.currentLanguage() === 'en' ? 'Privacy Policy' : 'سياسة الخصوصية' }}
+    </h1>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">
+        {{ languageService.currentLanguage() === 'en' ? '1. Information We Collect' : '1. المعلومات التي نجمعها' }}
+      </h2>
+      <p>
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'We collect personal information when you register, use our services, or communicate with us.' 
+          : 'نجمع المعلومات الشخصية عند التسجيل أو استخدام الخدمات أو التواصل معنا.' }}
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">
+        {{ languageService.currentLanguage() === 'en' ? '2. How We Use Information' : '2. كيفية استخدام المعلومات' }}
+      </h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>
+          {{ languageService.currentLanguage() === 'en' 
+            ? 'To provide and maintain our service' 
+            : 'لتقديم الخدمة والمحافظة عليها' }}
+        </li>
+        <li>
+          {{ languageService.currentLanguage() === 'en' 
+            ? 'To notify you about changes to our service' 
+            : 'لإعلامك بالتغييرات في الخدمة' }}
+        </li>
+        <li>
+          {{ languageService.currentLanguage() === 'en' 
+            ? 'To provide customer support' 
+            : 'لتقديم الدعم الفني' }}
+        </li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">
+        {{ languageService.currentLanguage() === 'en' ? '3. Data Security' : '3. أمان البيانات' }}
+      </h2>
+      <p>
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'We implement appropriate security measures to protect your personal information.' 
+          : 'نطبق إجراءات أمنية مناسبة لحماية معلوماتك الشخصية.' }}
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">
+        {{ languageService.currentLanguage() === 'en' ? '4. Third-Party Services' : '4. خدمات الطرف الثالث' }}
+      </h2>
+      <p>
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'We may use third-party services that collect information to provide and improve our service.' 
+          : 'قد نستخدم خدمات طرف ثالث تجمع المعلومات لتقديم وتحسين خدمتنا.' }}
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">
+        {{ languageService.currentLanguage() === 'en' ? '5. Your Rights' : '5. حقوقك' }}
+      </h2>
+      <p>
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'You have the right to access, update, or delete your personal information.' 
+          : 'لديك الحق في الوصول إلى معلوماتك الشخصية وتحديثها أو حذفها.' }}
+      </p>
+    </section>
+
+    <div class="mt-12 text-sm text-gray-500 dark:text-gray-400">
+      <p>
+        {{ languageService.currentLanguage() === 'en' 
+          ? 'Last updated: September 2025' 
+          : 'آخر تحديث: سبتمبر 2025' }}
+      </p>
+    </div>
+  </div>
+</div>
+</div>

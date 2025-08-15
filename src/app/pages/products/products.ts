@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +21,7 @@ import { LanguageService } from '../../services/language.service';
     ViewToggleComponent
   ]
 })
-export class ProductsPage implements OnInit {
+export class ProductsPage implements OnInit,OnDestroy {
   private languageService = inject(LanguageService);
   private productService = inject(ProductService);
   private router = inject(Router);
@@ -49,27 +49,20 @@ export class ProductsPage implements OnInit {
   viewMode: ViewMode = 'grid';
 
   ngOnInit(): void {
-    // Check for search results passed via state
-    if(this.products==null)
-    {
-      this.router.navigate(['/']);
-      return;
-    }
-    const navigation = this.router.getCurrentNavigation();
-    const state = navigation?.extras.state as {
-      searchResults: Product[],
-      searchQuery: string
-    };
+  const storedResults = sessionStorage.getItem('aiSearchResults');
+  const storedQuery = sessionStorage.getItem('aiSearchQuery');
 
-    if (state) {
-      this.products = state.searchResults;
-      this.searchQuery = state.searchQuery;
-    } else {
-      // If no search results, load all products
-      this.loadAllProducts();
-    }
+  if (storedResults) {
+    this.products = JSON.parse(storedResults);
+    this.searchQuery = storedQuery || '';
+  } else {
+    this.loadAllProducts();
   }
-
+}
+ngOnDestroy(): void {
+  sessionStorage.removeItem('aiSearchResults');
+  sessionStorage.removeItem('aiSearchQuery');
+}
   loadAllProducts(): void {
     this.productService.getAll().subscribe({
       next: (products) => {

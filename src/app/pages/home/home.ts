@@ -103,24 +103,23 @@ export class HomeComponent implements OnInit {
     return category.id;
   }
 
-  onAiSearch(): void {
-    if (!this.aiSearchQuery.trim()) return;
+ onAiSearch(): void {
+  if (!this.aiSearchQuery.trim()) return;
 
-    this.productService.search({
-      query: this.aiSearchQuery,
-      maxResults: Math.floor(Math.random() * 10 + 5)
-    }).subscribe({
-      next: (products) => {
-        this.router.navigate(['/products'], {
-          state: {
-            searchResults: products,
-            searchQuery: this.aiSearchQuery
-          }
-        });
-      },
-      error: (err) => {
-        console.error('AI search error:', err);
-      }
-    });
-  }
+  this.productService.search({
+    query: this.aiSearchQuery,
+    maxResults: Math.floor(Math.random() * 5)  
+  }).subscribe({
+    next: (products) => {
+      // Save in sessionStorage
+      sessionStorage.setItem('aiSearchResults', JSON.stringify(products));
+      sessionStorage.setItem('aiSearchQuery', this.aiSearchQuery);
+
+      this.router.navigate(['/products']);
+    },
+    error: (err) => {
+      console.error('AI search error:', err);
+    }
+  });
+}
 }
