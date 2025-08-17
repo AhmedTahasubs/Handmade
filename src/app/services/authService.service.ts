@@ -107,7 +107,6 @@ export class AuthService {
     ).pipe(
       tap(response => {
         this.handleSignupSuccess();
-        console.log(response)
       }),
       catchError(this.handleError)
     );

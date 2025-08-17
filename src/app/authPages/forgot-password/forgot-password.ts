@@ -150,16 +150,12 @@ export class ForgotPassword implements OnDestroy {
       // استدعاء الـ API
       const response = await this.authService.forgotPassword({ email: this.email }).toPromise()
 
-      console.log("Password reset email sent to:", this.email)
-      console.log("API Response:", response)
-
       // إظهار رسالة النجاح
       this.emailSent = true
       this.successMessage = this.labels.emailSentSuccess
       this.startResendCooldown()
 
     } catch (error: any) {
-      console.error("Failed to send reset email:", error)
 
       // التعامل مع أنواع الأخطاء المختلفة
       if (error.status === 0) {
@@ -189,14 +185,10 @@ export class ForgotPassword implements OnDestroy {
     try {
       const response = await this.authService.forgotPassword({ email: this.email }).toPromise()
 
-      console.log("Password reset email resent to:", this.email)
-      console.log("API Response:", response)
-
       this.successMessage = this.labels.emailSentSuccess
       this.startResendCooldown()
 
     } catch (error: any) {
-      console.error("Failed to resend email:", error)
 
       if (error.status === 0) {
         this.apiError = this.labels.networkError

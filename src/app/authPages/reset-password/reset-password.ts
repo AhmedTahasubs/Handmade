@@ -187,12 +187,10 @@ export class ResetPassword implements OnInit {
         })
         .toPromise();
 
-      console.log('Password reset successful:', response);
 
       this.passwordReset = true;
       this.successMessage = this.labels.passwordResetSuccess;
     } catch (error: any) {
-      console.error('Failed to reset password:', error);
 
       if (error.status === 0) {
         this.apiError = this.labels.networkError;

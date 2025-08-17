@@ -64,9 +64,7 @@ export class OrdersManagement implements OnInit {
           this.orders = orders;
           this.filterOrders();
         },
-        error: (error) => {
-          console.error('Error loading orders:', error);
-          this.toastService.showError(
+        error: (error) => {          this.toastService.showError(
             this.languageService.currentLanguage() === 'en' 
               ? 'Failed to load orders' 
               : 'فشل تحميل الطلبات'
@@ -152,9 +150,7 @@ export class OrdersManagement implements OnInit {
           this.selectedOrder = order;
           this.showDetailsModal = true;
         },
-        error: (error) => {
-          console.error('Error loading order details:', error);
-          this.toastService.showError(
+        error: (error) => {          this.toastService.showError(
             this.languageService.currentLanguage() === 'en' 
               ? 'Failed to load order details' 
               : 'فشل تحميل تفاصيل الطلب'

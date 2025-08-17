@@ -70,7 +70,6 @@ export class UsersManagement implements OnInit {
           this.users = users;
         },
         error: (error) => {
-          console.error('Error loading users:', error);
           this.toastService.showError(this.getErrorMessage('load'));
         }
       });
@@ -128,7 +127,6 @@ export class UsersManagement implements OnInit {
           this.showDetailsModal = true;
         },
         error: (error) => {
-          console.error('Error loading user details:', error);
           this.toastService.showError(this.getErrorMessage('details'));
         }
       });
@@ -146,7 +144,6 @@ export class UsersManagement implements OnInit {
           this.handleAdminResponse(response);
         },
         error: (error) => {
-          console.error('Error registering admin:', error);
           this.toastService.showError(this.getErrorMessage('register'));
         }
       });
@@ -250,7 +247,6 @@ export class UsersManagement implements OnInit {
   }
 
   onExport(): void {
-    console.log("Export users data");
     // Implement export functionality here
     // Could export to CSV, Excel, etc.
   }

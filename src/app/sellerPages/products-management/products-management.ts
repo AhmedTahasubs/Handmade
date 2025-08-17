@@ -499,7 +499,6 @@ export class SellerProductsManagement implements OnInit {
         this.toastService.showSuccess(this.getTranslation('deleteProductSuccess'));
       },
       error: (error) => {
-        console.error('Error deleting product:', error);
         this.toastService.showError(this.getTranslation('deleteProductError'));
         this.isLoading = false;
         if (modal) {
@@ -533,7 +532,6 @@ checkSellerVerification(): void {
       }
     },
     error: (err) => {
-      console.error('Error checking verification status:', err);
       this.toastService.showError('Failed to check verification status');
     }
   });

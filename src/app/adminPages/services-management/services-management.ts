@@ -79,7 +79,6 @@ export class ServicesManagement implements OnInit {
           this.filterServices();
         },
         error: (error) => {
-          console.error('Error loading services:', error);
           this.toastService.showError(this.getTranslation('Failed to load services. Please try again later.'));
         }
       });
@@ -95,7 +94,6 @@ export class ServicesManagement implements OnInit {
           this.showDetailsModal = true;
         },
         error: (error) => {
-          console.error('Error loading service details:', error);
           this.toastService.showError(this.getTranslation('Failed to load service details.'));
         }
       });
@@ -160,7 +158,6 @@ export class ServicesManagement implements OnInit {
           this.closeDetailsModal();
         },
         error: (error) => {
-          console.error('Error approving service:', error);
           this.toastService.showError(this.getTranslation('Failed to approve service. Please try again.'));
         }
       });
@@ -189,7 +186,6 @@ export class ServicesManagement implements OnInit {
           this.closeRejectModal();
         },
         error: (error) => {
-          console.error('Error rejecting service:', error);
           this.toastService.showError(this.getTranslation('Failed to reject service. Please try again.'));
         }
       });

@@ -73,7 +73,6 @@ export class ProductsManagement implements OnInit {
           this.filterProducts();
         },
         error: (error) => {
-          console.error('Error loading products:', error);
           this.toastService.showError(
             this.languageService.currentLanguage() === 'en' 
               ? 'Failed to load products. Please try again later.' 
@@ -188,7 +187,6 @@ export class ProductsManagement implements OnInit {
           this.loadProducts();
         },
         error: (error) => {
-          console.error('Error rejecting product:', error);
           this.toastService.showError(
             this.languageService.currentLanguage() === 'en'
               ? 'Failed to reject product. Please try again.'
@@ -217,7 +215,6 @@ export class ProductsManagement implements OnInit {
           location.reload();
         },
         error: (error) => {
-          console.error('Error updating product status:', error);
           this.toastService.showError(
             this.languageService.currentLanguage() === 'en'
               ? 'Failed to update product status. Please try again.'
@@ -239,6 +236,5 @@ export class ProductsManagement implements OnInit {
   }
 
   onExport(): void {
-    console.log("Export products data");
   }
 }

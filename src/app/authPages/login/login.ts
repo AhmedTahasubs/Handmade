@@ -205,7 +205,6 @@ export class Login {
         } else {
           this.passwordError = "Invalid login credentials";
         }
-        console.error("Login error:", error);
       }
     });
   }

@@ -151,9 +151,7 @@ export class CategoriesManagement implements OnInit {
         this.categories = categories;
       },
       error: (err) => {
-        this.toastService.showError('Failed to load categories. Please try again later.');
-        console.error('Error loading categories:', err);
-      }
+        this.toastService.showError('Failed to load categories. Please try again later.');      }
     });
   }
 
@@ -253,9 +251,7 @@ export class CategoriesManagement implements OnInit {
         this.closeModal();
       },
       error: (err) => {
-        this.toastService.showError(err.error?.message || 'Failed to save category. Please try again.');
-        console.error('Error saving category:', err);
-      }
+        this.toastService.showError(err.error?.message || 'Failed to save category. Please try again.');      }
     });
   }
 
@@ -309,9 +305,7 @@ export class CategoriesManagement implements OnInit {
         this.loadCategories();
       },
       error: (err) => {
-        this.toastService.showError(err.error?.message || 'Failed to delete category. Please try again.');
-        console.error('Error deleting category:', err);
-      }
+        this.toastService.showError(err.error?.message || 'Failed to delete category. Please try again.');      }
     });
   }
 

@@ -76,7 +76,6 @@ export class RequestsManagementComponent implements OnInit {
           this.filterRequests();
         },
         error: (error) => {
-          console.error('Error loading requests:', error);
           this.toastService.showError(
             this.languageService.currentLanguage() === 'en' 
               ? 'Failed to load requests. Please try again later.' 
@@ -164,7 +163,6 @@ export class RequestsManagementComponent implements OnInit {
           this.showDetailsModal = true;
         },
         error: (error) => {
-          console.error('Error loading request details:', error);
           this.toastService.showError(
             this.languageService.currentLanguage() === 'en'
               ? 'Failed to load request details.'

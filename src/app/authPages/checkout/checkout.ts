@@ -125,7 +125,6 @@ export class CheckoutComponent {
           error: (err) => {
             this.isLoading = false;
             this.error = this.translations.tryAgain;
-            console.error('Payment token creation failed:', err);
           }
         });
       }
@@ -133,7 +132,6 @@ export class CheckoutComponent {
     error: (err) => {
       this.isLoading = false;
       this.error = this.translations.tryAgain;
-      console.error('Order failed:', err);
     }
   });
 }

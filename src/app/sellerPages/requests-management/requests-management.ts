@@ -166,7 +166,6 @@ actions: TableAction[] = [
       }
     },
     error: (err) => {
-      console.error('Error checking verification status:', err);
       this.toastService.showError('Failed to check verification status');
     }
   });

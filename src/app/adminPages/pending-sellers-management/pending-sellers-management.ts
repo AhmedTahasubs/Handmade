@@ -54,9 +54,7 @@ export class PendingSellersManagementComponent implements OnInit {
         next: (sellers) => {
           this.pendingSellers = sellers;
         },
-        error: (error) => {
-          console.error('Error loading pending sellers:', error);
-          this.toastService.showError(this.getErrorMessage('load'));
+        error: (error) => {this.toastService.showError(this.getErrorMessage('load'));
         }
       });
   }
@@ -121,9 +119,7 @@ export class PendingSellersManagementComponent implements OnInit {
           this.loadPendingSellers();
           this.closeDetailsModal();
         },
-        error: (error) => {
-          console.error(`Error ${status.toLowerCase()} seller:`, error);
-          this.toastService.showError(this.getErrorMessage('status'));
+        error: (error) => {          this.toastService.showError(this.getErrorMessage('status'));
         }
       });
   }

@@ -35,7 +35,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private chatService: ChatSignalrService) {}
 
   ngOnInit(): void {
-    console.log('🚀 Chat Component Init - Current User:', this.currentUserId, 'Other User:', this.otherUserId);
 
     // Handle browser/tab close events
     this.setupDisconnectionHandlers();
@@ -43,7 +42,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.chatService.connect();
     this.subs.push(
       this.chatService.connectionStatus$.subscribe(status => {
-        console.log('📡 Connection Status:', status);
         this.connectionStatus = status;
       })
     );
@@ -110,7 +108,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     const content = this.newMessage.trim();
     if (!content) return;
 
-    console.log('📤 Sending message:', content, 'to:', this.otherUserId);
 
     // SIMPLIFIED: No optimistic updates for now
     this.newMessage = '';
@@ -118,30 +115,23 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     // Send message via SignalR
     this.chatService.sendMessage(this.otherUserId, content)
       .then(() => {
-        console.log('✅ Message sent successfully');
       })
       .catch(error => {
-        console.error('❌ Failed to send message:', error);
         // Restore message in input on failure
         this.newMessage = content;
       });
   }
 
   private handleIncomingMessage(msg: Message): void {
-    console.log('🎯 handleIncomingMessage called with:', msg);
 
     // Simple duplicate check by ID
     const existingMessage = this.messages.find(m => m.id === msg.id);
     if (existingMessage) {
-      console.log('🔄 Message already exists, ignoring duplicate:', msg.id);
       return;
     }
 
-    console.log('➕ Adding message to UI:', msg);
     this.messages.push(msg);
     this.messages.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
-
-    console.log('📋 Current messages array:', this.messages);
 
     setTimeout(() => this.scrollToBottom(), 100);
   }
@@ -153,7 +143,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   markDelivered(ids: number[]): void {
     if (!ids.length) return;
-    console.log('📋 Marking delivered:', ids);
     this.chatService.markDelivered(ids).subscribe({
       next: () => console.log('✅ Marked as delivered'),
       error: (error) => console.error('❌ Error marking delivered:', error)
