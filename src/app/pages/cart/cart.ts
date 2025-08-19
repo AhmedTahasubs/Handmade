@@ -33,6 +33,8 @@ export class CartComponent implements OnInit {
       next: (cart) => {
         this.cart = cart;
         this.isLoading = false;
+        console.log(cart);
+        
       },
       error: (err) => {
         console.error('Error loading cart:', err);
